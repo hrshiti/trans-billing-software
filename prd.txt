@@ -1,0 +1,242 @@
+FUNCTIONAL REQUIREMENT DOCUMENT (FRD)
+Project Name: Billing Software
+1. Project Overview
+The Billing Software is an application designed for Transporters and Garage Owners to manage their daily operations, billing, and customer records efficiently.
+The system provides:
+•
+Role-based login for users (Transport / Garage)
+•
+Billing & invoice generation
+•
+Party and transaction management
+•
+Admin control panel for system management
+2. Objectives
+•
+Simplify billing → Fast invoice creation
+•
+Manage customers → Party accounts
+•
+Track operations → Trips / Services
+•
+Generate invoices → PDF + share
+3. User Roles
+3.1 Admin
+System owner → Full access to manage platform
+3.2 User (Role-Based Only)
+Operational user → Access based on selected role
+User Roles:
+•
+Transport User → Manages trips & transport billing
+•
+Garage User → Manages vehicle services & billing
+4. Authentication System
+4.1 Login
+•
+Mobile Number → Primary login
+•
+OTP Verification → Secure access
+4.2 Role Selection (User Only)
+User selects role at first login:
+•
+Transport
+•
+Garage
+System loads modules based on selected role
+5. COMMON USER MODULES (ROLE-BASED)
+5.1 Language Selection
+User selects preferred language → Better usability
+5.2 Profile / Owner Details
+Description
+Stores business details → Used in invoice
+Fields:
+•
+Full Name → Owner name
+•
+Business Name → Transport/Garage
+•
+Address → Location
+•
+Phone Number → Contact
+•
+PAN / GST → Tax info
+•
+Bank Details → Payment info
+Additional:
+•
+Logo Upload → Branding
+•
+QR Code Generation → Payment via scan
+5.3 Payment Gateway Setup
+Description
+One-time setup → Enable online payment
+5.4 Party Management
+Description
+Manage customers → Billing accounts
+Features:
+•
+Add Party → Create client
+•
+Edit/Delete Party → Manage records
+•
+Multiple parties supported
+Fields:
+•
+Name
+•
+Address
+•
+Phone Number
+•
+GST/PAN
+5.5 Billing Module
+Description
+Core module → Invoice generation
+Features:
+•
+Create Bill
+•
+Preview Bill
+•
+Generate Bill
+•
+Save in system
+•
+Export PDF
+•
+Share Bill
+5.6 Payment Status Tracking
+Description
+Track payment status → Billing clarity
+•
+Paid
+•
+Pending
+•
+Partial (Advance)
+5.7 Advertisement Panel
+Description
+Displays ads → Admin controlled
+6. TRANSPORT USER MODULE
+6.1 Vehicle Management
+•
+Add Vehicle → Tempo details
+•
+Vehicle Number → (e.g., GJ15XX1234)
+6.2 Trip Management
+Description
+Track transport activity → Billing base
+Fields:
+•
+Date → Auto + editable
+•
+From Location → Pickup
+•
+To Location → Drop
+•
+Number of Trips
+•
+Amount
+6.3 Chalan Management
+Description
+Upload proof → Delivery confirmation
+•
+Capture photo
+•
+Save with trip
+6.4 Add to Bill
+Trip data added → Auto billing entry
+7. GARAGE USER MODULE
+7.1 Vehicle Details
+•
+Car Company
+•
+Car Model
+•
+KM Reading
+•
+Next Service KM
+7.2 Service Management
+Description
+Manage services → Garage operations
+•
+Add spare parts
+•
+Add fluids
+•
+Add tyres
+•
+Add custom services
+7.3 Pricing
+•
+Manual pricing
+•
+Service charge entry
+7.4 Service Reminder
+Notify next service → Customer convenience
+7.5 Add to Bill
+Service details → Invoice generation
+8. BILLING FLOW
+1.
+Select Party
+2.
+Add Trip / Service
+3.
+Enter Amount
+4.
+Preview
+5.
+Generate Bill
+6.
+Save
+7.
+Export PDF / Share
+9. FINANCE MODULE (USER)
+9.1 Transactions
+Track all records → Income tracking
+9.2 Reports
+•
+Daily
+•
+Monthly
+•
+Party-wise
+10. ADMIN PANEL
+10.1 Dashboard
+System overview → Key insights
+10.2 User Management
+•
+Add User
+•
+Assign Role → Transport / Garage
+•
+Activate / Deactivate
+10.3 Advertisement Management
+•
+Add Ads
+•
+Update Ads
+10.4 Billing Monitoring
+•
+View all bills
+•
+Filter/search
+10.5 Reports
+•
+Revenue
+•
+User activity
+10.6 System Settings
+•
+Payment gateway config
+•
+App settings
+11. NON-FUNCTIONAL REQUIREMENTS
+Security
+OTP login + secure data
+Performance
+Fast billing
+Scalability
+Multiple users support
+Reliability
+Data backup
