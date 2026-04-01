@@ -38,7 +38,7 @@ export default function RoleSelect() {
     // Simulate save delay
     await new Promise(r => setTimeout(r, 600))
     setRole(selected)
-    navigate('/dashboard', { replace: true })
+    navigate(`/register/${selected}`, { replace: true })
   }
 
   return (

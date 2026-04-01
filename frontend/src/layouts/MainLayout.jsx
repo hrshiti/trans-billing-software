@@ -22,6 +22,7 @@ const pageMeta = {
   '/admin/ads':           { title: 'Advertisements', subtitle: 'Manage banner ads' },
   '/admin/billing':       { title: 'Billing Monitor',subtitle: 'All system bills' },
   '/admin/reports':       { title: 'Reports',        subtitle: 'Revenue & usage analytics' },
+  '/admin/settings':      { title: 'System Settings',subtitle: 'Global app configuration' },
 }
 
 export default function MainLayout() {

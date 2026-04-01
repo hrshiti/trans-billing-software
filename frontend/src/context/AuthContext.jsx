@@ -34,6 +34,7 @@ export function AuthProvider({ children }) {
   const [sendingOTP, setSending] = useState(false)
   const [verifying, setVerifying] = useState(false)
   const [error, setError]       = useState('')
+  const [adminModule, setAdminModule] = useState(localStorage.getItem('admin_module') || 'Transport')
 
   useEffect(() => {
     try {
@@ -102,6 +103,11 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('billing_user')
   }, [])
 
+  const switchAdminModule = useCallback((moduleName) => {
+    setAdminModule(moduleName)
+    localStorage.setItem('admin_module', moduleName)
+  }, [])
+
   const login = useCallback(async (userData) => {
     setUser(userData)
     localStorage.setItem('billing_user', JSON.stringify(userData))
@@ -126,6 +132,8 @@ export function AuthProvider({ children }) {
     isTransport: user?.role === 'transport',
     isGarage: user?.role === 'garage',
     hasRole: !!user?.role,
+    adminModule,
+    switchAdminModule,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

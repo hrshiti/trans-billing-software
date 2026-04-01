@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, FileText, Users, Car, Wrench,
@@ -34,6 +35,7 @@ const adminNav = [
   { to: '/admin/ads',        icon: Megaphone,    label: 'Ads' },
   { to: '/admin/billing',    icon: Receipt,      label: 'Payments' },
   { to: '/admin/reports',    icon: BarChart2,    label: 'Reports' },
+  { to: '/admin/settings',   icon: Settings,     label: 'Settings' },
 ]
 
 const bottomNav = [
@@ -41,14 +43,23 @@ const bottomNav = [
 ]
 
 export default function Sidebar() {
-  const { user, logout } = useAuth()
+  const { user, logout, isAdmin, adminModule, switchAdminModule } = useAuth()
   const { sidebarCollapsed, toggleSidebar } = useApp()
   const navigate = useNavigate()
 
-  const roleNav = user?.role === 'transport' ? transportNav
-    : user?.role === 'garage' ? garageNav
-    : user?.role === 'admin'  ? adminNav
-    : []
+  const roleNav = useMemo(() => {
+    if (!user) return []
+    if (user.role === 'transport') return transportNav
+    if (user.role === 'garage') return garageNav
+    if (user.role === 'admin') {
+      return adminNav.filter(item => {
+        if (adminModule === 'Transport' && item.label === 'Garage') return false
+        if (adminModule === 'Garage' && item.label === 'Transport') return false
+        return true
+      })
+    }
+    return []
+  }, [user, adminModule])
 
   const handleLogout = () => {
     logout()
@@ -59,13 +70,52 @@ export default function Sidebar() {
 
   return (
     <aside className={cls}>
-      {/* ── Logo ── */}
-      <div className="sidebar-header">
-        <div className="sidebar-logo">
-          <FileText size={18} color="white" strokeWidth={2.5} />
+      {/* branding */}
+      <div className="flex items-center gap-3 p-6">
+        <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-[#9333ea] text-white">
+          <FileText className="size-6" />
         </div>
-        <span className="sidebar-brand" style={{ fontWeight: 900 }}>TRANS</span>
+        <span className="text-xl font-black italic tracking-tighter text-white">TRANS</span>
       </div>
+
+      {/* Admin Module Toggle */}
+      {isAdmin && (
+        <div className="px-4 mb-6">
+          <div style={{ 
+            background: 'rgba(255, 255, 255, 0.04)', padding: '5px', borderRadius: '14px',
+            display: 'flex', gap: '2px', border: '1px solid rgba(255, 255, 255, 0.08)'
+          }}>
+            <button
+              onClick={() => switchAdminModule('Transport')}
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: '10px', border: 'none',
+                background: adminModule === 'Transport' ? 'var(--primary)' : 'transparent',
+                color: adminModule === 'Transport' ? 'white' : 'rgba(255,255,255,0.6)', 
+                fontSize: '0.75rem', fontWeight: 750, cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                boxShadow: adminModule === 'Transport' ? '0 4px 12px rgba(124, 58, 237, 0.3)' : 'none'
+              }}
+            >
+              <Truck size={15} strokeWidth={2.5} /> Transport
+            </button>
+            <button
+              onClick={() => switchAdminModule('Garage')}
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: '10px', border: 'none',
+                background: adminModule === 'Garage' ? 'var(--primary)' : 'transparent',
+                color: adminModule === 'Garage' ? 'white' : 'rgba(255,255,255,0.6)', 
+                fontSize: '0.75rem', fontWeight: 750, cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                boxShadow: adminModule === 'Garage' ? '0 4px 12px rgba(124, 58, 237, 0.3)' : 'none'
+              }}
+            >
+              <Wrench size={15} strokeWidth={2.5} /> Garage
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Navigation ── */}
       <nav className="sidebar-nav">

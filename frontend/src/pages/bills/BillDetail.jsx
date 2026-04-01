@@ -6,9 +6,11 @@ import dayjs from 'dayjs'
 import { useRef } from 'react'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import { PDFInvoice } from '../../components/billing/PDFInvoice'
+import PaymentModal from '../../components/billing/PaymentModal'
+import { useState } from 'react'
 
 // ── Transport Consolidated Invoice Layout ────────────────────────────────────
-function TransportInvoice({ bill, business }) {
+function TransportInvoice({ bill, business, onPayOnline }) {
   const items = bill.items || []
   const gstLabel = bill.gstType === 'IGST' ? 'IGST' : `CGST + SGST`
 
@@ -91,6 +93,20 @@ function TransportInvoice({ bill, business }) {
               <span style={{ color: '#6B7280' }}>IFSC:</span> <strong>{business?.bankDetails?.ifsc}</strong>
               <span style={{ color: '#6B7280' }}>UPI ID:</span> <strong>{business?.bankDetails?.upiId}</strong>
            </div>
+           
+           {bill.status !== 'paid' && (
+             <button 
+               onClick={onPayOnline}
+               style={{
+                 marginTop: 16, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                 padding: '10px', background: 'linear-gradient(135deg, #7C3AED, #5B21B6)', color: 'white',
+                 border: 'none', borderRadius: 12, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+                 boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)'
+               }}
+             >
+               <CreditCard size={16} /> Pay Online Now
+             </button>
+           )}
         </div>
 
         <div style={{ width: '40%' }}>
@@ -131,7 +147,7 @@ function TransportInvoice({ bill, business }) {
 }
 
 // ── Garage Invoice Layout (Legacy Support) ───────────────────────────────────
-function GarageInvoice({ bill, business }) {
+function GarageInvoice({ bill, business, onPayOnline }) {
   const items = bill.items || []
   return (
     <div className="invoice-wrap">
@@ -164,6 +180,18 @@ function GarageInvoice({ bill, business }) {
        <div style={{ marginTop: 20, fontSize: '0.8rem', color: '#6B7280' }}>
          Bank: {business?.bankDetails?.bankName} A/c: {business?.bankDetails?.accountNumber}
        </div>
+       {bill.status !== 'paid' && (
+         <button 
+           onClick={onPayOnline}
+           style={{
+             marginTop: 20, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+             padding: '12px', background: 'linear-gradient(135deg, #16A34A, #15803D)', color: 'white',
+             border: 'none', borderRadius: 12, fontWeight: 700, cursor: 'pointer'
+           }}
+         >
+           <CreditCard size={18} /> Direct Online Payment
+         </button>
+       )}
     </div>
   )
 }
@@ -171,10 +199,11 @@ function GarageInvoice({ bill, business }) {
 // ── Main Page ────────────────────────────────────────────────────────────────
 export default function BillDetail() {
   const { id } = useParams()
-  const { getBill, deleteBill } = useBills()
+  const { getBill, deleteBill, recordPayment } = useBills()
   const { user } = useAuth()
   const navigate = useNavigate()
   const printRef = useRef()
+  const [isPayModalOpen, setIsPayModalOpen] = useState(false)
 
   const bill = getBill(id)
 
@@ -248,12 +277,19 @@ export default function BillDetail() {
         </div>
       </div>
 
-      {/* Invoice View */}
       <div ref={printRef} style={{ background: 'white', borderRadius: 28, padding: '32px', boxShadow: '0 10px 40px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.03)' }}>
         {bill.type === 'transport'
-          ? <TransportInvoice bill={bill} business={user} />
-          : <GarageInvoice bill={bill} business={user} />}
+          ? <TransportInvoice bill={bill} business={user} onPayOnline={() => setIsPayModalOpen(true)} />
+          : <GarageInvoice bill={bill} business={user} onPayOnline={() => setIsPayModalOpen(true)} />}
       </div>
+
+      <PaymentModal 
+        isOpen={isPayModalOpen} 
+        onClose={() => setIsPayModalOpen(false)} 
+        bill={bill} 
+        business={user} 
+        onSuccess={(amount) => recordPayment(bill.id, amount)}
+      />
 
       <div style={{ marginTop: 20, textAlign: 'center' }}>
          <button className="btn btn-ghost" onClick={() => navigate('/bills')} style={{ fontSize: '0.85rem' }}>

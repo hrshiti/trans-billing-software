@@ -11,20 +11,13 @@ export default function GarageMgmt() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState('Workshops')
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [newWorkshop, setNewWorkshop] = useState({ name: '', location: '', owner: '' })
 
   // Mock data for garage businesses
-  const garageUsers = [
-    { id: 1, name: 'Sharma Motors', location: 'Vapi, Gujarat', services: 342, revenue: 582000, status: 'Active', owner: 'Rahul Sharma' },
-    { id: 2, name: 'Metro Garage', location: 'Mumbai, MH', services: 189, revenue: 220000, status: 'Active', owner: 'Manoj Metro' },
-    { id: 3, name: 'Sai Services', location: 'Surat, Gujarat', services: 510, revenue: 940000, status: 'Active', owner: 'Suresh Patel' },
-    { id: 4, name: 'Quick Fix Auto', location: 'Delhi, DL', services: 45, revenue: 68000, status: 'Pending', owner: 'Anil Gupta' },
-  ]
+  const [garageUsers, setGarageUsers] = useState([])
 
-  const recentServices = [
-    { id: 'GR-901', business: 'Sharma Motors', date: '2026-03-27', vehicle: 'GJ15-CH-1234', amount: 8500, status: 'Paid' },
-    { id: 'GR-902', business: 'Metro Garage', date: '2026-03-26', vehicle: 'MH01-AX-9080', amount: 4200, status: 'Unpaid' },
-    { id: 'GR-903', business: 'Sai Services', date: '2026-03-25', vehicle: 'GJ05-RT-1144', amount: 15800, status: 'Paid' },
-  ]
+  const [recentServices, setRecentServices] = useState([])
 
   return (
     <div className="animate-fadeIn">
@@ -40,18 +33,18 @@ export default function GarageMgmt() {
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
            <button className="btn btn-ghost"><Download size={18} /> Export Data</button>
-           <button className="btn btn-primary" style={{ background: '#7C3AED', borderColor: '#7C3AED' }}>
-             <Plus size={18} /> Add New Workshop
-           </button>
+            <button className="btn btn-primary" style={{ background: '#7C3AED', borderColor: '#7C3AED' }} onClick={() => setShowAddModal(true)}>
+              <Plus size={18} /> Add New Workshop
+            </button>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 32 }}>
         {[
-          { label: 'Total Workshops', val: '86', icon: Building2, color: '#7C3AED', bg: '#EDE9FE' },
-          { label: 'Total Services', val: '12,240', icon: Zap, color: '#8B5CF6', bg: '#F5F3FF' },
-          { label: 'Service Revenue', val: '₹18.4L', icon: CreditCard, color: '#10B981', bg: '#ECFDF5' },
-          { label: 'Active Jobs', val: '42', icon: Smartphone, color: '#F3811E', bg: '#FFF7ED' },
+          { label: 'Total Workshops', val: '0', icon: Building2, color: '#7C3AED', bg: '#EDE9FE' },
+          { label: 'Total Services', val: '0', icon: Zap, color: '#8B5CF6', bg: '#F5F3FF' },
+          { label: 'Service Revenue', val: '₹0', icon: CreditCard, color: '#10B981', bg: '#ECFDF5' },
+          { label: 'Active Jobs', val: '0', icon: Smartphone, color: '#F3811E', bg: '#FFF7ED' },
         ].map(s => (
           <div key={s.label} className="card" style={{ padding: 20, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
              <div style={{ width: 40, height: 40, borderRadius: 12, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
@@ -168,6 +161,31 @@ export default function GarageMgmt() {
                 </div>
               ))}
            </div>
+        </div>
+      )}
+      {showAddModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+          <div className="card" style={{ width: '100%', maxWidth: 420, padding: 32 }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: 24 }}>Onboard Workshop</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="form-group">
+                <label className="form-label">WORKSHOP NAME</label>
+                <input type="text" className="form-input" placeholder="e.g. Metro Garage" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">OWNER NAME</label>
+                <input type="text" className="form-input" placeholder="e.g. Rahul Sharma" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">LOCATION</label>
+                <input type="text" className="form-input" placeholder="City / Area" />
+              </div>
+              <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+                <button className="btn btn-ghost btn-full" onClick={() => setShowAddModal(false)}>Cancel</button>
+                <button className="btn btn-primary btn-full" style={{ background: '#7C3AED' }} onClick={() => setShowAddModal(false)}>Register</button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

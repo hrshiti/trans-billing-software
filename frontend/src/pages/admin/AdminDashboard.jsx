@@ -1,8 +1,10 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { 
   Users, FileText, Banknote, TrendingUp, 
   ShieldCheck, AlertCircle, ArrowUpRight,
-  TrendingDown, Activity, Clock
+  TrendingDown, Activity, Clock, Globe,
+  Download, Filter, MoreHorizontal, UserPlus,
+  Truck, Wrench, MapPin, CreditCard, ExternalLink, ChevronRight
 } from 'lucide-react'
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, 
@@ -10,181 +12,158 @@ import {
 } from 'recharts'
 import { useNavigate } from 'react-router-dom'
 
+import { useAuth } from '../../context/AuthContext'
+
 export default function AdminDashboard() {
   const navigate = useNavigate()
-  // Mock data for Admin KPIs
-  const kpis = [
-    { label: 'Total Users', value: '1,248', change: '+12%', icon: Users, color: '#4F46E5', bg: '#EEF2FF', up: true },
-    { label: 'Total Invoices', value: '8,642', change: '+18%', icon: FileText, color: '#7C3AED', bg: '#EDE9FE', up: true },
-    { label: 'Revenue (MTD)', value: '₹4.2L', change: '+8%', icon: Banknote, color: '#059669', bg: '#ECFDF5', up: true },
-    { label: 'Active Sessions', value: '342', change: '-4%', icon: Activity, color: '#EA580C', bg: '#FFF7ED', up: false },
-  ]
+  const { adminModule, switchAdminModule } = useAuth()
+  const [timeRange, setTimeRange] = useState('7d')
 
-  const chartData = [
-    { name: 'Mon', users: 120, bills: 450 },
-    { name: 'Tue', users: 150, bills: 520 },
-    { name: 'Wed', users: 180, bills: 610 },
-    { name: 'Thu', users: 220, bills: 580 },
-    { name: 'Fri', users: 190, bills: 720 },
-    { name: 'Sat', users: 250, bills: 890 },
-    { name: 'Sun', users: 210, bills: 810 },
-  ]
+  // Data states (initially empty to remove static data)
+  const [kpis] = useState([
+    { label: 'Total Users', value: '0', change: '0%', icon: Users, color: '#6366F1', bg: '#EEF2FF', up: true, desc: 'Global' },
+    { label: 'System Revenue', value: '₹0', change: '0%', icon: Banknote, color: '#10B981', bg: '#ECFDF5', up: true, desc: 'MTD' },
+  ])
 
-  const recentUsers = [
-    { id: 1, name: 'Sharma Transports', role: 'Transport', status: 'Active', joined: '2m ago' },
-    { id: 2, name: 'Metro Garage', role: 'Garage', status: 'Active', joined: '15m ago' },
-    { id: 3, name: 'Rahul Logistics', role: 'Transport', status: 'Pending', joined: '1h ago' },
-    { id: 4, name: 'Perfect Auto', role: 'Garage', status: 'Active', joined: '3h ago' },
-  ]
+  // Module specific manageable data
+  const transportData = {
+    stats: [
+      { label: 'Active Trips', val: '0', icon: Truck, color: '#F59E0B' },
+      { label: 'Total Fleet', val: '0', icon: MapPin, color: '#82ca9d' },
+    ],
+    items: []
+  }
+
+  const garageData = {
+    stats: [
+      { label: 'Active Jobs', val: '0', icon: Wrench, color: '#7C3AED' },
+      { label: 'Service Revenue', val: '₹0', icon: CreditCard, color: '#10B981' },
+    ],
+    items: []
+  }
+
+  const chartData = []
+
+  const currentData = adminModule === 'Transport' ? transportData : garageData
 
   return (
     <div className="animate-fadeIn">
+      {/* ── Header ── */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>Admin Command Center</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem' }}>System-wide performance and user analytics</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+             <Globe size={20} color="var(--primary)" />
+             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--primary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Command Dashboard</span>
+          </div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Admin Console</h1>
         </div>
+        
         <div style={{ display: 'flex', gap: 12 }}>
-          <button className="btn btn-ghost btn-sm"><Clock size={16} /> Last 7 Days</button>
-          <button className="btn btn-primary btn-sm"><TrendingUp size={16} /> Export Report</button>
+          <button className="btn btn-ghost" onClick={() => navigate(adminModule === 'Transport' ? '/admin/transport' : '/admin/garage')}>
+            Manage {adminModule} <ExternalLink size={16} />
+          </button>
         </div>
       </div>
 
-      {/* KPI Grid */}
+      {/* ── KPI Grid ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 32 }}>
+        {/* Global KPIs */}
         {kpis.map((kpi, idx) => (
-          <div key={idx} className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div style={{ width: 48, height: 48, borderRadius: 14, background: kpi.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <kpi.icon size={24} color={kpi.color} />
-              </div>
-              <span style={{ 
-                display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', fontWeight: 700,
-                color: kpi.up ? '#059669' : '#DC2626', background: kpi.up ? '#DCFCE7' : '#FEE2E2',
-                padding: '4px 8px', borderRadius: 99
-              }}>
-                {kpi.up ? <ArrowUpRight size={12} /> : <TrendingDown size={12} />}
-                {kpi.change}
-              </span>
-            </div>
-            <div>
-              <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{kpi.label}</p>
-              <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: '4px 0 0' }}>{kpi.value}</h2>
-            </div>
+          <div key={idx} className="card" style={{ padding: '24px' }}>
+             <p style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>{kpi.label}</p>
+             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: 900, margin: 0 }}>{kpi.value}</h2>
+                <div style={{ padding: '4px 10px', borderRadius: 99, background: kpi.bg, color: kpi.color, fontSize: '0.75rem', fontWeight: 800 }}>{kpi.change}</div>
+             </div>
+          </div>
+        ))}
+        
+        {/* Module Specific Stats (Dynamic Based on Toggle) */}
+        {currentData.stats.map((s, idx) => (
+          <div key={idx} className="card animate-fadeIn" style={{ padding: '24px', borderLeft: `4px solid ${s.color}` }}>
+             <p style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>{s.label}</p>
+             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${s.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                   <s.icon size={22} color={s.color} />
+                </div>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: 900, margin: 0 }}>{s.val}</h2>
+             </div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, marginBottom: 32 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 24, marginBottom: 32 }}>
         {/* Growth Chart */}
         <div className="card" style={{ padding: '24px' }}>
-          <div className="flex items-center justify-between mb-6">
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Growth & Activity</h3>
-            <div style={{ display: 'flex', gap: 16, fontSize: '0.8125rem', fontWeight: 600 }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--primary)' }} /> Invoices</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><div style={{ width: 8, height: 8, borderRadius: '50%', background: '#F59E0B' }} /> New Users</span>
-            </div>
+          <div className="flex items-center justify-between mb-8">
+            <h3 style={{ fontSize: '1.125rem', fontWeight: 800 }}>System Growth</h3>
+            <select className="form-input" style={{ width: 120, height: 36, padding: '0 10px', fontSize: '0.8rem' }} value={timeRange} onChange={e => setTimeRange(e.target.value)}>
+               <option value="7d">Last 7 Days</option>
+               <option value="30d">Last 30 Days</option>
+            </select>
           </div>
           <div style={{ width: '100%', height: 300 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="colorBills" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.1}/>
                     <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                  itemStyle={{ fontWeight: 600 }}
-                />
-                <Area type="monotone" dataKey="bills" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorBills)" />
-                <Area type="monotone" dataKey="users" stroke="#F59E0B" strokeWidth={3} fill="none" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 600, fill: '#9CA3AF' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 600, fill: '#9CA3AF' }} />
+                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: 'var(--shadow-lg)', fontWeight: 700 }} />
+                <Area type="monotone" dataKey="revenue" stroke="var(--primary)" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* User Status */}
-        <div className="card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: 20 }}>System Health</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: '#DCFCE7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ShieldCheck color="#059669" size={20} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '0.875rem', fontWeight: 700, margin: 0 }}>API Server</p>
-                <p style={{ fontSize: '0.75rem', color: '#059669', margin: 0 }}>All systems operational</p>
-              </div>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#059669' }} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: '#DBEAFE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Activity color="#2563EB" size={20} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '0.875rem', fontWeight: 700, margin: 0 }}>Database</p>
-                <p style={{ fontSize: '0.75rem', color: '#2563EB', margin: 0 }}>99.9% Up time / 12ms latency</p>
-              </div>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#2563EB' }} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <AlertCircle color="#D97706" size={20} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '0.875rem', fontWeight: 700, margin: 0 }}>Pending KYC</p>
-                <p style={{ fontSize: '0.75rem', color: '#D97706', margin: 0 }}>24 users awaiting approval</p>
-              </div>
-              <ArrowUpRight size={16} color="var(--text-muted)" />
-            </div>
-          </div>
+        {/* Module Manageable Things (Dynamic Content) */}
+        <div className="card animate-fadeIn" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
+           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 900 }}>{adminModule} Monitor</h3>
+              <span style={{ fontSize: '0.7rem', fontWeight: 800, background: 'var(--bg)', padding: '4px 10px', borderRadius: 99 }}>LIVE</span>
+           </div>
+           
+           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
+              {currentData.items.map(item => (
+                <div key={item.id} style={{ 
+                  padding: '16px', borderRadius: 16, background: 'var(--bg)', border: '1.5px solid var(--border)',
+                  display: 'flex', alignItems: 'center', gap: 14, transition: 'var(--transition)'
+                }} className="item-hover">
+                   <div style={{ 
+                     width: 40, height: 40, borderRadius: 12, background: 'white', 
+                     display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: 'var(--primary)', boxShadow: 'var(--shadow-xs)' 
+                   }}>
+                     {item.name[0]}
+                   </div>
+                   <div style={{ flex: 1 }}>
+                      <p style={{ margin: 0, fontWeight: 800, fontSize: '0.9375rem' }}>{item.name}</p>
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{item.activity}</p>
+                   </div>
+                   <div style={{ textAlign: 'right' }}>
+                      <p style={{ margin: 0, fontSize: '0.8125rem', fontWeight: 800, color: item.trend.startsWith('+') ? 'var(--success)' : 'var(--danger)' }}>{item.trend}</p>
+                      <span style={{ fontSize: '0.625rem', fontWeight: 800, textTransform: 'uppercase', opacity: 0.6 }}>{item.status}</span>
+                   </div>
+                </div>
+              ))}
+           </div>
+           
+           <button 
+             className="btn btn-ghost btn-full btn-sm" style={{ marginTop: 20 }}
+             onClick={() => navigate(adminModule === 'Transport' ? '/admin/transport' : '/admin/garage')}
+           >
+              Full {adminModule} View <ChevronRight size={16} />
+           </button>
         </div>
       </div>
 
-      {/* User Management Preview */}
-      <div className="card" style={{ padding: '24px' }}>
-        <div className="flex items-center justify-between mb-6">
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700 }}>New Onboardings</h3>
-          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/users')}>View All Users</button>
-        </div>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border)' }}>
-                <th style={{ padding: '12px 0', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)' }}>Business Name</th>
-                <th style={{ padding: '12px 0', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)' }}>Type</th>
-                <th style={{ padding: '12px 0', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)' }}>Status</th>
-                <th style={{ padding: '12px 0', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)' }}>Time</th>
-                <th style={{ padding: '12px 0', textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentUsers.map(u => (
-                <tr key={u.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '16px 0', fontWeight: 600 }}>{u.name}</td>
-                  <td style={{ padding: '16px 0' }}>
-                    <span className={`badge ${u.role === 'Transport' ? 'badge-warning' : 'badge-info'}`}>{u.role}</span>
-                  </td>
-                  <td style={{ padding: '16px 0' }}>
-                    <span className={`badge ${u.status === 'Active' ? 'badge-success' : 'badge-warning'}`}>{u.status}</span>
-                  </td>
-                  <td style={{ padding: '16px 0', color: 'var(--text-muted)', fontSize: '0.8125rem' }}>{u.joined}</td>
-                  <td style={{ padding: '16px 0', textAlign: 'right' }}>
-                    <button className="btn btn-icon btn-sm" onClick={() => navigate(`/admin/manage/${u.id}`)}>
-                       <ArrowUpRight size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <style>{`
+        .item-hover:hover { border-color: var(--primary); background: white; transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+      `}</style>
     </div>
   )
 }

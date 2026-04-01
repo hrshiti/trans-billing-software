@@ -11,20 +11,12 @@ export default function TransportMgmt() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState('Businesses')
+  const [showAddModal, setShowAddModal] = useState(false)
 
   // Mock data for transport businesses
-  const transportUsers = [
-    { id: 1, name: 'Rahul Logistics', location: 'Vapi, Gujarat', trips: 142, revenue: 852000, status: 'Active', owner: 'Rahul Sharma' },
-    { id: 2, name: 'Viking Transport', location: 'Mumbai, MH', trips: 89, revenue: 420000, status: 'Active', owner: 'Vikram Singh' },
-    { id: 3, name: 'Jaguar Fast', location: 'Surat, Gujarat', trips: 210, revenue: 1240000, status: 'Inactive', owner: 'Amit Patel' },
-    { id: 4, name: 'Global Freight', location: 'Delhi, DL', trips: 45, revenue: 180000, status: 'Active', owner: 'Sanjay Gupta' },
-  ]
+  const [transportUsers, setTransportUsers] = useState([])
 
-  const recentBills = [
-    { id: 'TX-901', business: 'Rahul Logistics', date: '2026-03-27', trips: 4, amount: 45000, status: 'Paid' },
-    { id: 'TX-902', business: 'Viking Transport', date: '2026-03-26', trips: 2, amount: 22000, status: 'Unpaid' },
-    { id: 'TX-903', business: 'Jaguar Fast', date: '2026-03-25', trips: 8, amount: 98000, status: 'Paid' },
-  ]
+  const [recentBills, setRecentBills] = useState([])
 
   return (
     <div className="animate-fadeIn">
@@ -40,7 +32,7 @@ export default function TransportMgmt() {
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
            <button className="btn btn-ghost"><Download size={18} /> Export Data</button>
-           <button className="btn btn-primary" style={{ background: '#F3811E', borderColor: '#F3811E' }}>
+           <button className="btn btn-primary" style={{ background: '#F3811E', borderColor: '#F3811E' }} onClick={() => setShowAddModal(true)}>
              <Plus size={18} /> Add New Business
            </button>
         </div>
@@ -48,10 +40,10 @@ export default function TransportMgmt() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 32 }}>
         {[
-          { label: 'Total Businesses', val: '124', icon: Building2, color: '#F3811E', bg: '#FFF7ED' },
-          { label: 'Total Trips', val: '8,420', icon: MapPin, color: '#8B5CF6', bg: '#F5F3FF' },
-          { label: 'Revenue Generated', val: '₹42.8L', icon: CreditCard, color: '#10B981', bg: '#ECFDF5' },
-          { label: 'Pending Bills', val: '14', icon: Calendar, color: '#EF4444', bg: '#FEF2F2' },
+          { label: 'Total Businesses', val: '0', icon: Building2, color: '#F3811E', bg: '#FFF7ED' },
+          { label: 'Total Trips', val: '0', icon: MapPin, color: '#8B5CF6', bg: '#F5F3FF' },
+          { label: 'Revenue Generated', val: '₹0', icon: CreditCard, color: '#10B981', bg: '#ECFDF5' },
+          { label: 'Pending Bills', val: '0', icon: Calendar, color: '#EF4444', bg: '#FEF2F2' },
         ].map(s => (
           <div key={s.label} className="card" style={{ padding: 20, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
              <div style={{ width: 40, height: 40, borderRadius: 12, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
@@ -168,6 +160,31 @@ export default function TransportMgmt() {
                 </div>
               ))}
            </div>
+        </div>
+      )}
+      {showAddModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+          <div className="card" style={{ width: '100%', maxWidth: 420, padding: 32 }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: 24 }}>Onboard Transport Business</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="form-group">
+                <label className="form-label">BUSINESS NAME</label>
+                <input type="text" className="form-input" placeholder="e.g. Rahul Logistics" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">OWNER NAME</label>
+                <input type="text" className="form-input" placeholder="e.g. Rahul Sharma" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">LOCATION</label>
+                <input type="text" className="form-input" placeholder="City / Area" />
+              </div>
+              <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+                <button className="btn btn-ghost btn-full" onClick={() => setShowAddModal(false)}>Cancel</button>
+                <button className="btn btn-primary btn-full" style={{ background: '#F3811E' }} onClick={() => setShowAddModal(false)}>Register</button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -13,6 +13,8 @@ import Login      from '../pages/auth/Login'
 import AdminLogin from '../pages/auth/AdminLogin'
 import OTPVerify  from '../pages/auth/OTPVerify'
 import RoleSelect from '../pages/auth/RoleSelect'
+import TransportRegistration from '../pages/auth/TransportRegistration'
+import GarageRegistration    from '../pages/auth/GarageRegistration'
 
 // App pages (lazy)
 const Dashboard        = lazy(() => import('../pages/dashboard/Dashboard'))
@@ -33,6 +35,7 @@ const AddParty         = lazy(() => import('../pages/parties/AddParty'))
 // Phase 2 — Transport
 const TransportVehicleList = lazy(() => import('../pages/transport/VehicleList'))
 const AddVehicle           = lazy(() => import('../pages/transport/AddVehicle'))
+const TripManagement       = lazy(() => import('../pages/transport/TripManagement'))
 
 // Phase 2 — Garage
 const GarageVehicles = lazy(() => import('../pages/garage/GarageVehicles'))
@@ -44,6 +47,7 @@ const AdminUsers     = lazy(() => import('../pages/admin/UserManagement'))
 const AdminAds       = lazy(() => import('../pages/admin/AdManager'))
 const AdminBilling   = lazy(() => import('../pages/admin/BillingMonitor'))
 const AdminReports   = lazy(() => import('../pages/admin/SystemReports'))
+const AdminSettings  = lazy(() => import('../pages/admin/SystemSettings'))
 
 // Specialized Admin Management
 const AdminTransport = lazy(() => import('../pages/admin/TransportMgmt'))
@@ -77,6 +81,8 @@ export default function AppRouter() {
           <Route path="/admin-login"   element={<AdminLogin />} />
           <Route path="/otp"           element={<OTPVerify />} />
           <Route path="/role-select"   element={<RoleSelect />} />
+          <Route path="/register/transport" element={<TransportRegistration />} />
+          <Route path="/register/garage"    element={<GarageRegistration />} />
         </Route>
 
         {/* ── App (protected) ── */}
@@ -112,7 +118,7 @@ export default function AppRouter() {
               <Route path="/transport/vehicles"          element={<TransportVehicleList />} />
               <Route path="/transport/vehicles/add"      element={<AddVehicle />} />
               <Route path="/transport/vehicles/edit/:id" element={<AddVehicle />} />
-              <Route path="/transport/trips"             element={<CreateBill />} />
+              <Route path="/transport/trips"             element={<TripManagement />} />
             </Route>
 
             {/* ── Garage Module ── */}
@@ -128,6 +134,7 @@ export default function AppRouter() {
               <Route path="/admin/ads"       element={<AdminAds />} />
               <Route path="/admin/billing"   element={<AdminBilling />} />
               <Route path="/admin/reports"   element={<AdminReports />} />
+              <Route path="/admin/settings"  element={<AdminSettings />} />
               <Route path="/admin/transport" element={<AdminTransport />} />
               <Route path="/admin/garage"    element={<AdminGarage />} />
               <Route path="/admin/manage/:id" element={<AdminManage />} />

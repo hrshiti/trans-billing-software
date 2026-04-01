@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react'
-import { Wrench, Car, User, TrendingUp, Clock, AlertTriangle, ArrowRight, Plus } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+import { Wrench, Car, User, TrendingUp, Clock, AlertTriangle, ArrowRight, Plus, Bell, Calendar as CalIcon, X } from 'lucide-react'
 import { useBills } from '../../context/BillContext'
 import { useNavigate } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -8,22 +8,54 @@ import dayjs from 'dayjs'
 export default function GarageDashboard() {
   const { bills } = useBills()
   const navigate = useNavigate()
+  const [showReminders, setShowReminders] = useState(false)
 
   const garageBills = useMemo(() => bills.filter(b => b.type === 'garage'), [bills])
+
+  const remindersList = useMemo(() => {
+    const today = dayjs().startOf('day')
+    // Get unique vehicles and their latest service
+    const latestByVehicle = {}
+    garageBills.forEach(b => {
+      if (!b.vehicleNo) return
+      if (!latestByVehicle[b.vehicleNo] || dayjs(b.billDate).isAfter(dayjs(latestByVehicle[b.vehicleNo].billDate))) {
+        latestByVehicle[b.vehicleNo] = b
+      }
+    })
+
+    return Object.values(latestByVehicle)
+      .filter(b => b.nextServiceDate)
+      .map(b => {
+        const dueDate = dayjs(b.nextServiceDate)
+        const daysDiff = dueDate.diff(today, 'day')
+        let status = 'upcoming'
+        if (daysDiff < 0) status = 'overdue'
+        else if (daysDiff === 0) status = 'due_today'
+        else if (daysDiff <= 7) status = 'upcoming_soon'
+
+        return {
+          ...b,
+          daysLeft: daysDiff,
+          reminderStatus: status
+        }
+      })
+      .filter(r => r.reminderStatus !== 'upcoming')
+      .sort((a, b) => a.daysLeft - b.daysLeft)
+  }, [garageBills])
 
   const stats = useMemo(() => {
     const totalService = garageBills.reduce((s, b) => s + (b.grandTotal || 0), 0)
     const pendingAmount = garageBills.filter(b => b.status !== 'paid').reduce((s, b) => s + (b.grandTotal || 0), 0)
     const servicesDone = garageBills.length
-    const reminders = garageBills.filter(b => b.nextServiceKm).length
+    const activeReminders = remindersList.length
 
     return [
       { label: 'Total Sales', value: `₹${totalService.toLocaleString()}`, sub: 'From all job cards', icon: TrendingUp, color: '#16A34A', bg: '#DCFCE7' },
       { label: 'Receivables', value: `₹${pendingAmount.toLocaleString()}`, sub: 'Payment pending', icon: Clock, color: '#DC2626', bg: '#FEE2E2' },
       { label: 'Services Done', value: servicesDone.toString(), sub: 'Completed', icon: Wrench, color: '#7C3AED', bg: '#EDE9FE' },
-      { label: 'Service Reminders', value: reminders.toString(), sub: 'Upcoming work', icon: AlertTriangle, color: '#D97706', bg: '#FEF3C7' },
+      { label: 'Critical Reminders', value: activeReminders.toString(), sub: 'Due or overdue', icon: AlertTriangle, color: '#D97706', bg: '#FEF3C7' },
     ]
-  }, [garageBills])
+  }, [garageBills, remindersList])
 
   const chartData = useMemo(() => {
     return garageBills.slice(-7).map(b => ({
@@ -46,15 +78,40 @@ export default function GarageDashboard() {
       {/* Stats Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 20 }}>
         {stats.map(s => (
-          <div key={s.label} className="card" style={{ padding: '16px 14px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+          <div key={s.label} className="card" style={{ padding: '16px 14px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', position: 'relative' }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
               <s.icon size={18} color={s.color} />
             </div>
             <div style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>{s.value}</div>
             <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: 2 }}>{s.label}</div>
+            {s.label === 'Critical Reminders' && remindersList.length > 0 && (
+               <span style={{ position: 'absolute', top: 12, right: 12, width: 8, height: 8, borderRadius: '50%', background: '#EF4444', animation: 'pulse 1.5s infinite' }} />
+            )}
           </div>
         ))}
       </div>
+
+      {/* Service Notification Banner */}
+      {remindersList.length > 0 && (
+         <div className="animate-fadeInLeft" style={{ background: '#FFF7ED', border: '1.5px solid #FDBA74', borderRadius: 20, padding: '14px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+               <Bell className={remindersList.some(r => r.reminderStatus === 'overdue') ? 'shake' : ''} size={22} />
+            </div>
+            <div style={{ flex: 1 }}>
+               <h4 style={{ fontSize: '0.875rem', fontWeight: 900, color: '#92400E', margin: 0 }}>Service Alerts ({remindersList.length})</h4>
+               <p style={{ fontSize: '0.75rem', color: '#B45309', margin: '2px 0 0' }}>
+                  {remindersList.filter(r => r.reminderStatus === 'overdue').length || 0} overdue and {remindersList.filter(r => r.reminderStatus !== 'overdue').length || 0} due soon.
+               </p>
+            </div>
+            <button 
+              onClick={() => setShowReminders(true)}
+              className="btn btn-sm" 
+              style={{ background: '#92400E', color: 'white', borderRadius: 10, height: 32, fontSize: '0.75rem', fontWeight: 800 }}
+            >
+              Check Now
+            </button>
+         </div>
+      )}
 
       {/* Analytics Chart */}
       <div className="card" style={{ padding: '20px 16px', marginBottom: 20 }}>
@@ -71,15 +128,15 @@ export default function GarageDashboard() {
         </div>
       </div>
 
-      {/* Recent Jobs */}
+      {/* Recent Activity / Upcoming List */}
       <div className="card" style={{ padding: '18px 16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-          <h3 style={{ fontSize: '0.875rem', fontWeight: 700 }}>Upcoming Services</h3>
+          <h3 style={{ fontSize: '0.875rem', fontWeight: 700 }}>Upcoming / Recent Jobs</h3>
           <button onClick={() => navigate('/bills')} className="btn btn-ghost btn-sm" style={{ color: 'var(--primary)', fontWeight: 700 }}>View All</button>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {garageBills.slice(0, 4).map((b, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--bg)', padding: '10px 12px', borderRadius: 14 }}>
+          {garageBills.slice(0, 5).map((b, i) => (
+            <div key={i} onClick={() => navigate(`/bills/${b.id}`)} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--bg)', padding: '10px 12px', borderRadius: 14, cursor: 'pointer' }}>
               <div style={{ width: 40, height: 40, borderRadius: 10, background: '#EDE9FE', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Car size={18} />
               </div>
@@ -98,10 +155,78 @@ export default function GarageDashboard() {
         </div>
       </div>
 
-      <button onClick={() => navigate('/bills/new')} className="btn btn-primary btn-lg" style={{ position: 'fixed', bottom: 84, right: 20, borderRadius: 20, boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)' }}>
+      {/* Reminders Detail Drawer/Modal */}
+      {showReminders && (
+         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.2s ease both' }}>
+            <div 
+               className="animate-fadeInRight"
+               style={{ width: '100%', maxWidth: 400, background: 'white', height: '100%', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 20, boxShadow: '-10px 0 30px rgba(0,0,0,0.1)' }}
+            >
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F0D2E', margin: 0 }}>Service Alerts</h2>
+                  <button onClick={() => setShowReminders(false)} style={{ border: 'none', background: '#F3F4F6', color: '#6B7280', borderRadius: 10, width: 32, height: 32, cursor: 'pointer' }}>
+                     <X size={18} />
+                  </button>
+               </div>
+
+               <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {remindersList.length > 0 ? remindersList.map(r => (
+                     <div key={r.id} style={{ border: '1px solid #E5E7EB', borderRadius: 16, padding: '14px', position: 'relative' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                           <div style={{ width: 36, height: 36, borderRadius: 10, background: r.reminderStatus === 'overdue' ? '#FEE2E2' : '#EFF6FF', color: r.reminderStatus === 'overdue' ? '#EF4444' : '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <Car size={18} />
+                           </div>
+                           <div>
+                              <div style={{ fontWeight: 800, fontSize: '0.875rem' }}>{r.vehicleNo}</div>
+                              <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>{r.customerName}</div>
+                           </div>
+                           <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+                              <div style={{ fontSize: '0.625rem', fontWeight: 900, padding: '2px 8px', borderRadius: 6, background: r.reminderStatus === 'overdue' ? '#EF4444' : '#3B82F6', color: 'white', textTransform: 'uppercase' }}>
+                                 {r.reminderStatus.replace('_', ' ')}
+                              </div>
+                           </div>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', padding: '8px 10px', background: '#F9FAFB', borderRadius: 10 }}>
+                           <span style={{ color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}><CalIcon size={12} /> Due: {dayjs(r.nextServiceDate).format('DD MMM YYYY')}</span>
+                           <span style={{ fontWeight: 700, color: r.reminderStatus === 'overdue' ? '#EF4444' : '#3B82F6' }}>
+                              {r.reminderStatus === 'overdue' ? `Delayed by ${Math.abs(r.daysLeft)} days` : `In ${r.daysLeft} days`}
+                           </span>
+                        </div>
+                        <button 
+                           onClick={() => navigate(`/bills/new?vehicleNo=${r.vehicleNo}`)}
+                           style={{ width: '100%', marginTop: 10, background: '#0F0D2E', color: 'white', border: 'none', borderRadius: 10, padding: '8px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
+                        >
+                           Create New Job Card
+                        </button>
+                     </div>
+                  )) : (
+                     <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9CA3AF' }}>
+                        <Bell size={48} style={{ opacity: 0.1, marginBottom: 12 }} />
+                        <p>No active service reminders.</p>
+                     </div>
+                  )}
+               </div>
+            </div>
+         </div>
+      )}
+
+      <button onClick={() => navigate('/bills/new')} className="btn btn-primary btn-lg" style={{ position: 'fixed', bottom: 84, right: 20, borderRadius: 20, boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)', zIndex: 100 }}>
         <Plus size={20} /> New Job Card
       </button>
 
+      <style>{`
+         @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+         }
+         @keyframes shake {
+            0%, 100% { transform: rotate(0); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+         }
+         .shake { animation: shake 0.5s infinite; }
+      `}</style>
       <div style={{ height: 20 }} />
     </div>
   )

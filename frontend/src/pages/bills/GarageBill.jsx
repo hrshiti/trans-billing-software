@@ -10,6 +10,21 @@ import { useBills } from '../../context/BillContext'
 import { useParties } from '../../context/PartyContext'
 import dayjs from 'dayjs'
 
+// Import services data from CSV (raw text)
+import servicesRaw from '../../data/services.csv?raw'
+
+// Parse labels: extract strings starting with [ ], remove brackets, trim
+// Headers are lines that don't start with whitespace
+const SERVICES_DATA = servicesRaw
+  .split('\n')
+  .filter(line => line.includes('[ ]'))
+  .map(line => {
+    const isHeader = !line.startsWith(' ') && !line.startsWith('\t');
+    const label = line.replace(/\[\s*\]/, '').trim();
+    return { label, isHeader };
+  })
+  .filter(item => item.label.length > 0);
+
 function Field({ label, error, children, required }) {
   return (
     <div className="form-group">
@@ -46,6 +61,9 @@ export default function GarageBill() {
   const navigate = useNavigate()
   const [saving, setSaving] = useState(false)
   const [savedBill, setSavedBill] = useState(null)
+  
+  // Custom dropdown state
+  const [activeIdx, setActiveIdx] = useState(null)
 
   const { register, handleSubmit, watch, setValue, control, formState: { errors } } = useForm({
     defaultValues: {
@@ -53,7 +71,7 @@ export default function GarageBill() {
       partyId: '',
       customerName: '', customerPhone: '',
       vehicleNo: '', vehicleModel: '', vehicleCompany: '',
-      kmReading: '', nextServiceKm: '',
+      kmReading: '', nextServiceKm: '', nextServiceDate: '',
       paymentMode: 'unpaid',
       gstPercent: '0',
       laborCharge: '0',
@@ -182,6 +200,9 @@ export default function GarageBill() {
             <Field label="Next Service KM">
               <input {...register('nextServiceKm')} type="number" placeholder="50000" className="form-input" inputMode="numeric" />
             </Field>
+            <Field label="Next Service Date">
+              <input {...register('nextServiceDate')} type="date" className="form-input" />
+            </Field>
           </div>
         </SectionCard>
 
@@ -195,21 +216,74 @@ export default function GarageBill() {
               ))}
             </div>
 
-            {fields.map((field, index) => (
-              <div key={field.id} style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 0.8fr 0.8fr 36px', gap: 6, alignItems: 'center' }}>
-                <input {...register(`items.${index}.description`, { required: true })} placeholder="Service / Part name" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px 10px' }} />
-                <input {...register(`items.${index}.qty`)} type="number" min="0.1" step="0.1" placeholder="1" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px 8px', textAlign: 'center' }} inputMode="decimal" />
-                <input {...register(`items.${index}.rate`)} type="number" min="0" step="0.01" placeholder="0" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px 8px' }} inputMode="decimal" />
-                <div style={{ background: '#F4F4F8', borderRadius: 10, padding: '8px 8px', fontSize: '0.8125rem', fontWeight: 600, color: '#0F0D2E', textAlign: 'right' }}>
-                  ₹{parseFloat(items[index]?.amount || 0).toFixed(2)}
+            {fields.map((field, index) => {
+              const currentDesc = watch(`items.${index}.description`) || ''
+              const filtered = SERVICES_DATA.filter(item => 
+                currentDesc === '' || item.label.toLowerCase().includes(currentDesc.toLowerCase())
+              )
+
+              return (
+                <div key={field.id} style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 0.8fr 0.8fr 36px', gap: 6, alignItems: 'center', position: 'relative' }}>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      {...register(`items.${index}.description`, { required: true })}
+                      placeholder="Service / Part name"
+                      className="form-input"
+                      style={{ fontSize: '0.8125rem', padding: '8px 10px', width: '100%' }}
+                      onFocus={() => setActiveIdx(index)}
+                      onBlur={() => setTimeout(() => setActiveIdx(null), 200)}
+                      autoComplete="off"
+                    />
+                    
+                    {activeIdx === index && filtered.length > 0 && (
+                      <div style={{
+                        position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100,
+                        background: 'white', border: '1px solid #E5E7EB', borderRadius: 12,
+                        boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+                        marginTop: 4, maxHeight: 220, overflowY: 'auto'
+                      }}>
+                        {filtered.map((item, i) => (
+                          <div
+                            key={i}
+                            onClick={() => {
+                              setValue(`items.${index}.description`, item.label)
+                              setActiveIdx(null)
+                            }}
+                            style={{
+                              padding: item.isHeader ? '10px 12px 6px' : '8px 12px',
+                              fontSize: item.isHeader ? '0.7rem' : '0.8125rem',
+                              fontWeight: item.isHeader ? 800 : 500,
+                              color: item.isHeader ? '#7C3AED' : '#0F0D2E',
+                              background: item.isHeader ? '#F9F8FF' : 'white',
+                              cursor: item.isHeader ? 'default' : 'pointer',
+                              textTransform: item.isHeader ? 'uppercase' : 'none',
+                              letterSpacing: item.isHeader ? '0.04em' : 'normal',
+                              paddingLeft: item.isHeader ? 12 : 20,
+                              borderBottom: '1px solid #F3F4F6',
+                              transition: 'background 0.1s'
+                            }}
+                            onMouseEnter={e => !item.isHeader && (e.currentTarget.style.background = '#F5F3FF')}
+                            onMouseLeave={e => !item.isHeader && (e.currentTarget.style.background = 'white')}
+                          >
+                            {item.label}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <input {...register(`items.${index}.qty`)} type="number" min="0.1" step="0.1" placeholder="1" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px 8px', textAlign: 'center' }} inputMode="decimal" />
+                  <input {...register(`items.${index}.rate`)} type="number" min="0" step="0.01" placeholder="0" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px 8px' }} inputMode="decimal" />
+                  <div style={{ background: '#F4F4F8', borderRadius: 10, padding: '8px 8px', fontSize: '0.8125rem', fontWeight: 600, color: '#0F0D2E', textAlign: 'right' }}>
+                    ₹{parseFloat(items[index]?.amount || 0).toFixed(2)}
+                  </div>
+                  <button type="button" onClick={() => fields.length > 1 && remove(index)}
+                    disabled={fields.length === 1}
+                    style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: fields.length > 1 ? '#FEE2E2' : '#F4F4F4', cursor: fields.length > 1 ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Trash2 size={13} color={fields.length > 1 ? '#DC2626' : '#D1D5DB'} />
+                  </button>
                 </div>
-                <button type="button" onClick={() => fields.length > 1 && remove(index)}
-                  disabled={fields.length === 1}
-                  style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: fields.length > 1 ? '#FEE2E2' : '#F4F4F4', cursor: fields.length > 1 ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Trash2 size={13} color={fields.length > 1 ? '#DC2626' : '#D1D5DB'} />
-                </button>
-              </div>
-            ))}
+              )
+            })}
 
             <button type="button" onClick={() => append({ description: '', qty: '1', rate: '', amount: '' })}
               style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#EDE9FE', color: '#7C3AED', border: 'none', borderRadius: 10, padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.8125rem', width: 'fit-content', marginTop: 4 }}>

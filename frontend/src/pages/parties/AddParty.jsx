@@ -257,7 +257,7 @@ export default function AddParty() {
               <input
                 id="field-party-gstin"
                 {...register('gstin', {
-                  pattern: { value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, message: 'Invalid GSTIN format' }
+                  pattern: { value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i, message: 'Invalid GSTIN format' }
                 })}
                 placeholder="29ABCDE1234F1Z5"
                 className={`form-input ${errors.gstin ? 'error' : ''}`}
@@ -269,7 +269,7 @@ export default function AddParty() {
               <input
                 id="field-party-pan"
                 {...register('pan', {
-                  pattern: { value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, message: 'Invalid PAN' }
+                  pattern: { value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, message: 'Invalid PAN' }
                 })}
                 placeholder="ABCDE1234F"
                 className={`form-input ${errors.pan ? 'error' : ''}`}
