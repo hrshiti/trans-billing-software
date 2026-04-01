@@ -1,50 +1,91 @@
-import React, { useMemo, useState } from 'react'
-import { 
-  Users, FileText, Banknote, TrendingUp, 
-  ShieldCheck, AlertCircle, ArrowUpRight,
-  TrendingDown, Activity, Clock, Globe,
-  Download, Filter, MoreHorizontal, UserPlus,
-  Truck, Wrench, MapPin, CreditCard, ExternalLink, ChevronRight
-} from 'lucide-react'
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, AreaChart, Area 
-} from 'recharts'
+import React, { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  Users, FileText, Banknote, TrendingUp,
+  Truck, Wrench, MapPin, CreditCard,
+  Building2, ChevronRight, Globe, Activity,
+  AlertCircle, CheckCircle, Clock, IndianRupee
+} from 'lucide-react'
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell
+} from 'recharts'
+import { useAdmin } from '../../context/AdminContext'
 
-import { useAuth } from '../../context/AuthContext'
+const COLORS_T = ['#7C3AED', '#6366F1', '#10B981', '#EF4444']
+const COLORS_G = ['#7C3AED', '#10B981', '#8B5CF6', '#EF4444']
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
-  const { adminModule, switchAdminModule } = useAuth()
-  const [timeRange, setTimeRange] = useState('7d')
+  const {
+    mode, stats,
+    users, businesses, invoices
+  } = useAdmin()
 
-  // Data states (initially empty to remove static data)
-  const [kpis] = useState([
-    { label: 'Total Users', value: '0', change: '0%', icon: Users, color: '#6366F1', bg: '#EEF2FF', up: true, desc: 'Global' },
-    { label: 'System Revenue', value: '₹0', change: '0%', icon: Banknote, color: '#10B981', bg: '#ECFDF5', up: true, desc: 'MTD' },
-  ])
+  const isTransport = mode === 'transport'
+  const COLORS = isTransport ? COLORS_T : COLORS_G
+  const accentColor = '#7C3AED'
+  const accentLight = '#EDE9FE'
 
-  // Module specific manageable data
-  const transportData = {
-    stats: [
-      { label: 'Active Trips', val: '0', icon: Truck, color: '#F59E0B' },
-      { label: 'Total Fleet', val: '0', icon: MapPin, color: '#82ca9d' },
-    ],
-    items: []
-  }
+  /* Last 6 days activity from invoices */
+  const chartData = useMemo(() => {
+    const days = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date()
+      d.setDate(d.getDate() - (5 - i))
+      return d.toISOString().split('T')[0]
+    })
+    return days.map(date => ({
+      name: new Date(date).toLocaleDateString('en', { weekday: 'short' }),
+      invoices: invoices.filter(inv => inv.date === date).length,
+      revenue: invoices.filter(inv => inv.date === date && inv.status === 'Paid')
+        .reduce((s, inv) => s + (Number(inv.total) || 0), 0),
+    }))
+  }, [invoices])
 
-  const garageData = {
-    stats: [
-      { label: 'Active Jobs', val: '0', icon: Wrench, color: '#7C3AED' },
-      { label: 'Service Revenue', val: '₹0', icon: CreditCard, color: '#10B981' },
-    ],
-    items: []
-  }
+  const pieData = [
+    { name: 'Paid', value: stats.paidInvoices },
+    { name: 'Pending', value: stats.pendingInvoices },
+    { name: 'Businesses', value: stats.totalBusinesses },
+    { name: 'Users', value: stats.totalUsers },
+  ].filter(d => d.value > 0)
 
-  const chartData = []
+  const kpiCards = [
+    {
+      label: isTransport ? 'Transporters' : 'Garage Owners',
+      value: stats.totalUsers,
+      icon: Users,
+      color: '#6366F1',
+      bg: '#EEF2FF',
+      sub: `${stats.activeUsers} active`
+    },
+    {
+      label: isTransport ? 'Transport Businesses' : 'Garage Businesses',
+      value: stats.totalBusinesses,
+      icon: Building2,
+      color: accentColor,
+      bg: accentLight,
+      sub: 'registered'
+    },
+    {
+      label: isTransport ? 'Transport Invoices' : 'Service Invoices',
+      value: stats.totalInvoices,
+      icon: FileText,
+      color: '#10B981',
+      bg: '#ECFDF5',
+      sub: `${stats.pendingInvoices} pending`
+    },
+    {
+      label: 'Collected Revenue',
+      value: `₹${stats.totalRevenue.toLocaleString('en-IN')}`,
+      icon: IndianRupee,
+      color: '#059669',
+      bg: '#D1FAE5',
+      sub: `₹${stats.pendingRevenue.toLocaleString('en-IN')} pending`
+    },
+  ]
 
-  const currentData = adminModule === 'Transport' ? transportData : garageData
+  const recentUsers = [...users].slice(0, 4)
+  const recentInvoices = [...invoices].slice(0, 5)
 
   return (
     <div className="animate-fadeIn">
@@ -52,117 +93,232 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-             <Globe size={20} color="var(--primary)" />
-             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--primary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Command Dashboard</span>
+            <Globe size={18} color="var(--primary)" />
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--primary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              {isTransport ? '🚛 Transport Mode' : '🔧 Garage Mode'} · Live Dashboard
+            </span>
           </div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Admin Console</h1>
+          <h1 style={{ fontSize: '1.875rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: 0 }}>
+            Admin Console
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: 4 }}>
+            Real-time overview of all {isTransport ? 'transport' : 'garage'} operations
+          </p>
         </div>
-        
-        <div style={{ display: 'flex', gap: 12 }}>
-          <button className="btn btn-ghost" onClick={() => navigate(adminModule === 'Transport' ? '/admin/transport' : '/admin/garage')}>
-            Manage {adminModule} <ExternalLink size={16} />
-          </button>
-        </div>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate(isTransport ? '/admin/transport' : '/admin/garage')}
+          style={{ background: accentColor, borderColor: accentColor }}
+        >
+          {isTransport ? <Truck size={16} /> : <Wrench size={16} />}
+          Manage {isTransport ? 'Transport' : 'Garage'}
+        </button>
       </div>
 
-      {/* ── KPI Grid ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 32 }}>
-        {/* Global KPIs */}
-        {kpis.map((kpi, idx) => (
-          <div key={idx} className="card" style={{ padding: '24px' }}>
-             <p style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>{kpi.label}</p>
-             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h2 style={{ fontSize: '1.75rem', fontWeight: 900, margin: 0 }}>{kpi.value}</h2>
-                <div style={{ padding: '4px 10px', borderRadius: 99, background: kpi.bg, color: kpi.color, fontSize: '0.75rem', fontWeight: 800 }}>{kpi.change}</div>
-             </div>
-          </div>
-        ))}
-        
-        {/* Module Specific Stats (Dynamic Based on Toggle) */}
-        {currentData.stats.map((s, idx) => (
-          <div key={idx} className="card animate-fadeIn" style={{ padding: '24px', borderLeft: `4px solid ${s.color}` }}>
-             <p style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>{s.label}</p>
-             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${s.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                   <s.icon size={22} color={s.color} />
-                </div>
-                <h2 style={{ fontSize: '1.75rem', fontWeight: 900, margin: 0 }}>{s.val}</h2>
-             </div>
+      {/* ── Mode Badge ── */}
+      <div style={{
+        display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px',
+        background: `${accentColor}15`, borderRadius: 99, border: `1px solid ${accentColor}30`,
+        marginBottom: 28
+      }}>
+        {isTransport ? <Truck size={15} color={accentColor} /> : <Wrench size={15} color={accentColor} />}
+        <span style={{ fontSize: '0.8rem', fontWeight: 800, color: accentColor }}>
+          Currently viewing: {isTransport ? 'Transport' : 'Garage'} data
+        </span>
+        <span style={{
+          width: 8, height: 8, borderRadius: '50%', background: accentColor,
+          boxShadow: `0 0 0 3px ${accentColor}30`, animation: 'pulse 1.5s infinite'
+        }} />
+      </div>
+
+      {/* ── KPI Cards ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 20, marginBottom: 32 }}>
+        {kpiCards.map((kpi, i) => (
+          <div key={i} className="card" style={{ padding: '22px 24px', borderTop: `3px solid ${kpi.color}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <p style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
+                {kpi.label}
+              </p>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: kpi.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <kpi.icon size={18} color={kpi.color} />
+              </div>
+            </div>
+            <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{kpi.value}</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 6, fontWeight: 600 }}>{kpi.sub}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 24, marginBottom: 32 }}>
-        {/* Growth Chart */}
+      {/* ── Charts Row ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, marginBottom: 28 }}>
+
+        {/* Area Chart */}
         <div className="card" style={{ padding: '24px' }}>
-          <div className="flex items-center justify-between mb-8">
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 800 }}>System Growth</h3>
-            <select className="form-input" style={{ width: 120, height: 36, padding: '0 10px', fontSize: '0.8rem' }} value={timeRange} onChange={e => setTimeRange(e.target.value)}>
-               <option value="7d">Last 7 Days</option>
-               <option value="30d">Last 30 Days</option>
-            </select>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <h3 style={{ margin: 0, fontWeight: 900, fontSize: '1rem' }}>Invoice Activity (Last 6 Days)</h3>
+            <span style={{ fontSize: '0.7rem', fontWeight: 800, color: accentColor, background: `${accentColor}15`, padding: '4px 10px', borderRadius: 99 }}>LIVE</span>
           </div>
-          <div style={{ width: '100%', height: 300 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          {chartData.some(d => d.invoices > 0 || d.revenue > 0) ? (
+            <ResponsiveContainer width="100%" height={240}>
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                  <linearGradient id="colInv" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={accentColor} stopOpacity={0.15} />
+                    <stop offset="95%" stopColor={accentColor} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 600, fill: '#9CA3AF' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 600, fill: '#9CA3AF' }} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: 'var(--shadow-lg)', fontWeight: 700 }} />
-                <Area type="monotone" dataKey="revenue" stroke="var(--primary)" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 600, fill: '#9CA3AF' }} dy={8} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 600, fill: '#9CA3AF' }} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 8px 30px rgba(0,0,0,0.12)', fontWeight: 700 }}
+                />
+                <Area type="monotone" dataKey="invoices" stroke={accentColor} strokeWidth={3} fill="url(#colInv)" name="Invoices" />
               </AreaChart>
             </ResponsiveContainer>
+          ) : (
+            <div style={{ height: 240, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+              <Activity size={40} color="var(--text-muted)" strokeWidth={1.5} />
+              <div>
+                <p style={{ margin: 0, fontWeight: 700, color: 'var(--text-secondary)', textAlign: 'center' }}>No invoice data yet</p>
+                <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center' }}>Transactions history will appear here</p>
+              </div>
+              <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/billing')}>View Billing Monitor</button>
+            </div>
+          )}
+        </div>
+
+        {/* Pie Chart / Summary */}
+        <div className="card" style={{ padding: '24px' }}>
+          <h3 style={{ margin: '0 0 20px', fontWeight: 900, fontSize: '1rem' }}>System Snapshot</h3>
+          {pieData.length > 0 ? (
+            <>
+              <PieChart width={180} height={180} style={{ margin: '0 auto' }}>
+                <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={80} paddingAngle={4} dataKey="value" stroke="none">
+                  {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                </Pie>
+                <Tooltip contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', fontWeight: 700 }} />
+              </PieChart>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 20 }}>
+                {pieData.map((d, i) => (
+                  <div key={d.name} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', fontWeight: 700 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 10, height: 10, borderRadius: '50%', background: COLORS[i % COLORS.length] }} />
+                      <span style={{ color: 'var(--text-secondary)' }}>{d.name}</span>
+                    </span>
+                    <span style={{ fontWeight: 900 }}>{d.value}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 220, gap: 12 }}>
+              <TrendingUp size={40} color="var(--text-muted)" strokeWidth={1.5} />
+              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-muted)', textAlign: 'center' }}>Add data to see breakdown</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Bottom Row: Recent Users + Recent Invoices ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+
+        {/* Recent Users */}
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h3 style={{ margin: 0, fontWeight: 900, fontSize: '0.9375rem' }}>Recent {isTransport ? 'Transporters' : 'Garage Owners'}</h3>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/users')} style={{ paddingInline: 12 }}>
+              View All <ChevronRight size={14} />
+            </button>
+          </div>
+          <div style={{ padding: '8px 0' }}>
+            {recentUsers.length === 0 ? (
+              <div style={{ padding: '40px 24px', textAlign: 'center' }}>
+                <Users size={32} color="var(--text-muted)" strokeWidth={1.5} style={{ margin: '0 auto 12px' }} />
+                <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-muted)' }}>No users yet. Add one from User Management.</p>
+              </div>
+            ) : recentUsers.map(u => (
+              <div key={u.id} style={{
+                display: 'flex', alignItems: 'center', gap: 14, padding: '12px 24px',
+                borderBottom: '1px solid var(--border)', transition: 'background 0.2s'
+              }}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg)'}
+                onMouseLeave={e => e.currentTarget.style.background = ''}
+              >
+                <div style={{
+                  width: 38, height: 38, borderRadius: 10, background: `${accentColor}20`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 900, color: accentColor, fontSize: '0.9rem'
+                }}>
+                  {(u.name || '?')[0].toUpperCase()}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, fontWeight: 800, fontSize: '0.875rem' }}>{u.name}</p>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>{u.phone || u.email || '—'}</p>
+                </div>
+                <span style={{
+                  fontSize: '0.625rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em',
+                  padding: '3px 8px', borderRadius: 99,
+                  background: u.status === 'Active' ? 'var(--success-light)' : '#FEF3C7',
+                  color: u.status === 'Active' ? 'var(--success)' : '#D97706'
+                }}>{u.status}</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Module Manageable Things (Dynamic Content) */}
-        <div className="card animate-fadeIn" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
-           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 900 }}>{adminModule} Monitor</h3>
-              <span style={{ fontSize: '0.7rem', fontWeight: 800, background: 'var(--bg)', padding: '4px 10px', borderRadius: 99 }}>LIVE</span>
-           </div>
-           
-           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-              {currentData.items.map(item => (
-                <div key={item.id} style={{ 
-                  padding: '16px', borderRadius: 16, background: 'var(--bg)', border: '1.5px solid var(--border)',
-                  display: 'flex', alignItems: 'center', gap: 14, transition: 'var(--transition)'
-                }} className="item-hover">
-                   <div style={{ 
-                     width: 40, height: 40, borderRadius: 12, background: 'white', 
-                     display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: 'var(--primary)', boxShadow: 'var(--shadow-xs)' 
-                   }}>
-                     {item.name[0]}
-                   </div>
-                   <div style={{ flex: 1 }}>
-                      <p style={{ margin: 0, fontWeight: 800, fontSize: '0.9375rem' }}>{item.name}</p>
-                      <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{item.activity}</p>
-                   </div>
-                   <div style={{ textAlign: 'right' }}>
-                      <p style={{ margin: 0, fontSize: '0.8125rem', fontWeight: 800, color: item.trend.startsWith('+') ? 'var(--success)' : 'var(--danger)' }}>{item.trend}</p>
-                      <span style={{ fontSize: '0.625rem', fontWeight: 800, textTransform: 'uppercase', opacity: 0.6 }}>{item.status}</span>
-                   </div>
+        {/* Recent Invoices */}
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h3 style={{ margin: 0, fontWeight: 900, fontSize: '0.9375rem' }}>Recent Invoices</h3>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/billing')} style={{ paddingInline: 12 }}>
+              View All <ChevronRight size={14} />
+            </button>
+          </div>
+          <div style={{ padding: '8px 0' }}>
+            {recentInvoices.length === 0 ? (
+              <div style={{ padding: '40px 24px', textAlign: 'center' }}>
+                <FileText size={32} color="var(--text-muted)" strokeWidth={1.5} style={{ margin: '0 auto 12px' }} />
+                <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-muted)' }}>No invoices records found in history.</p>
+              </div>
+            ) : recentInvoices.map(inv => (
+              <div key={inv.id} style={{
+                display: 'flex', alignItems: 'center', gap: 14, padding: '12px 24px',
+                borderBottom: '1px solid var(--border)', transition: 'background 0.2s'
+              }}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg)'}
+                onMouseLeave={e => e.currentTarget.style.background = ''}
+              >
+                <div style={{
+                  width: 38, height: 38, borderRadius: 10, background: 'var(--bg)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <FileText size={16} color="var(--primary)" />
                 </div>
-              ))}
-           </div>
-           
-           <button 
-             className="btn btn-ghost btn-full btn-sm" style={{ marginTop: 20 }}
-             onClick={() => navigate(adminModule === 'Transport' ? '/admin/transport' : '/admin/garage')}
-           >
-              Full {adminModule} View <ChevronRight size={16} />
-           </button>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, fontWeight: 800, fontSize: '0.8125rem' }}>{inv.id}</p>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>{inv.businessName || inv.user || '—'}</p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ margin: 0, fontWeight: 900, fontSize: '0.875rem' }}>₹{(inv.total || 0).toLocaleString('en-IN')}</p>
+                  <span style={{
+                    fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase',
+                    padding: '3px 8px', borderRadius: 99,
+                    background: inv.status === 'Paid' ? 'var(--success-light)' : inv.status === 'Partial' ? 'var(--primary-lighter)' : '#FEF3C7',
+                    color: inv.status === 'Paid' ? 'var(--success)' : inv.status === 'Partial' ? 'var(--primary)' : '#D97706'
+                  }}>{inv.status}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       <style>{`
-        .item-hover:hover { border-color: var(--primary); background: white; transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
       `}</style>
     </div>
   )

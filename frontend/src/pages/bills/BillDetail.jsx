@@ -12,186 +12,233 @@ import { useState } from 'react'
 // ── Transport Consolidated Invoice Layout ────────────────────────────────────
 function TransportInvoice({ bill, business, onPayOnline }) {
   const items = bill.items || []
-  const gstLabel = bill.gstType === 'IGST' ? 'IGST' : `CGST + SGST`
+  const accent = '#F3811E' // Radhe Tempo Orange
 
   return (
-    <div className="invoice-wrap">
-      {/* Header */}
-      <div className="inv-header">
-        <div className="inv-brand">
-          {business?.logoUrl
-            ? <img src={business.logoUrl} alt="logo" style={{ width: 120, height: 45, objectFit: 'contain' }} />
-            : <div style={{ width: 56, height: 56, borderRadius: 10, background: '#EDE9FE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.125rem', color: '#7C3AED' }}>
-                {(business?.businessName || 'BP')[0]}
-              </div>}
-          <div>
-            <div style={{ fontWeight: 800, fontSize: '1.25rem', color: '#0F0D2E' }}>{business?.businessName || 'Your Business'}</div>
-            {business?.slogan && <div style={{ fontSize: '0.75rem', color: '#6B7280', fontStyle: 'italic' }}>{business.slogan}</div>}
-            <div style={{ fontSize: '0.75rem', color: '#6B7280', marginTop: 4 }}>{business?.address}</div>
-          </div>
+    <div className="invoice-wrap" style={{ color: '#000', fontFamily: 'Inter, sans-serif', padding: '10px' }}>
+      {/* Top Header Section */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', border: '1px solid #ccc', borderRadius: '2px 2px 0 0' }}>
+        <div style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: 16 }}>
+           {business?.logoUrl 
+             ? <img src={business.logoUrl} style={{ width: 80, height: 60, objectFit: 'contain' }} />
+             : <div style={{ minWidth: 60, height: 60, background: '#eee', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 900 }}>T</div>
+           }
+           <div>
+             <h1 style={{ fontSize: '2.4rem', fontWeight: 950, margin: 0, letterSpacing: '-0.04em', lineHeight: 0.9 }}>{business?.businessName || 'BUSINESS'}</h1>
+             <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#444', textTransform: 'capitalize', marginTop: 8 }}>{business?.slogan || 'Move What Matters'}</p>
+           </div>
         </div>
-        <div style={{ textAlign: 'right' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#0F0D2E', margin: 0 }}>INVOICE</h2>
-          <div style={{ fontSize: '0.8rem', color: '#6B7280' }}>Bill No: <strong style={{ color: '#0F0D2E' }}>{bill.invoiceNo}</strong></div>
-          <div style={{ fontSize: '0.8rem', color: '#6B7280' }}>Date: <strong style={{ color: '#0F0D2E' }}>{dayjs(bill.billDate).format('DD MMM YYYY')}</strong></div>
-          <div style={{ marginTop: 6 }}>
-            <span style={{ padding: '3px 10px', borderRadius: 99, fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', background: bill.status === 'paid' ? '#DCFCE7' : '#FEE2E2', color: bill.status === 'paid' ? '#16A34A' : '#DC2626' }}>
-              {bill.status?.toUpperCase()}
-            </span>
-          </div>
+        <div style={{ borderLeft: '1px solid #ccc' }}>
+           <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', borderBottom: '1px solid #ccc' }}>
+             <div style={{ padding: '14px 12px', background: '#fff', fontWeight: 600, fontSize: '0.85rem' }}>Bill No.:</div>
+             <div style={{ padding: '14px 12px', fontWeight: 800, fontSize: '0.95rem', borderLeft: '1px solid #eee' }}>{bill.invoiceNo}</div>
+           </div>
+           <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr' }}>
+             <div style={{ padding: '14px 12px', background: '#fff', fontWeight: 600, fontSize: '0.85rem' }}>Date :</div>
+             <div style={{ padding: '14px 12px', fontWeight: 800, fontSize: '0.95rem', borderLeft: '1px solid #eee' }}>{dayjs(bill.billDate).format('DD/MM/YYYY')}</div>
+           </div>
         </div>
       </div>
 
-      <div style={{ height: 1, background: '#EEE', margin: '20px 0' }} />
-
-      {/* Addresses */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
-        <div>
-          <div style={{ fontSize: '0.7rem', color: '#9CA3AF', fontWeight: 800, textTransform: 'uppercase', marginBottom: 6 }}>From :</div>
-          <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{business?.businessName}</div>
-          <div style={{ fontSize: '0.8rem', color: '#6B7280', lineHeight: 1.4 }}>{business?.address}</div>
+      {/* From / To Section */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: '1px solid #ccc', borderTop: 'none' }}>
+        <div style={{ padding: '12px 16px', borderRight: '1px solid #ccc' }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 800, marginBottom: 4 }}>From : <span style={{ fontWeight: 900, textTransform: 'uppercase' }}>{business?.businessName}</span></div>
+          <div style={{ fontSize: '0.75rem', color: '#333', lineHeight: 1.5 }}>
+            {business?.address}<br/>
+            Email : {business?.email}<br/>
+            Mob : {business?.phone}
+            {business?.panNo && <span><br/>PAN No : {business?.panNo}</span>}
+          </div>
         </div>
-        <div>
-          <div style={{ fontSize: '0.7rem', color: '#9CA3AF', fontWeight: 800, textTransform: 'uppercase', marginBottom: 6 }}>Billed To :</div>
-          <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{bill.billedToName}</div>
-          <div style={{ fontSize: '0.8rem', color: '#6B7280', lineHeight: 1.4 }}>{bill.billedToAddress}</div>
+        <div style={{ padding: '12px 16px' }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 800, marginBottom: 4 }}>Billed To : <span style={{ fontWeight: 900, textTransform: 'uppercase' }}>{bill.billedToName}</span></div>
+          <div style={{ fontSize: '0.75rem', color: '#333', lineHeight: 1.5 }}>{bill.billedToAddress}</div>
         </div>
       </div>
 
-      {/* Billing Summary Table */}
-      <div style={{ background: '#F9FAFB', borderRadius: 16, overflow: 'hidden', border: '1px solid #EEE' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#F3811E', color: 'white' }}>
-              {['No.', 'Date', 'From', 'To', 'Chalan No', 'Amount'].map((h, i) => (
-                <th key={h} style={{ padding: '10px 12px', textAlign: i === 5 ? 'right' : 'left', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, i) => (
-              <tr key={i} style={{ borderBottom: '1px solid #EEE' }}>
-                <td style={{ padding: '12px', color: '#6B7280' }}>{i + 1}</td>
-                <td style={{ padding: '12px' }}>{dayjs(item.date).format('DD/MM/YY')}</td>
-                <td style={{ padding: '12px', fontWeight: 600 }}>{item.companyFrom}</td>
-                <td style={{ padding: '12px' }}>{item.companyTo}</td>
-                <td style={{ padding: '12px', color: '#6B7280' }}>{item.chalanNo}</td>
-                <td style={{ padding: '12px', textAlign: 'right', fontWeight: 700 }}>₹{parseFloat(item.amount || 0).toLocaleString()}</td>
-              </tr>
+      {/* Billing Summary Centered Banner */}
+      <div style={{ background: accent, color: 'white', textAlign: 'center', padding: '10px', fontWeight: 900, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.15em', borderX: '1px solid #ccc', margin: '0 -1px' }}>
+        Billing Summary
+      </div>
+
+      {/* Table grid */}
+      <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc', borderTop: 'none' }}>
+        <thead>
+          <tr style={{ background: '#fdf7f2' }}>
+            {['No.', 'Date', 'Company (From)', 'Company (To)', 'Chalan No.', 'Amount'].map((h, i) => (
+              <th key={h} style={{ padding: '12px 6px', fontSize: '0.75rem', fontWeight: 800, border: '1px solid #ccc', textAlign: i === 5 ? 'right' : 'center', color: '#333' }}>{h}</th>
             ))}
-          </tbody>
-        </table>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item, i) => (
+            <tr key={i}>
+              <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center', fontSize: '0.85rem' }}>{i + 1}</td>
+              <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center', fontSize: '0.85rem' }}>{dayjs(item.date).format('DD/MM/YY')}</td>
+              <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center', fontSize: '0.85rem', fontWeight: 600 }}>{item.companyFrom || '—'}</td>
+              <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center', fontSize: '0.85rem' }}>{item.companyTo || '—'}</td>
+              <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'center', fontSize: '0.85rem' }}>{item.chalanNo || '—'}</td>
+              <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'right', fontSize: '0.85rem', fontWeight: 700 }}>{parseFloat(item.amount || 0).toLocaleString()}</td>
+            </tr>
+          ))}
+          {/* Total Row exactly like Radhe Tempo */}
+          <tr>
+            <td colSpan="4" style={{ background: accent, color: 'white', padding: '12px 20px', fontWeight: 800, fontSize: '0.9rem', textAlign: 'center' }}>
+              Grateful for Moving What Matters to You!
+            </td>
+            <td style={{ padding: '12px', textAlign: 'center', fontWeight: 900, fontSize: '1rem', border: '1px solid #ccc', background: '#f5f5f5' }}>TOTAL :</td>
+            <td style={{ padding: '12px', textAlign: 'right', fontWeight: 950, fontSize: '1.25rem', border: '1px solid #ccc' }}>₹{bill.grandTotal?.toLocaleString()}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {/* Bank Details Horizontal Strip */}
+      <div style={{ marginTop: 12, border: '1px solid #ccc' }}>
+         <div style={{ background: '#fdf3f0', padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, borderBottom: '1px solid #ccc' }}>BANK DETAILS :</div>
+         <div style={{ padding: '12px', backgroundColor: '#fff' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 0.4fr', gap: 15 }}>
+               <div style={{ fontSize: '0.8rem', display: 'flex', gap: 6 }}>
+                  <span style={{ fontWeight: 600, color: '#555' }}>Account No.:</span> <span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountNumber || ''}</span>
+               </div>
+               <div style={{ fontSize: '0.8rem', display: 'flex', gap: 6 }}>
+                  <span style={{ fontWeight: 600, color: '#555' }}>IFSC Code :</span> <span style={{ fontWeight: 900 }}>{business?.bankDetails?.ifsc || ''}</span>
+               </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '0.6fr 0.4fr', gap: 15, marginTop: 6 }}>
+               <div style={{ fontSize: '0.8rem', display: 'flex', gap: 6 }}>
+                  <span style={{ fontWeight: 600, color: '#555' }}>Account Name :</span> <span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountName || ''}</span>
+               </div>
+               <div style={{ fontSize: '0.8rem', display: 'flex', gap: 6 }}>
+                  <span style={{ fontWeight: 600, color: '#555' }}>Bank Name :</span> <span style={{ fontWeight: 900 }}>{business?.bankDetails?.bankName || ''}</span>
+               </div>
+            </div>
+         </div>
       </div>
 
-      {/* Totals Section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
-        <div style={{ width: '55%', background: '#F8F9FF', padding: 16, borderRadius: 16, border: '1px solid #E0E7FF' }}>
-           <div style={{ fontWeight: 800, fontSize: '0.7rem', color: '#4338CA', textTransform: 'uppercase', marginBottom: 10 }}>Bank Details</div>
-           <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 4, fontSize: '0.8rem' }}>
-              <span style={{ color: '#6B7280' }}>Bank:</span> <strong>{business?.bankDetails?.bankName}</strong>
-              <span style={{ color: '#6B7280' }}>A/c No:</span> <strong>{business?.bankDetails?.accountNumber}</strong>
-              <span style={{ color: '#6B7280' }}>IFSC:</span> <strong>{business?.bankDetails?.ifsc}</strong>
-              <span style={{ color: '#6B7280' }}>UPI ID:</span> <strong>{business?.bankDetails?.upiId}</strong>
-           </div>
-           
-           {bill.status !== 'paid' && (
-             <button 
-               onClick={onPayOnline}
-               style={{
-                 marginTop: 16, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                 padding: '10px', background: 'linear-gradient(135deg, #7C3AED, #5B21B6)', color: 'white',
-                 border: 'none', borderRadius: 12, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
-                 boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)'
-               }}
-             >
-               <CreditCard size={16} /> Pay Online Now
-             </button>
-           )}
-        </div>
-
-        <div style={{ width: '40%' }}>
-           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #EEE', fontSize: '0.85rem' }}>
-              <span style={{ color: '#6B7280' }}>Subtotal</span>
-              <span style={{ fontWeight: 700 }}>₹{bill.subtotal?.toLocaleString()}</span>
-           </div>
-           {bill.gstAmount > 0 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #EEE', fontSize: '0.85rem' }}>
-                <span style={{ color: '#6B7280' }}>{gstLabel} ({bill.gstPercent}%)</span>
-                <span style={{ fontWeight: 700 }}>₹{bill.gstAmount?.toLocaleString()}</span>
-              </div>
-           )}
-           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', fontSize: '1.25rem' }}>
-              <span style={{ fontWeight: 800 }}>Total</span>
-              <span style={{ fontWeight: 900, color: '#F3811E' }}>₹{bill.grandTotal?.toLocaleString()}</span>
-           </div>
-        </div>
-      </div>
-
-      {bill.notes && (
-        <div style={{ marginTop: 20, textAlign: 'center', padding: '12px', background: '#FDF2F2', borderRadius: 12, color: '#991B1B', fontWeight: 700, fontSize: '0.9rem' }}>
-          {bill.notes}
-        </div>
-      )}
-
-      {/* Signature Section */}
-      <div style={{ marginTop: 40, display: 'flex', justifyContent: 'flex-end', textAlign: 'center' }}>
-         <div style={{ width: 160 }}>
-            {business?.signatureUrl && <img src={business.signatureUrl} style={{ height: 40, width: 100, marginBottom: 8, objectFit: 'contain' }} />}
-            <div style={{ height: 1, background: '#000' }} />
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, marginTop: 4 }}>Authorised Signatory</div>
-            <div style={{ fontSize: '0.65rem', color: '#6B7280' }}>For {business?.businessName}</div>
+      {/* Footer Branding & Signature */}
+      <div style={{ marginTop: 25, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+         <div>
+            <div style={{ fontWeight: 950, fontSize: '1.125rem' }}>{business?.businessName?.toUpperCase() || ''} <span style={{ fontWeight: 400, color: '#666', fontSize: '0.9rem' }}>— {business?.slogan || ''}</span></div>
+         </div>
+         <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 900 }}>For {business?.businessName || ''},</div>
+            <div style={{ width: 180, borderBottom: '1px solid #000', margin: '35px 0 6px' }} />
+            <div style={{ fontSize: '0.75rem', color: '#666' }}>(Authorized Signatory)</div>
          </div>
       </div>
     </div>
   )
 }
 
-// ── Garage Invoice Layout (Legacy Support) ───────────────────────────────────
+// ── Garage Specific Invoice Layout (Repair Estimate Style) ──────────────────
 function GarageInvoice({ bill, business, onPayOnline }) {
   const items = bill.items || []
+  const themeColor = '#FFB800' // Amber/Yellow from target image
+
   return (
-    <div className="invoice-wrap">
-       <div style={{ textAlign: 'center', padding: 20 }}>
-          <h3 style={{ margin: 0 }}>Service Invoice</h3>
-          <p>#{bill.invoiceNo}</p>
-       </div>
-       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#1E1B4B', color: 'white' }}>
-              <th style={{ padding: 10, textAlign: 'left' }}>Description</th>
-              <th style={{ padding: 10, textAlign: 'right' }}>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, i) => (
-              <tr key={i} style={{ borderBottom: '1px solid #EEE' }}>
-                <td style={{ padding: 10 }}>{item.description}</td>
-                <td style={{ padding: 10, textAlign: 'right' }}>₹{parseFloat(item.amount || 0).toLocaleString()}</td>
+    <div className="garage-invoice-wrap" style={{ color: '#000', fontFamily: 'Inter, sans-serif' }}>
+      {/* Top Banner */}
+      <div style={{ background: themeColor, padding: '24px 30px', borderRadius: '8px 8px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#111' }}>Repair Estimate</h1>
+          <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, opacity: 0.85, color: '#333' }}>{business?.slogan || 'Restoring Vehicles, Reviving Peace of Mind'}</p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+           <div style={{ fontWeight: 900, fontSize: '1.25rem', color: '#111' }}>{business?.businessName?.toUpperCase() || 'AUTO REPAIRS'}</div>
+           <div style={{ fontSize: '0.75rem', fontWeight: 700, marginTop: 4 }}>Bill No: {bill.invoiceNo}</div>
+        </div>
+      </div>
+
+      <div style={{ padding: '30px', border: '1px solid #eee', borderTop: 'none', borderRadius: '0 0 8px 8px', background: 'white' }}>
+        
+        {/* Info Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 30, marginBottom: 30 }}>
+          {/* Customer Info */}
+          <div>
+            <div style={{ background: themeColor, padding: '4px 10px', display: 'inline-block', fontWeight: 800, fontSize: '0.75rem', marginBottom: 10, borderRadius: 2 }}>Customer Information</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '0.85rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Name:</span> <span>{bill.customerName}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Address:</span> <span>{bill.customerAddress || '—'}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Phone:</span> <span>{bill.customerPhone}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Email:</span> <span>{bill.customerEmail || '—'}</span></div>
+            </div>
+          </div>
+          {/* Vehicle Info */}
+          <div>
+            <div style={{ background: themeColor, padding: '4px 10px', display: 'inline-block', fontWeight: 800, fontSize: '0.75rem', marginBottom: 10, borderRadius: 2 }}>Vehicle Information</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '0.85rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Make:</span> <span>{bill.vehicleCompany || '—'}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Model:</span> <span>{bill.vehicleModel || '—'}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Model Year:</span> <span>{bill.vehicleYear || '—'}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Reg No:</span> <span style={{ fontWeight: 800 }}>{bill.vehicleNo?.toUpperCase()}</span></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Repair Details Table */}
+        <div style={{ marginBottom: 30 }}>
+          <div style={{ background: themeColor, padding: '4px 10px', display: 'inline-block', fontWeight: 800, fontSize: '0.75rem', marginBottom: 10, borderRadius: 2 }}>Repair Details</div>
+          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
+            <thead>
+              <tr style={{ background: themeColor }}>
+                <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #ddd', fontSize: '0.75rem', fontWeight: 800 }}>Description</th>
+                <th style={{ padding: '12px', textAlign: 'center', border: '1px solid #ddd', fontSize: '0.75rem', fontWeight: 800, width: '15%' }}>Quantity</th>
+                <th style={{ padding: '12px', textAlign: 'right', border: '1px solid #ddd', fontSize: '0.75rem', fontWeight: 800, width: '20%' }}>Unit Price (₹)</th>
+                <th style={{ padding: '12px', textAlign: 'right', border: '1px solid #ddd', fontSize: '0.75rem', fontWeight: 800, width: '20%' }}>Total Price (₹)</th>
               </tr>
-            ))}
-          </tbody>
-          <tfoot>
-             <tr>
-                <td style={{ padding: 10, fontWeight: 800 }}>Total</td>
-                <td style={{ padding: 10, textAlign: 'right', fontWeight: 800 }}>₹{bill.grandTotal?.toLocaleString()}</td>
-             </tr>
-          </tfoot>
-       </table>
-       <div style={{ marginTop: 20, fontSize: '0.8rem', color: '#6B7280' }}>
-         Bank: {business?.bankDetails?.bankName} A/c: {business?.bankDetails?.accountNumber}
-       </div>
-       {bill.status !== 'paid' && (
-         <button 
-           onClick={onPayOnline}
-           style={{
-             marginTop: 20, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-             padding: '12px', background: 'linear-gradient(135deg, #16A34A, #15803D)', color: 'white',
-             border: 'none', borderRadius: 12, fontWeight: 700, cursor: 'pointer'
-           }}
-         >
-           <CreditCard size={18} /> Direct Online Payment
-         </button>
-       )}
+            </thead>
+            <tbody>
+              {items.map((item, i) => (
+                <tr key={i}>
+                  <td style={{ padding: '10px 12px', border: '1px solid #ddd', fontSize: '0.85rem' }}>{item.description}</td>
+                  <td style={{ padding: '10px 12px', border: '1px solid #ddd', fontSize: '0.85rem', textAlign: 'center' }}>{item.qty || 1}</td>
+                  <td style={{ padding: '10px 12px', border: '1px solid #ddd', fontSize: '0.85rem', textAlign: 'right' }}>{parseFloat(item.rate || item.amount).toLocaleString()}</td>
+                  <td style={{ padding: '10px 12px', border: '1px solid #ddd', fontSize: '0.85rem', textAlign: 'right', fontWeight: 600 }}>{parseFloat(item.amount).toLocaleString()}</td>
+                </tr>
+              ))}
+              <tr>
+                <td colSpan="3" style={{ padding: '12px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 800 }}>Total</td>
+                <td style={{ padding: '12px', border: '1px solid #ddd', textAlign: 'right', fontWeight: 950, fontSize: '1.25rem', background: '#fcfcfc' }}>₹{bill.subtotal?.toLocaleString()}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Footer info splits */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 40, borderTop: '2px solid #222', paddingTop: 20 }}>
+          <div style={{ border: '1px solid #ddd', padding: 16, borderRadius: 6, background: '#fafafa' }}>
+             <h4 style={{ margin: '0 0 10px 0', fontSize: '0.8rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Terms and Conditions</h4>
+             <p style={{ margin: 0, fontSize: '0.7rem', color: '#555', lineHeight: 1.6 }}>
+                By signing below, the customer agrees to the repair estimate and authorizes {business?.businessName || 'the garage'} to proceed with repairs, understanding that additional costs may apply after detailed assessment. This estimate is valid for 30 days from the bill date.
+             </p>
+          </div>
+          <div style={{ textAlign: 'right', paddingRight: 10 }}>
+             <div style={{ marginBottom: 40 }}>
+                <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 800 }}>Customer Signature: ____________________</p>
+                <p style={{ margin: '15px 0 0 0', fontSize: '0.85rem', fontWeight: 800 }}>Date: ____________________</p>
+             </div>
+             <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 800, color: '#888' }}>Processed by {business?.businessName}</p>
+          </div>
+        </div>
+
+        {bill.status !== 'paid' && (
+          <button 
+            onClick={onPayOnline}
+            style={{
+              marginTop: 25, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              padding: '14px', background: 'linear-gradient(135deg, #16A34A, #15803D)', color: 'white',
+              border: 'none', borderRadius: 14, fontWeight: 800, fontSize: '1rem', cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(22, 163, 74, 0.3)'
+            }}
+          >
+            <CreditCard size={20} /> Direct Online Payment
+          </button>
+        )}
+      </div>
+      
+      {/* Footer stripe */}
+      <div style={{ height: 16, background: themeColor, borderRadius: '0 0 8px 8px' }} />
     </div>
   )
 }

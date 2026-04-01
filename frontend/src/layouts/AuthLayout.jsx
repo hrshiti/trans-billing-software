@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import { FileText } from 'lucide-react'
+import logo from '../assets/trans-logo.png'
 
 export default function AuthLayout() {
   return (
@@ -21,7 +22,7 @@ export default function AuthLayout() {
 
         {/* Logo */}
         <div style={{
-          width: 72, height: 72, borderRadius: 20,
+          width: 84, height: 84, borderRadius: 24, overflow: 'hidden',
           background: 'rgba(255,255,255,0.15)',
           backdropFilter: 'blur(10px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -30,7 +31,7 @@ export default function AuthLayout() {
           border: '1px solid rgba(255,255,255,0.2)',
           position: 'relative', zIndex: 1
         }}>
-          <FileText size={32} color="white" strokeWidth={2} />
+          <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
 
         {/* Brand name */}

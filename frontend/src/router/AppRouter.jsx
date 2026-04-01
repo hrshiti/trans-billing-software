@@ -44,15 +44,15 @@ const GarageServices = lazy(() => import('../pages/garage/GarageServices'))
 // Admin pages
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'))
 const AdminUsers     = lazy(() => import('../pages/admin/UserManagement'))
-const AdminAds       = lazy(() => import('../pages/admin/AdManager'))
 const AdminBilling   = lazy(() => import('../pages/admin/BillingMonitor'))
 const AdminReports   = lazy(() => import('../pages/admin/SystemReports'))
 const AdminSettings  = lazy(() => import('../pages/admin/SystemSettings'))
-
-// Specialized Admin Management
-const AdminTransport = lazy(() => import('../pages/admin/TransportMgmt'))
-const AdminGarage    = lazy(() => import('../pages/admin/GarageMgmt'))
 const AdminManage    = lazy(() => import('../pages/admin/ManageBusiness'))
+const Specialized    = lazy(() => import('../pages/admin/SpecializedManagement'))
+const AdminNotifications = lazy(() => import('../pages/admin/AdminNotifications'))
+const GarageServiceLogs  = lazy(() => import('../pages/admin/GarageServiceLogs'))
+const TripHistoryLogs    = lazy(() => import('../pages/admin/TripHistoryLogs'))
+const RecentRegistrations = lazy(() => import('../pages/admin/RecentRegistrations'))
 
 // Loader fallback
 const PageLoader = () => (
@@ -129,15 +129,24 @@ export default function AppRouter() {
 
             {/* ── Admin Module ── */}
             <Route element={<ProtectedRoute requireRole="admin" />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/users"     element={<AdminUsers />} />
-              <Route path="/admin/ads"       element={<AdminAds />} />
-              <Route path="/admin/billing"   element={<AdminBilling />} />
-              <Route path="/admin/reports"   element={<AdminReports />} />
-              <Route path="/admin/settings"  element={<AdminSettings />} />
-              <Route path="/admin/transport" element={<AdminTransport />} />
-              <Route path="/admin/garage"    element={<AdminGarage />} />
-              <Route path="/admin/manage/:id" element={<AdminManage />} />
+              <Route path="/admin/dashboard"  element={<AdminDashboard />} />
+              <Route path="/admin/users"      element={<AdminUsers />} />
+              <Route path="/admin/drivers"    element={<Specialized />} />
+              <Route path="/admin/mechanics"  element={<Specialized />} />
+              <Route path="/admin/staff"      element={<Specialized />} />
+              <Route path="/admin/manage"     element={<AdminManage />} />
+              <Route path="/admin/billing"    element={<AdminBilling />} />
+              <Route path="/admin/reports"    element={<AdminReports />} />
+              <Route path="/admin/settings"   element={<AdminSettings />} />
+              {/* Backwards compatibility / Catch-alls */}
+              <Route path="/admin/transport"  element={<AdminManage />} />
+              <Route path="/admin/garage"     element={<AdminManage />} />
+              <Route path="/admin/notifications" element={<AdminNotifications />} />
+              <Route path="/admin/services/garage" element={<GarageServiceLogs />} />
+              <Route path="/admin/trips/history" element={<TripHistoryLogs />} />
+              <Route path="/admin/onboarding"    element={<RecentRegistrations />} />
+              <Route path="/admin/support"       element={<AdminSettings />} />
+              <Route path="/admin/security"      element={<AdminSettings />} />
             </Route>
           </Route>
         </Route>

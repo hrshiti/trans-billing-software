@@ -4,11 +4,19 @@ const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [viewMode, setViewMode] = useState(
+    () => localStorage.getItem('view_mode') || 'transport'
+  )
   const [language, setLanguage] = useState(
     () => localStorage.getItem('app_lang') || 'en'
   )
 
   const toggleSidebar = () => setSidebarCollapsed(p => !p)
+
+  const switchViewMode = (mode) => {
+    setViewMode(mode)
+    localStorage.setItem('view_mode', mode)
+  }
 
   const changeLanguage = (lang) => {
     import('../i18n/i18n').then(({ default: i18n }) => {
@@ -22,6 +30,8 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       sidebarCollapsed,
       toggleSidebar,
+      viewMode,
+      switchViewMode,
       language,
       changeLanguage,
     }}>

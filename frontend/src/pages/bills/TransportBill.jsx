@@ -104,6 +104,14 @@ export default function TransportBill() {
   const gstAmount = subtotal * (parseFloat(gstPercent) || 0) / 100
   const grandTotal = subtotal + gstAmount
 
+  // Auto-append row logic: if the last row is filled, add a new one
+  useEffect(() => {
+    const lastItem = watchedItems[watchedItems.length - 1]
+    if (lastItem?.companyTo && lastItem?.amount && lastItem?.amount !== '0') {
+      append({ date: dayjs().format('YYYY-MM-DD'), companyFrom: 'RA', companyTo: '', chalanNo: '', amount: '' })
+    }
+  }, [watchedItems.map(i => `${i.companyTo}_${i.amount}`).join(',')])
+
   const onSubmit = async (data) => {
     setSaving(true)
     await new Promise(r => setTimeout(r, 800))

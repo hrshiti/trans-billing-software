@@ -28,18 +28,19 @@ export default function TopHeader({ title, subtitle }) {
         {subtitle && <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 1 }}>{subtitle}</p>}
       </div>
 
-      {/* Right — actions */}
       <div className="flex items-center gap-2">
-        {/* Search */}
-        <button 
-          className="btn-icon" 
-          aria-label="Search" 
-          id="btn-header-search"
-          onClick={() => navigate('/bills')}
-          style={{ background: 'rgba(0,0,0,0.05)', borderRadius: 10, width: 36, height: 36, cursor: 'pointer' }}
-        >
-          <Search size={18} />
-        </button>
+        {/* Search (Hide for Admin) */}
+        {!user?.role?.includes('admin') && (
+          <button 
+            className="btn-icon" 
+            aria-label="Search" 
+            id="btn-header-search"
+            onClick={() => navigate('/bills')}
+            style={{ background: 'rgba(0,0,0,0.05)', borderRadius: 10, width: 36, height: 36, cursor: 'pointer' }}
+          >
+            <Search size={18} />
+          </button>
+        )}
 
         {/* Notifications */}
         <button

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider }    from './context/AuthContext'
 import { AppProvider }     from './context/AppContext'
+import { AdminProvider }   from './context/AdminContext'
 import { PartyProvider }   from './context/PartyContext'
 import { VehicleProvider } from './context/VehicleContext'
 import { BillProvider }    from './context/BillContext'
@@ -16,15 +17,17 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <AuthProvider>
         <AppProvider>
-          <PartyProvider>
-            <VehicleProvider>
-              <BillProvider>
-                <FinanceProvider>
-                  <App />
-                </FinanceProvider>
-              </BillProvider>
-            </VehicleProvider>
-          </PartyProvider>
+          <AdminProvider>
+            <PartyProvider>
+              <VehicleProvider>
+                <BillProvider>
+                  <FinanceProvider>
+                    <App />
+                  </FinanceProvider>
+                </BillProvider>
+              </VehicleProvider>
+            </PartyProvider>
+          </AdminProvider>
         </AppProvider>
       </AuthProvider>
     </BrowserRouter>

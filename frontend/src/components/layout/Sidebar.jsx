@@ -1,225 +1,280 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, FileText, Users, Car, Wrench,
-  TrendingUp, Settings, LogOut, ChevronLeft,
-  ChevronRight, Zap, ShieldCheck, Megaphone,
-  Receipt, BarChart2, Truck
+  LayoutDashboard, Users, Building2, Receipt,
+  BarChart2, Bell, ShieldCheck, Settings,
+  LogOut, ChevronLeft, ChevronRight, Truck,
+  Wrench, HelpCircle, ShieldAlert, Monitor,
+  Plus, ChevronDown, UserCircle, MapPin, Banknote
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
-
-// Nav items per role
-const commonNav = [
-  { to: '/dashboard',   icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/bills',       icon: FileText,         label: 'Bills',    badge: null },
-  { to: '/parties',     icon: Users,            label: 'Parties' },
-  { to: '/finance',     icon: TrendingUp,       label: 'Finance' },
-]
-
-const transportNav = [
-  { to: '/transport/trips',    icon: Car,    label: 'Trips' },
-  { to: '/transport/vehicles', icon: Zap,    label: 'Vehicles' },
-]
-
-const garageNav = [
-  { to: '/garage/vehicles',  icon: Car,     label: 'Vehicles' },
-  { to: '/garage/services',  icon: Wrench,  label: 'Services' },
-]
-
-const adminNav = [
-  { to: '/admin/dashboard',  icon: ShieldCheck, label: 'Overview' },
-  { to: '/admin/users',      icon: Users,        label: 'User Base' },
-  { to: '/admin/transport',  icon: Truck,        label: 'Transport' },
-  { to: '/admin/garage',     icon: Wrench,       label: 'Garage' },
-  { to: '/admin/ads',        icon: Megaphone,    label: 'Ads' },
-  { to: '/admin/billing',    icon: Receipt,      label: 'Payments' },
-  { to: '/admin/reports',    icon: BarChart2,    label: 'Reports' },
-  { to: '/admin/settings',   icon: Settings,     label: 'Settings' },
-]
-
-const bottomNav = [
-  { to: '/profile',  icon: Settings, label: 'Profile' },
-]
+import { useAdmin } from '../../context/AdminContext'
+import logo from '../../assets/trans-logo.png'
 
 export default function Sidebar() {
-  const { user, logout, isAdmin, adminModule, switchAdminModule } = useAuth()
+  const { logout, user, isAdmin } = useAuth()
   const { sidebarCollapsed, toggleSidebar } = useApp()
+  const { mode, switchMode } = useAdmin()
   const navigate = useNavigate()
 
-  const roleNav = useMemo(() => {
-    if (!user) return []
-    if (user.role === 'transport') return transportNav
-    if (user.role === 'garage') return garageNav
-    if (user.role === 'admin') {
-      return adminNav.filter(item => {
-        if (adminModule === 'Transport' && item.label === 'Garage') return false
-        if (adminModule === 'Garage' && item.label === 'Transport') return false
-        return true
-      })
-    }
-    return []
-  }, [user, adminModule])
+  const [expanded, setExpanded] = useState({
+    userMgmt: false,
+    bizMgmt: false
+  })
+
+  const toggleSection = (s) => setExpanded(p => ({ ...p, [s]: !p[s] }))
+
+  const isTransport = mode === 'transport'
+  const accentColor = '#7C3AED'
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
 
-  const cls = sidebarCollapsed ? 'sidebar collapsed' : 'sidebar'
+  // Navigation for Transporters
+  const transportItems = [
+    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/bills', icon: Receipt, label: 'Invoices & Bills' },
+    { to: '/parties', icon: Users, label: 'Parties / Clients' },
+    { to: '/transport/vehicles', icon: Truck, label: 'Manage Fleet' },
+    { to: '/transport/trips', icon: MapPin || Monitor, label: 'Trip Management' },
+    { to: '/finance', icon: Banknote || Receipt, label: 'Finance & Payments' },
+    { to: '/profile', icon: UserCircle, label: 'Profile' },
+  ]
+
+  // Navigation for Garage Owners
+  const garageItems = [
+    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/bills', icon: Receipt, label: 'Billing & Records' },
+    { to: '/parties', icon: Users, label: 'Parties' },
+    { to: '/garage/vehicles', icon: Truck, label: 'Vehicles' },
+    { to: '/garage/services', icon: Wrench, label: 'Services' },
+    { to: '/finance', icon: Banknote || Receipt, label: 'Finance & Payments' },
+    { to: '/profile', icon: UserCircle, label: 'Profile' },
+  ]
+
+  // Navigation for Admins
+  const adminItems = [
+    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Admin Dashboard' },
+    {
+      id: 'userMgmt',
+      icon: Users,
+      label: 'User Management',
+      isCollapsible: true,
+      children: [
+        { to: '/admin/users', label: isTransport ? 'Transporters' : 'Garage Owners' },
+        { to: '/admin/drivers', label: isTransport ? 'Drivers' : 'Mechanics' },
+        { to: '/admin/staff', label: 'Staff' }
+      ]
+    },
+    {
+      id: 'bizMgmt',
+      icon: Building2,
+      label: 'Business Mgmt',
+      isCollapsible: true,
+      children: [
+        { to: '/admin/manage', label: isTransport ? 'Transport Businesses' : 'Garage Businesses' },
+        { to: '/admin/onboarding', label: 'Recent Registrations' }
+      ]
+    },
+    { to: '/admin/billing', icon: Receipt, label: 'Billing Monitor' },
+    // Only show Service Management in Garage Mode
+    ...(!isTransport ? [{
+      id: 'svcMgmt',
+      icon: Wrench,
+      label: 'Service Management',
+      isCollapsible: true,
+      children: [
+        { to: '/admin/services/garage', label: 'Garage Service Logs' }
+      ]
+    }] : []),
+    
+    // Only show Trip Management in Transport Mode
+    ...(isTransport ? [{
+      id: 'tripMgmt',
+      icon: MapPin,
+      label: 'Trip Management',
+      isCollapsible: true,
+      children: [
+        { to: '/admin/trips/history', label: 'Trip History' }
+      ]
+    }] : []),
+    { to: '/admin/reports', icon: BarChart2, label: 'Reports & Analytics' },
+    { to: '/admin/notifications', icon: Bell, label: 'Notifications' },
+    { to: '/admin/support', icon: HelpCircle, label: 'Support & Helpdesk' },
+    { to: '/admin/security', icon: ShieldAlert, label: 'Security & Logs' },
+    { to: '/admin/settings', icon: Settings, label: 'Settings' },
+  ]
+
+  const navItems = isAdmin ? adminItems : (user?.role === 'transport' ? transportItems : garageItems)
+
+  const sidebarCls = `sidebar ${sidebarCollapsed ? 'collapsed' : ''}`
 
   return (
-    <aside className={cls}>
-      {/* branding */}
-      <div className="flex items-center gap-3 p-6">
-        <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-[#9333ea] text-white">
-          <FileText className="size-6" />
+    <aside className={sidebarCls} style={{ zIndex: 100 }}>
+      {/* ── Branding ── */}
+      <div className="flex items-center gap-3 px-6 pt-10 pb-6" style={{ cursor: 'pointer', marginBottom: 10 }} onClick={() => navigate('/dashboard')}>
+        <div style={{
+          width: 42, height: 42, borderRadius: 12, overflow: 'hidden',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.4s'
+        }}>
+          <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
-        <span className="text-xl font-black italic tracking-tighter text-white">TRANS</span>
+        {!sidebarCollapsed && (
+          <div style={{ lineHeight: 1 }}>
+            <span style={{ fontSize: '1.25rem', fontWeight: 900, color: 'white', letterSpacing: '-0.02em', fontStyle: 'italic' }}>
+               TRANS
+            </span>
+            <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginTop: 2 }}>
+               {isAdmin ? 'Admin Panel' : (user?.role === 'transport' ? 'Transport Hub' : 'Garage Hub')}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Admin Module Toggle */}
-      {isAdmin && (
+      {/* ── Mode Switcher (Admin Only) ── */}
+      {!sidebarCollapsed && isAdmin && (
         <div className="px-4 mb-6">
-          <div style={{ 
-            background: 'rgba(255, 255, 255, 0.04)', padding: '5px', borderRadius: '14px',
-            display: 'flex', gap: '2px', border: '1px solid rgba(255, 255, 255, 0.08)'
+          <div style={{
+            background: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: 4, display: 'flex', gap: 4,
+            border: '1px solid rgba(255,255,255,0.1)'
           }}>
             <button
-              onClick={() => switchAdminModule('Transport')}
+              onClick={() => switchMode('transport')}
               style={{
-                flex: 1, padding: '10px 0', borderRadius: '10px', border: 'none',
-                background: adminModule === 'Transport' ? 'var(--primary)' : 'transparent',
-                color: adminModule === 'Transport' ? 'white' : 'rgba(255,255,255,0.6)', 
-                fontSize: '0.75rem', fontWeight: 750, cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                boxShadow: adminModule === 'Transport' ? '0 4px 12px rgba(124, 58, 237, 0.3)' : 'none'
+                flex: 1, padding: '10px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
+                background: isTransport ? '#7C3AED' : 'transparent',
+                color: isTransport ? 'white' : 'rgba(255,255,255,0.4)',
+                fontSize: '0.72rem', fontWeight: 800, transition: '0.2s',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                boxShadow: isTransport ? '0 4px 12px rgba(124, 58, 237, 0.3)' : 'none'
               }}
             >
-              <Truck size={15} strokeWidth={2.5} /> Transport
+              <Truck size={14} /> Transport
             </button>
             <button
-              onClick={() => switchAdminModule('Garage')}
+              onClick={() => switchMode('garage')}
               style={{
-                flex: 1, padding: '10px 0', borderRadius: '10px', border: 'none',
-                background: adminModule === 'Garage' ? 'var(--primary)' : 'transparent',
-                color: adminModule === 'Garage' ? 'white' : 'rgba(255,255,255,0.6)', 
-                fontSize: '0.75rem', fontWeight: 750, cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                boxShadow: adminModule === 'Garage' ? '0 4px 12px rgba(124, 58, 237, 0.3)' : 'none'
+                flex: 1, padding: '10px 0', borderRadius: 8, border: 'none', cursor: 'pointer',
+                background: !isTransport ? '#7C3AED' : 'transparent',
+                color: !isTransport ? 'white' : 'rgba(255,255,255,0.4)',
+                fontSize: '0.72rem', fontWeight: 800, transition: '0.2s',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                boxShadow: !isTransport ? '0 4px 12px rgba(124, 58, 237, 0.3)' : 'none'
               }}
             >
-              <Wrench size={15} strokeWidth={2.5} /> Garage
+              <Wrench size={14} /> Garage
             </button>
           </div>
         </div>
       )}
 
       {/* ── Navigation ── */}
-      <nav className="sidebar-nav">
+      <nav className="sidebar-nav" style={{ flex: 1, padding: '0 12px' }}>
+        <p style={{
+          fontSize: '0.65rem', fontWeight: 800, color: 'rgba(255,255,255,0.25)',
+          textTransform: 'uppercase', letterSpacing: '0.1em', padding: '0 12px', marginBottom: 12, marginTop: 16
+        }}>Main Navigation</p>
 
-        {/* Main */}
-        <span className="nav-section-label">Main</span>
-        {commonNav.map(item => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === '/dashboard'}
-            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-          >
-            <item.icon size={20} className="nav-icon" />
-            <span className="nav-label">{item.label}</span>
-            {item.badge && <span className="nav-badge">{item.badge}</span>}
-          </NavLink>
-        ))}
+        {navItems.map(item => {
+          if (item.isCollapsible) {
+            return (
+              <div key={item.id} className="nav-collapsible" style={{ marginBottom: 4 }}>
+                <button
+                  className="nav-item w-full"
+                  onClick={() => toggleSection(item.id)}
+                  style={{ background: 'none', border: 'none', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 12, padding: '12px', borderRadius: 10, position: 'relative' }}
+                >
+                  <item.icon size={20} className="nav-icon" color="rgba(255,255,255,0.6)" />
+                  {!sidebarCollapsed && (
+                    <>
+                      <span className="nav-label" style={{ flex: 1, fontSize: '0.875rem', fontWeight: 650, color: 'rgba(255,255,255,0.8)' }}>{item.label}</span>
+                      <ChevronDown size={14} color="rgba(255,255,255,0.4)" style={{ transform: expanded[item.id] ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+                    </>
+                  )}
+                </button>
+                {expanded[item.id] && !sidebarCollapsed && (
+                  <div style={{ marginLeft: 32, marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {item.children.map(child => (
+                      <NavLink key={child.to} to={child.to} className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+                        style={({ isActive }) => ({
+                          fontSize: '0.8rem', padding: '10px 12px', borderRadius: 8, color: isActive ? 'white' : 'rgba(255,255,255,0.4)',
+                          background: isActive ? accentColor : 'transparent', fontWeight: 700
+                        })}
+                      >
+                        {child.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          }
 
-        {/* Role-specific */}
-        {roleNav.length > 0 && (
-          <>
-            <span className="nav-section-label" style={{ marginTop: 8 }}>
-              {user?.role === 'transport' ? 'Transport' : user?.role === 'admin' ? 'Admin' : 'Garage'}
-            </span>
-            {roleNav.map(item => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-              >
-                <item.icon size={20} className="nav-icon" />
-                <span className="nav-label">{item.label}</span>
-              </NavLink>
-            ))}
-          </>
-        )}
-
-        {/* Settings */}
-        <span className="nav-section-label" style={{ marginTop: 8 }}>Settings</span>
-        {bottomNav.map(item => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-          >
-            <item.icon size={20} className="nav-icon" />
-            <span className="nav-label">{item.label}</span>
-          </NavLink>
-        ))}
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+              style={({ isActive }) => ({
+                display: 'flex', alignItems: 'center', gap: 12, padding: '12px', borderRadius: 10,
+                background: isActive ? accentColor : 'transparent',
+                marginBottom: 4, transition: '0.2s', position: 'relative',
+                boxShadow: isActive ? `0 4px 15px ${accentColor}40` : 'none'
+              })}
+            >
+              {({ isActive }) => (
+                <>
+                  <item.icon size={20} className="nav-icon" color={isActive ? 'white' : 'rgba(255,255,255,0.6)'} />
+                  {!sidebarCollapsed && (
+                    <span className="nav-label" style={{ fontSize: '0.875rem', fontWeight: 650, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
+                      {item.label}
+                    </span>
+                  )}
+                </>
+              )}
+            </NavLink>
+          )
+        })}
       </nav>
 
-      {/* ── User + Logout ── */}
-      <div className="sidebar-footer">
-        {/* User row */}
-        <div className="nav-item" style={{ cursor: 'default', marginBottom: 4 }}>
-          <div className="avatar avatar-sm">
-            {user?.name?.[0]?.toUpperCase() || user?.phone?.slice(-2) || '?'}
+      {/* ── Footer ── */}
+      <div className="sidebar-footer" style={{ padding: 18, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+          <div className="avatar" style={{ width: 38, height: 38, borderRadius: 10, background: 'linear-gradient(135deg, #FF6B6B, #FF8E53)', color: 'white', fontWeight: 900 }}>
+             {user?.name?.[0]?.toUpperCase() || 'A'}
           </div>
-          <div className="nav-label" style={{ lineHeight: 1.3 }}>
-            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
-              {user?.name || 'Business Owner'}
+          {!sidebarCollapsed && (
+            <div style={{ overflow: 'hidden' }}>
+              <p style={{ margin: 0, fontWeight: 800, fontSize: '0.8125rem', color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{user?.name || (isAdmin ? 'Super Admin' : 'Business Owner')}</p>
+              <p style={{ margin: 0, fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>{isAdmin ? (isTransport ? 'Transport Ops' : 'Garage Ops') : (user?.role?.toUpperCase())}</p>
             </div>
-            <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>
-              {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'User'}
-            </div>
-          </div>
+          )}
         </div>
-
-        <button className="nav-item btn-icon w-full" onClick={handleLogout}>
-          <LogOut size={20} className="nav-icon" style={{ color: 'rgba(255,100,100,0.8)' }} />
-          <span className="nav-label" style={{ color: 'rgba(255,100,100,0.8)', fontSize: '0.875rem' }}>
-            Logout
-          </span>
+        <button
+          onClick={handleLogout}
+          className="btn-icon"
+          style={{ width: '100%', background: 'rgba(255,100,100,0.08)', padding: '10px', borderRadius: 10, color: '#FF6B6B', fontSize: '0.8rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, border: 'none', cursor: 'pointer' }}
+        >
+          <LogOut size={18} /> {!sidebarCollapsed && 'Logout Account'}
         </button>
       </div>
 
-      {/* ── Collapse toggle ── */}
-      <button
-        onClick={toggleSidebar}
-        aria-label="Toggle Sidebar"
-        style={{
-          position: 'absolute',
-          top: '50%',
-          right: -14,
-          transform: 'translateY(-50%)',
-          width: 28,
-          height: 28,
-          borderRadius: '50%',
-          background: 'var(--primary)',
-          border: '2px solid white',
-          color: 'white',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-          zIndex: 10,
-        }}
-      >
-        {sidebarCollapsed
-          ? <ChevronRight size={14} />
-          : <ChevronLeft size={14} />}
+      <button onClick={toggleSidebar} style={{
+        position: 'absolute', top: 50, right: -12, width: 24, height: 24, borderRadius: '50%', background: accentColor, border: '2px solid #111',
+        color: 'white', cursor: 'pointer', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center'
+      }}>
+        {sidebarCollapsed ? <ChevronRight size={14} strokeWidth={3} /> : <ChevronLeft size={14} strokeWidth={3} />}
       </button>
+
+      <style>{`
+        .sidebar { background: #0f1014; color: rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-right: 1px solid rgba(255,255,255,0.05); }
+        .nav-item:hover:not(.active) { background: rgba(255,255,255,0.03); }
+        .nav-item.active { color: white !important; }
+        .nav-item.active .nav-label { color: white !important; }
+      `}</style>
     </aside>
   )
 }

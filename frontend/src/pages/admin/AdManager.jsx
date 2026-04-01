@@ -18,7 +18,7 @@ export default function AdManager() {
   const metrics = [
     { label: 'System Impressions', value: '0', icon: Eye, color: '#6366F1', bg: '#EEF2FF', change: '0%' },
     { label: 'Engagement (Clicks)', value: '0', icon: MousePointer2, color: '#10B981', bg: '#ECFDF5', change: '0%' },
-    { label: 'Avg conversion Rate', value: '0%', icon: TrendingUp, color: '#F59E0B', bg: '#FFFBEB', change: '0%' },
+    { label: 'Avg conversion Rate', value: '0%', icon: TrendingUp, color: '#7C3AED', bg: '#EDE9FE', change: '0%' },
   ]
 
   const tabs = ['All', 'Active', 'Paused', 'Draft']

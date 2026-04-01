@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { ShieldCheck, ArrowLeft, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
+import { ShieldCheck, ArrowLeft, Loader2, AlertCircle, RefreshCw, Check } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const OTP_LENGTH = 6
@@ -88,10 +88,8 @@ export default function OTPVerify() {
     }
     const res = await verifyOTP(phone, code)
     if (res.success) {
-      // Always show selection page after OTP
       navigate('/role-select', { replace: true })
     }
-    // error displayed via context
   }, [otp, phone, verifyOTP, navigate])
 
   const handleResend = async () => {
@@ -111,104 +109,134 @@ export default function OTPVerify() {
   const displayError = localError || error
 
   return (
-    <>
+    <div className="animate-fadeIn" style={{ maxWidth: 440, margin: '0 auto' }}>
       {/* Header */}
-      <div className="auth-card-header">
-        <div style={{
-          width: 44, height: 44, borderRadius: 12,
-          background: 'var(--primary-lighter)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          marginBottom: 16
+      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+        <div style={{ 
+          width: 72, height: 72, borderRadius: 24, background: '#F5F3FF',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
+          boxShadow: '0 8px 30px rgba(124, 58, 237, 0.1)', position: 'relative'
         }}>
-          <ShieldCheck size={20} color="var(--primary)" />
+          <ShieldCheck size={32} color="#7C3AED" strokeWidth={2.5} />
+          <div style={{ 
+            position: 'absolute', bottom: -5, right: -5, width: 24, height: 24, 
+            borderRadius: '50%', background: '#7C3AED', display: 'flex', 
+            alignItems: 'center', justifyContent: 'center', color: 'white', border: '3px solid white' 
+          }}>
+            <Check size={14} strokeWidth={4} />
+          </div>
         </div>
-        <h2 className="auth-card-title">Verify OTP</h2>
-        <p className="auth-card-subtitle">
+        <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', marginBottom: 8 }}>
+          Verify OTP
+        </h2>
+        <p style={{ fontSize: '0.9375rem', color: '#64748B', fontWeight: 500 }}>
           We sent a 6-digit code to<br />
-          <strong style={{ color: 'var(--text-primary)' }}>{displayPhone}</strong>
+          <strong style={{ color: '#1E293B', fontSize: '1rem' }}>{displayPhone}</strong>
         </p>
       </div>
 
-      {/* OTP Boxes */}
-      <div className="form-group" style={{ marginBottom: 8 }}>
-        <div className="otp-grid" onPaste={handlePaste}>
-          {otp.map((digit, i) => (
-            <input
-              key={i}
-              ref={el => inputRefs.current[i] = el}
-              id={`otp-box-${i}`}
-              type="text"
-              inputMode="numeric"
-              maxLength={1}
-              value={digit}
-              onChange={e => handleChange(i, e.target.value)}
-              onKeyDown={e => handleKeyDown(i, e)}
-              className={`otp-box${digit ? ' filled' : ''}${displayError ? ' error' : ''}`}
-              autoComplete={i === 0 ? 'one-time-code' : 'off'}
-              style={displayError ? { borderColor: 'var(--danger)' } : {}}
-            />
-          ))}
+      {/* Form Card */}
+      <div style={{ 
+        background: 'white', padding: 32, borderRadius: 28, 
+        border: '1px solid #F1F5F9', boxShadow: '0 20px 50px rgba(0,0,0,0.04)' 
+      }}>
+        {/* OTP Boxes */}
+        <div className="form-group" style={{ marginBottom: 24 }}>
+          <div className="otp-grid" onPaste={handlePaste} style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+            {otp.map((digit, i) => (
+              <input
+                key={i}
+                ref={el => inputRefs.current[i] = el}
+                id={`otp-box-${i}`}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={e => handleChange(i, e.target.value)}
+                onKeyDown={e => handleKeyDown(i, e)}
+                style={{
+                  width: 50, height: 60, borderRadius: 16, border: '2px solid #F1F5F9',
+                  textAlign: 'center', fontSize: '1.5rem', fontWeight: 700, outline: 'none',
+                  transition: 'all 0.2s', background: digit ? '#F5F3FF' : 'white',
+                  borderColor: digit ? '#7C3AED' : (displayError ? '#FECACA' : '#F1F5F9'),
+                  color: '#1E293B'
+                }}
+                className={digit ? 'filled' : ''}
+                autoComplete={i === 0 ? 'one-time-code' : 'off'}
+              />
+            ))}
+          </div>
+
+          {displayError && (
+            <div className="form-error" style={{ justifyContent: 'center', marginTop: 16, color: '#DC2626', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <AlertCircle size={14} /> {displayError}
+            </div>
+          )}
         </div>
 
-        {displayError && (
-          <div className="form-error" style={{ justifyContent: 'center', marginTop: 8 }}>
-            <AlertCircle size={13} /> {displayError}
-          </div>
-        )}
-      </div>
-
-      {/* Verify Button */}
-      <button
-        id="btn-verify-otp"
-        className="btn btn-primary btn-lg btn-full"
-        onClick={() => handleVerify()}
-        disabled={verifying || otp.join('').length < OTP_LENGTH}
-        style={{ marginTop: 16 }}
-      >
-        {verifying ? (
-          <><Loader2 size={18} className="spin" /> Verifying...</>
-        ) : (
-          'Verify & Continue'
-        )}
-      </button>
-
-      {/* Resend + Back */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between',
-        alignItems: 'center', marginTop: 20
-      }}>
+        {/* Verify Button */}
         <button
-          id="btn-change-number"
-          onClick={() => navigate('/login')}
-          className="btn btn-ghost btn-sm"
-          style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+          id="btn-verify-otp"
+          className="btn btn-primary btn-lg btn-full"
+          onClick={() => handleVerify()}
+          disabled={verifying || otp.join('').length < OTP_LENGTH}
+          style={{ height: 56, borderRadius: 16, fontSize: '0.95rem', fontWeight: 800, background: 'linear-gradient(135deg, #7C3AED, #6D28D9)', boxShadow: '0 10px 25px rgba(124, 58, 237, 0.3)' }}
         >
-          <ArrowLeft size={14} /> Change Number
+          {verifying ? (
+            <><Loader2 size={20} className="spin" /> Verifying...</>
+          ) : (
+            'Verify & Continue'
+          )}
         </button>
 
-        {timer > 0 ? (
-          <span style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
-            Resend in <strong style={{ color: 'var(--text-primary)' }}>{timer}s</strong>
-          </span>
-        ) : (
+        {/* Actions */}
+        <div style={{
+          display: 'flex', justifyContent: 'space-between',
+          alignItems: 'center', marginTop: 24
+        }}>
           <button
-            id="btn-resend-otp"
-            onClick={handleResend}
-            disabled={resending}
-            className="btn btn-ghost btn-sm"
-            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+            id="btn-change-number"
+            onClick={() => navigate('/login')}
+            className="btn btn-ghost"
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
+              fontSize: '0.85rem', fontWeight: 700, color: '#64748B', border: '1px solid #F1F5F9', borderRadius: 12
+            }}
           >
-            <RefreshCw size={14} className={resending ? 'spin' : ''} />
-            {resending ? 'Sending...' : 'Resend OTP'}
+            <ArrowLeft size={16} /> Change Number
           </button>
-        )}
+
+          {timer > 0 ? (
+            <div style={{ fontSize: '0.85rem', color: '#94A3B8', fontWeight: 600 }}>
+              Resend in <span style={{ color: '#7C3AED' }}>{timer}s</span>
+            </div>
+          ) : (
+            <button
+              id="btn-resend-otp"
+              onClick={handleResend}
+              disabled={resending}
+              className="btn btn-ghost"
+              style={{ 
+                display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
+                fontSize: '0.85rem', fontWeight: 700, color: '#7C3AED', border: '1px solid #EDE9FE', borderRadius: 12
+              }}
+            >
+              <RefreshCw size={16} className={resending ? 'spin' : ''} />
+              {resending ? 'Sending...' : 'Resend OTP'}
+            </button>
+          )}
+        </div>
       </div>
 
       <style>{`
         .spin { animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .otp-box.error { border-color: var(--danger) !important; }
+        input:focus { 
+          border-color: #7C3AED !important; 
+          box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1) !important;
+          background: #F5F3FF !important;
+        }
       `}</style>
-    </>
+    </div>
   )
 }

@@ -245,8 +245,13 @@ export default function GarageBill() {
                         {filtered.map((item, i) => (
                           <div
                             key={i}
-                            onClick={() => {
-                              setValue(`items.${index}.description`, item.label)
+                            onMouseDown={(e) => {
+                              if (item.isHeader) return
+                              e.preventDefault()
+                              e.stopPropagation()
+                              setValue(`items.${index}.description`, item.label, { shouldValidate: true })
+                              // Auto-append new row for multiple selection
+                              append({ description: '', qty: '1', rate: '', amount: '' })
                               setActiveIdx(null)
                             }}
                             style={{

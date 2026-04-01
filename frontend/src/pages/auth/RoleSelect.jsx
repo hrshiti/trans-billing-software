@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loader2, Truck, Wrench, CheckCircle2, ArrowRight } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import logo from '../../assets/trans-logo.png'
 
 const roles = [
   {
@@ -45,6 +46,13 @@ export default function RoleSelect() {
     <>
       {/* Header */}
       <div className="auth-card-header">
+        <div style={{
+          width: 56, height: 56, borderRadius: 16, overflow: 'hidden',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          marginBottom: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+        }}>
+          <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
         <h2 className="auth-card-title">Choose Your Role</h2>
         <p className="auth-card-subtitle">
           Select what best describes your business.<br />

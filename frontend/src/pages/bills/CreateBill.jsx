@@ -10,7 +10,13 @@ export default function CreateBill() {
   const navigate = useNavigate()
   const role = user?.role
 
-  // If role is clear — render directly
+  // Admin — Block access (redirect)
+  if (role === 'admin') {
+    navigate('/admin/dashboard')
+    return null
+  }
+
+  // Common roles — render directly
   if (role === 'transport') return <TransportBill />
   if (role === 'garage')    return <GarageBill />
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Lock, Mail, Loader2, AlertCircle, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import logo from '../../assets/trans-logo.png'
 
 export default function AdminLogin() {
   const [email, setEmail]       = useState('')
@@ -42,13 +43,12 @@ export default function AdminLogin() {
       {/* Branding / Header */}
       <div className="auth-card-header" style={{ textAlign: 'center' }}>
         <div style={{
-          width: 56, height: 56, borderRadius: 16,
-          background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
+          width: 64, height: 64, borderRadius: 16, overflow: 'hidden',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 20px',
-          boxShadow: '0 8px 16px rgba(124, 58, 237, 0.2)'
+          boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
         }}>
-          <ShieldCheck size={28} color="white" />
+          <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
         <h2 className="auth-card-title" style={{ fontSize: '1.5rem', letterSpacing: '-0.02em' }}>Admin Portal</h2>
         <p className="auth-card-subtitle">
