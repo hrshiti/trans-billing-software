@@ -16,7 +16,7 @@ export default function MobileHeader({
 
   return (
     <header
-      className="mobile-header sticky top-0"
+      className="mobile-header fixed top-0 left-0 right-0"
       style={{
         background: 'rgba(240, 239, 234, 0.75)', /* blends with --bg */
         backdropFilter: 'blur(12px)',
