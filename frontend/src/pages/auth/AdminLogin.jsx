@@ -23,12 +23,12 @@ export default function AdminLogin() {
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     // Secure Admin Validation (Hardcoded for demo)
-    if (email === 'admin@billpro.com' && password === 'admin123') {
+    if (email === 'admin@trans.com' && password === 'admin123') {
       await login({ 
         id: 'sys_admin_root', 
         name: 'Super Admin', 
         role: 'admin', 
-        email: 'admin@billpro.com',
+        email: 'admin@trans.com',
         avatar: 'SA'
       })
       navigate('/admin/dashboard', { replace: true })
@@ -67,7 +67,7 @@ export default function AdminLogin() {
             <Mail size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
             <input 
               type="email" 
-              placeholder="admin@billpro.com"
+              placeholder="admin@trans.com"
               value={email}
               onChange={e => {setEmail(e.target.value); if(error) setError('')}}
               required

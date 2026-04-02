@@ -161,7 +161,7 @@ export default function GarageBill() {
 
         {/* Customer */}
         <SectionCard icon={User} iconBg="#EDE9FE" iconColor="#7C3AED" title="Customer">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="grid grid-cols-1 gap-3">
             <Field label="Select Party">
               <div style={{ position: 'relative' }}>
                 <select {...register('partyId')} className="form-input" style={{ appearance: 'none', paddingRight: 36 }}>
@@ -171,7 +171,7 @@ export default function GarageBill() {
                 <ChevronDown size={15} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
               </div>
             </Field>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="grid sm-grid-cols-2 gap-3">
               <Field label="Customer Name" error={errors.customerName} required>
                 <input {...register('customerName', { required: 'Required' })} placeholder="Name" className={`form-input ${errors.customerName ? 'error' : ''}`} />
               </Field>
@@ -184,7 +184,7 @@ export default function GarageBill() {
 
         {/* Vehicle */}
         <SectionCard icon={Car} iconBg="#FEF3C7" iconColor="#D97706" title="Vehicle">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="grid sm-grid-cols-2 gap-3">
             <Field label="Vehicle Number" error={errors.vehicleNo} required>
               <input {...register('vehicleNo', { required: 'Required' })} placeholder="GJ15AB1234" className={`form-input ${errors.vehicleNo ? 'error' : ''}`} style={{ textTransform: 'uppercase' }} />
             </Field>
@@ -201,131 +201,148 @@ export default function GarageBill() {
               <input {...register('nextServiceKm')} type="number" placeholder="50000" className="form-input" inputMode="numeric" />
             </Field>
             <Field label="Next Service Date">
-              <input {...register('nextServiceDate')} type="date" className="form-input" />
+              <input {...register('nextServiceDate')} type="date" className="form-input" min={dayjs().format('YYYY-MM-DD')} />
             </Field>
           </div>
         </SectionCard>
 
         {/* Service Items */}
         <SectionCard icon={Wrench} iconBg="#DCFCE7" iconColor="#16A34A" title="Parts & Services">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {/* Header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 0.8fr 0.8fr 36px', gap: 6 }}>
-              {['Description', 'Qty', 'Rate ₹', 'Amount ₹', ''].map(h => (
-                <div key={h} style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.04em', paddingLeft: 4 }}>{h}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* Header - Desktop only */}
+            <div className="hide-mobile" style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 0.8fr 0.8fr 36px', gap: 8, padding: '0 4px' }}>
+              {['Description', 'Qty', 'Rate', 'Amount', ''].map(h => (
+                <div key={h} style={{ fontSize: '0.625rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</div>
               ))}
             </div>
 
-            {fields.map((field, index) => {
-              const currentDesc = watch(`items.${index}.description`) || ''
-              const filtered = SERVICES_DATA.filter(item => 
-                currentDesc === '' || item.label.toLowerCase().includes(currentDesc.toLowerCase())
-              )
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {fields.map((field, index) => {
+                const currentDesc = watch(`items.${index}.description`) || ''
+                const filtered = SERVICES_DATA.filter(item => 
+                  currentDesc === '' || item.label.toLowerCase().includes(currentDesc.toLowerCase())
+                )
 
-              return (
-                <div key={field.id} style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 0.8fr 0.8fr 36px', gap: 6, alignItems: 'center', position: 'relative' }}>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      {...register(`items.${index}.description`, { required: true })}
-                      placeholder="Service / Part name"
-                      className="form-input"
-                      style={{ fontSize: '0.8125rem', padding: '8px 10px', width: '100%' }}
-                      onFocus={() => setActiveIdx(index)}
-                      onBlur={() => setTimeout(() => setActiveIdx(null), 200)}
-                      autoComplete="off"
-                    />
-                    
-                    {activeIdx === index && filtered.length > 0 && (
-                      <div style={{
-                        position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100,
-                        background: 'white', border: '1px solid #E5E7EB', borderRadius: 12,
-                        boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
-                        marginTop: 4, maxHeight: 220, overflowY: 'auto'
-                      }}>
-                        {filtered.map((item, i) => (
-                          <div
-                            key={i}
-                            onMouseDown={(e) => {
+                return (
+                  <div key={field.id} className="bill-item-row" style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '2fr 0.6fr 0.8fr 0.8fr 36px', 
+                    gap: 8, 
+                    background: window.innerWidth < 640 ? '#F8FAFC' : 'transparent',
+                    padding: window.innerWidth < 640 ? '12px' : '0',
+                    borderRadius: '12px',
+                    position: 'relative'
+                  }}>
+                    {/* Description */}
+                    <div style={{ position: 'relative' }}>
+                      {window.innerWidth < 640 && <label className="form-label" style={{ fontSize: '0.65rem', marginBottom: 4, display: 'block' }}>Description</label>}
+                      <input
+                        {...register(`items.${index}.description`, { required: true })}
+                        placeholder="Service / Part name"
+                        className="form-input"
+                        style={{ fontSize: '0.875rem', padding: '10px', width: '100%' }}
+                        onFocus={() => setActiveIdx(index)}
+                        onBlur={() => setTimeout(() => setActiveIdx(null), 200)}
+                        autoComplete="off"
+                      />
+                      
+                      {activeIdx === index && filtered.length > 0 && (
+                        <div style={{
+                          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100,
+                          background: 'white', border: '1px solid #E5E7EB', borderRadius: 12,
+                          boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
+                          marginTop: 4, maxHeight: 200, overflowY: 'auto'
+                        }}>
+                          {filtered.map((item, i) => (
+                            <div key={i} onMouseDown={(e) => {
                               if (item.isHeader) return
                               e.preventDefault()
-                              e.stopPropagation()
                               setValue(`items.${index}.description`, item.label, { shouldValidate: true })
-                              // Auto-append new row for multiple selection
                               append({ description: '', qty: '1', rate: '', amount: '' })
                               setActiveIdx(null)
-                            }}
-                            style={{
-                              padding: item.isHeader ? '10px 12px 6px' : '8px 12px',
-                              fontSize: item.isHeader ? '0.7rem' : '0.8125rem',
+                            }} style={{
+                              padding: '10px 14px', fontSize: '0.8125rem',
                               fontWeight: item.isHeader ? 800 : 500,
                               color: item.isHeader ? '#7C3AED' : '#0F0D2E',
                               background: item.isHeader ? '#F9F8FF' : 'white',
-                              cursor: item.isHeader ? 'default' : 'pointer',
-                              textTransform: item.isHeader ? 'uppercase' : 'none',
-                              letterSpacing: item.isHeader ? '0.04em' : 'normal',
-                              paddingLeft: item.isHeader ? 12 : 20,
-                              borderBottom: '1px solid #F3F4F6',
-                              transition: 'background 0.1s'
-                            }}
-                            onMouseEnter={e => !item.isHeader && (e.currentTarget.style.background = '#F5F3FF')}
-                            onMouseLeave={e => !item.isHeader && (e.currentTarget.style.background = 'white')}
-                          >
-                            {item.label}
-                          </div>
-                        ))}
+                            }}>
+                              {item.label}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Qty, Rate, Amount Group for Mobile */}
+                    <div className="grid grid-cols-3 sm-grid-cols-4 gap-2" style={{ gridTemplateColumns: window.innerWidth < 640 ? '1fr 1.5fr 1.5fr' : undefined }}>
+                      <div className="flex flex-col gap-1">
+                        {window.innerWidth < 640 && <label className="form-label" style={{ fontSize: '0.65rem' }}>Qty</label>}
+                        <input {...register(`items.${index}.qty`)} type="number" min="0.1" step="0.1" placeholder="1" className="form-input" style={{ fontSize: '0.875rem', padding: '10px', textAlign: 'center' }} inputMode="decimal" />
                       </div>
-                    )}
+                      <div className="flex flex-col gap-1">
+                        {window.innerWidth < 640 && <label className="form-label" style={{ fontSize: '0.65rem' }}>Rate</label>}
+                        <input {...register(`items.${index}.rate`)} type="number" min="0" step="0.01" placeholder="0" className="form-input" style={{ fontSize: '0.875rem', padding: '10px' }} inputMode="decimal" />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        {window.innerWidth < 640 && <label className="form-label" style={{ fontSize: '0.65rem' }}>Total</label>}
+                        <div style={{ background: '#F1F5F9', borderRadius: 10, padding: '10px', fontSize: '0.875rem', fontWeight: 700, color: '#0F0D2E', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', height: '100%' }}>
+                          ₹{parseFloat(items[index]?.amount || 0).toFixed(0)}
+                        </div>
+                      </div>
+                      {/* Delete button on same line for desktop, or top right for mobile */}
+                      <div style={{ 
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        position: window.innerWidth < 640 ? 'absolute' : 'static',
+                        top: 8, right: 8
+                      }}>
+                        <button type="button" onClick={() => fields.length > 1 && remove(index)}
+                          disabled={fields.length === 1}
+                          style={{ width: 32, height: 32, borderRadius: 10, border: 'none', background: fields.length > 1 ? '#FEE2E2' : '#F1F5F9', cursor: fields.length > 1 ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Trash2 size={14} color={fields.length > 1 ? '#DC2626' : '#CBD5E1'} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <input {...register(`items.${index}.qty`)} type="number" min="0.1" step="0.1" placeholder="1" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px 8px', textAlign: 'center' }} inputMode="decimal" />
-                  <input {...register(`items.${index}.rate`)} type="number" min="0" step="0.01" placeholder="0" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px 8px' }} inputMode="decimal" />
-                  <div style={{ background: '#F4F4F8', borderRadius: 10, padding: '8px 8px', fontSize: '0.8125rem', fontWeight: 600, color: '#0F0D2E', textAlign: 'right' }}>
-                    ₹{parseFloat(items[index]?.amount || 0).toFixed(2)}
-                  </div>
-                  <button type="button" onClick={() => fields.length > 1 && remove(index)}
-                    disabled={fields.length === 1}
-                    style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: fields.length > 1 ? '#FEE2E2' : '#F4F4F4', cursor: fields.length > 1 ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Trash2 size={13} color={fields.length > 1 ? '#DC2626' : '#D1D5DB'} />
-                  </button>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
 
             <button type="button" onClick={() => append({ description: '', qty: '1', rate: '', amount: '' })}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#EDE9FE', color: '#7C3AED', border: 'none', borderRadius: 10, padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.8125rem', width: 'fit-content', marginTop: 4 }}>
-              <Plus size={14} /> Add Row
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#EDE9FE', color: '#7C3AED', border: 'none', borderRadius: 12, padding: '10px 16px', cursor: 'pointer', fontWeight: 700, fontSize: '0.8125rem', width: 'fit-content', marginTop: 8 }}>
+              <Plus size={16} /> Add Another Item
             </button>
 
             {/* Labor + GST */}
-            <div style={{ borderTop: '1px dashed #E5E7EB', paddingTop: 12, marginTop: 4, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <Field label="Total Labour Charge (₹)">
+            <div style={{ borderTop: '1px dashed #E2E8F0', paddingTop: 16, marginTop: 8 }}>
+              <div className="grid sm-grid-cols-2 gap-3 mb-4">
+                <Field label="Labour Charge (₹)">
                   <div className="input-group">
                     <span className="input-prefix">₹</span>
                     <input {...register('laborCharge')} type="number" min="0" step="0.01" placeholder="0" className="form-input" inputMode="decimal" />
                   </div>
                 </Field>
-                <Field label="GST %">
+                <Field label="GST Percentage">
                   <div style={{ position: 'relative' }}>
                     <select {...register('gstPercent')} className="form-input" style={{ appearance: 'none', paddingRight: 30 }}>
                       {['0','5','12','18'].map(g => <option key={g} value={g}>{g}%</option>)}
                     </select>
-                    <ChevronDown size={13} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
+                    <ChevronDown size={14} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none' }} />
                   </div>
                 </Field>
               </div>
 
-              {/* Live total */}
-              <div style={{ background: 'linear-gradient(135deg, #1E1B4B, #4C1D95)', borderRadius: 14, padding: '14px 16px' }}>
-                {[
-                  { label: 'Parts Total',  val: partsTotal },
-                  { label: 'Labour',       val: labor },
-                  { label: `GST (${gstPercent}%)`, val: gstAmount },
-                ].map(row => (
-                  <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', marginBottom: 4 }}>
-                    <span>{row.label}</span><span>₹{row.val.toFixed(2)}</span>
-                  </div>
-                ))}
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 8, marginTop: 4, display: 'flex', justifyContent: 'space-between', color: 'white', fontWeight: 800, fontSize: '1.125rem' }}>
+              {/* Summary Box */}
+              <div style={{ background: '#1E1B4B', borderRadius: 18, padding: '16px 20px', boxShadow: '0 10px 25px -5px rgba(30, 27, 75, 0.2)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94A3B8', fontSize: '0.8125rem', marginBottom: 6 }}>
+                  <span>Parts Subtotal</span><span>₹{partsTotal.toFixed(2)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94A3B8', fontSize: '0.8125rem', marginBottom: 6 }}>
+                  <span>Labour Charge</span><span>₹{labor.toFixed(2)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94A3B8', fontSize: '0.8125rem', marginBottom: 10 }}>
+                  <span>GST Amount ({gstPercent}%)</span><span>₹{gstAmount.toFixed(2)}</span>
+                </div>
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 10, display: 'flex', justifyContent: 'space-between', color: 'white', fontWeight: 800, fontSize: '1.25rem' }}>
                   <span>Grand Total</span><span>₹{grandTotal.toFixed(2)}</span>
                 </div>
               </div>
@@ -335,12 +352,18 @@ export default function GarageBill() {
 
         {/* Payment Mode */}
         <SectionCard icon={FileText} iconBg="#EDE9FE" iconColor="#7C3AED" title="Payment Status">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          <div className="grid grid-cols-3 gap-2">
             {PAYMENT_MODES.map(pm => {
               const isActive = paymentMode === pm.val
               return (
                 <button key={pm.val} type="button" onClick={() => setValue('paymentMode', pm.val)}
-                  style={{ padding: '10px 6px', borderRadius: 12, border: isActive ? `2px solid ${pm.color}` : '2px solid transparent', background: isActive ? pm.bg : '#F4F4F8', color: isActive ? pm.color : '#6B7280', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.18s', boxShadow: isActive ? `0 2px 10px ${pm.color}25` : 'none' }}>
+                  style={{ 
+                    padding: '12px 4px', borderRadius: 12, 
+                    border: isActive ? `2px solid ${pm.color}` : '2px solid transparent', 
+                    background: isActive ? pm.bg : '#F8FAFC', 
+                    color: isActive ? pm.color : '#64748B', 
+                    fontWeight: 700, fontSize: '0.8125rem', cursor: 'pointer', transition: 'all 0.2s' 
+                  }}>
                   {pm.label}
                 </button>
               )
@@ -350,16 +373,16 @@ export default function GarageBill() {
         </SectionCard>
 
         {/* Notes */}
-        <div style={{ background: 'white', borderRadius: 20, padding: '16px 18px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)', marginBottom: 20, border: '1px solid rgba(0,0,0,0.04)' }}>
+        <div style={{ background: 'white', borderRadius: 20, padding: '18px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)', marginBottom: 20, border: '1px solid #F1F5F9' }}>
           <Field label="Notes">
-            <textarea {...register('notes')} placeholder="Warranty terms, special instructions…" className="form-input" style={{ minHeight: 70, resize: 'vertical' }} rows={3} />
+            <textarea {...register('notes')} placeholder="Warranty, terms..." className="form-input" style={{ minHeight: 60, fontSize: '0.875rem' }} />
           </Field>
         </div>
 
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div className="btn-group btn-group-mobile-col">
           <button type="button" className="btn btn-ghost btn-full" onClick={() => navigate('/bills')}>Cancel</button>
-          <button id="btn-save-garage-bill" type="submit" className="btn btn-primary btn-full btn-lg" disabled={saving}>
-            {saving ? <><Loader2 size={18} className="spin" /> Creating…</> : <><CheckCircle2 size={18} /> Create Bill</>}
+          <button id="btn-save-garage-bill" type="submit" className="btn btn-primary btn-full btn-lg" disabled={saving} style={{ height: 52 }}>
+            {saving ? <><Loader2 size={18} className="spin" /> Generating…</> : <><CheckCircle2 size={18} /> Create Bill</>}
           </button>
         </div>
       </form>

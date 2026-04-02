@@ -166,7 +166,7 @@ export default function TransportBill() {
 
         {/* ── Billed To (Party) ── */}
         <SectionCard icon={User} iconBg="#EDE9FE" iconColor="#7C3AED" title="Billed To (Customer)">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="grid grid-cols-1 gap-4">
             <Field label="Select Party (Quick Fill)">
               <div style={{ position: 'relative' }}>
                 <select {...register('partyId')} className="form-input" style={{ appearance: 'none', paddingRight: 36 }}>
@@ -176,7 +176,7 @@ export default function TransportBill() {
                 <ChevronDown size={15} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
               </div>
             </Field>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 12 }}>
+            <div className="grid md-grid-cols-2 gap-3">
               <Field label="Business Name" error={errors.billedToName} required>
                 <input {...register('billedToName', { required: 'Required' })} placeholder="Party Name" className="form-input" />
               </Field>
@@ -189,7 +189,7 @@ export default function TransportBill() {
 
         {/* ── Billing Summary (Multiple Items) ── */}
         <SectionCard icon={Truck} iconBg="#FEF3C7" iconColor="#D97706" title="Billing Summary (Trips / Chalans)">
-          <div style={{ overflowX: 'auto', margin: '0 -18px', padding: '0 18px' }}>
+          <div className="table-responsive" style={{ margin: '0 -10px', width: 'calc(100% + 20px)' }}>
             <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px', minWidth: 600 }}>
               <thead>
                 <tr style={{ textAlign: 'left', color: '#6B7280', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>
@@ -236,25 +236,25 @@ export default function TransportBill() {
           </div>
           <button type="button" onClick={() => append({ date: dayjs().format('YYYY-MM-DD'), companyFrom: 'RA', companyTo: '', chalanNo: '', amount: '' })} 
             style={{ 
-              marginTop: 12, width: '100%', padding: '10px', borderRadius: 12, border: '2px dashed #E5E7EB', 
+              marginTop: 12, width: '100%', padding: '12px', borderRadius: 12, border: '2px dashed #E5E7EB', 
               background: '#F9FAFB', fontWeight: 700, fontSize: '0.875rem', color: '#4F46E5', 
-              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: '0.2s'
-            }} onMouseEnter={e => e.currentTarget.style.borderColor = '#4F46E5'} onMouseLeave={e => e.currentTarget.style.borderColor = '#E5E7EB'}>
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+            }}>
             <Plus size={18} /> Add Another Trip
           </button>
         </SectionCard>
 
         {/* ── Other Charges & GST ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 14 }}>
+        <div className="grid md-grid-cols-2 gap-4">
           <SectionCard icon={FileText} iconBg="#FEE2E2" iconColor="#DC2626" title="Extra Charges">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { name: 'loadingCharge',   label: 'Loading (₹)' },
-                { name: 'unloadingCharge', label: 'Unloading (₹)' },
-                { name: 'detentionCharge', label: 'Detention (₹)' },
-                { name: 'otherCharge',     label: 'Other (₹)' },
+                { name: 'loadingCharge',   label: 'Loading' },
+                { name: 'unloadingCharge', label: 'Unloading' },
+                { name: 'detentionCharge', label: 'Detention' },
+                { name: 'otherCharge',     label: 'Other' },
               ].map(c => (
-                <Field key={c.name} label={c.label}>
+                <Field key={c.name} label={`${c.label} (₹)`}>
                   <div className="input-group">
                     <span className="input-prefix">₹</span>
                     <input {...register(c.name)} type="number" placeholder="0" className="form-input" />
@@ -265,7 +265,7 @@ export default function TransportBill() {
           </SectionCard>
 
           <SectionCard icon={FileText} iconBg="#DCFCE7" iconColor="#16A34A" title="Taxes & Totals">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+            <div className="grid grid-cols-2 gap-3 mb-4">
               <Field label="GST %">
                 <select {...register('gstPercent')} className="form-input">
                   {['0','5','12','18'].map(g => <option key={g} value={g}>{g}%</option>)}
@@ -278,12 +278,12 @@ export default function TransportBill() {
               </Field>
             </div>
             
-            <div style={{ background: '#1E1B4B', borderRadius: 16, padding: '16px', color: 'white' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: '0.875rem', opacity: 0.8 }}>
+            <div style={{ background: '#1E1B4B', borderRadius: 16, padding: '16px', color: 'white', boxShadow: '0 8px 20px rgba(30, 27, 75, 0.15)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)' }}>
                 <span>Subtotal</span>
                 <span>₹{subtotal.toFixed(2)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: '0.875rem', opacity: 0.8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)' }}>
                 <span>GST Amount</span>
                 <span>₹{gstAmount.toFixed(2)}</span>
               </div>
@@ -296,15 +296,15 @@ export default function TransportBill() {
         </div>
 
         {/* ── Payment & Notes ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 14, marginBottom: 24 }}>
+        <div className="grid md-grid-cols-2 gap-4 mb-6">
           <SectionCard icon={Calendar} iconBg="#EDE9FE" iconColor="#7C3AED" title="Payment Mode">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            <div className="grid grid-cols-3 gap-2">
               {PAYMENT_MODES.map(pm => {
                 const isActive = paymentMode === pm.val
                 return (
                   <button key={pm.val} type="button" onClick={() => setValue('paymentMode', pm.val)}
                     style={{
-                      padding: '12px 6px', borderRadius: 12, border: isActive ? `2px solid ${pm.color}` : '2px solid transparent',
+                      padding: '12px 4px', borderRadius: 12, border: isActive ? `2px solid ${pm.color}` : '2px solid transparent',
                       background: isActive ? pm.bg : '#F3F4F6', color: isActive ? pm.color : '#6B7280',
                       fontWeight: 700, fontSize: '0.8125rem', cursor: 'pointer', transition: '0.2s'
                     }}
@@ -315,18 +315,18 @@ export default function TransportBill() {
             <input type="hidden" {...register('paymentMode')} />
           </SectionCard>
 
-          <div style={{ background: 'white', borderRadius: 20, padding: '18px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.04)' }}>
+          <div style={{ background: 'white', borderRadius: 20, padding: '18px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)', border: '1px solid #F1F5F9' }}>
             <Field label="Notes / Slogan">
-              <textarea {...register('notes')} className="form-input" style={{ minHeight: 70, fontSize: '0.875rem' }} />
+              <textarea {...register('notes')} className="form-input" style={{ minHeight: 60, fontSize: '0.875rem' }} />
             </Field>
           </div>
         </div>
 
         {/* Submit */}
-        <div style={{ display: 'flex', gap: 12, marginBottom: 40 }}>
-          <button type="button" className="btn btn-ghost btn-full" onClick={() => navigate('/bills')}>Cancel</button>
-          <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={saving}>
-            {saving ? <><Loader2 size={18} className="spin" /> Generating…</> : <><FileText size={18} /> Generate Consolidated Bill</>}
+        <div className="btn-group btn-group-mobile-col" style={{ marginBottom: 40 }}>
+          <button type="button" className="btn btn-ghost btn-full" onClick={() => navigate('/bills')} style={{ height: 52 }}>Cancel</button>
+          <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={saving} style={{ height: 52 }}>
+            {saving ? <><Loader2 size={18} className="spin" /> Generating…</> : <><FileText size={18} /> Generate Bill</>}
           </button>
         </div>
       </form>

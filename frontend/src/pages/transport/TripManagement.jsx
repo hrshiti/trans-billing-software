@@ -142,35 +142,35 @@ export default function TripManagement() {
   }, [trips, search])
 
   return (
-    <div className="page-wrapper animate-fadeIn">
+    <div className="page-wrapper animate-fadeIn trip-mgmt-container">
       
       {/* Header section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-        <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#0F0D2E', margin: 0 }}>Detailed Trip Management</h1>
-          <p style={{ color: '#6B7280', fontSize: '0.875rem' }}>Track and manage route-wise operations</p>
+      <div className="trip-header">
+        <div className="trip-header-info">
+          <h1 className="trip-title">Detailed Trip Management</h1>
+          <p className="trip-subtitle">Track and manage route-wise operations</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn btn-primary" style={{ height: 48, borderRadius: 16, padding: '0 20px', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 8px 24px rgba(79, 70, 229, 0.2)' }}>
+        <button onClick={() => setShowForm(!showForm)} className="btn btn-primary add-trip-btn">
           {showForm ? <><ArrowLeft size={18} /> Cancel</> : <><Plus size={18} /> Log New Trip</>}
         </button>
       </div>
 
       {/* Stats row */}
       {!showForm && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
-          <div style={{ background: 'white', borderRadius: 24, padding: '20px', border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 2px 12px rgba(0,0,0,0.02)' }}>
-            <div style={{ color: '#6B7280', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>Total Trips</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#0F0D2E' }}>{trips.length}</div>
+        <div className="stats-grid-compact">
+          <div className="stat-card">
+            <div className="stat-label">Total Trips</div>
+            <div className="stat-value">{trips.length}</div>
           </div>
-          <div style={{ background: '#EEF2FF', borderRadius: 24, padding: '20px', border: '1px solid #E0E7FF' }}>
-            <div style={{ color: '#4F46E5', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>Active Routes</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#4338CA' }}>{new Set(trips.map(t => `${t.fromLocation}-${t.toLocation}`)).size}</div>
+          <div className="stat-card accent">
+            <div className="stat-label">Active Routes</div>
+            <div className="stat-value">{new Set(trips.map(t => `${t.fromLocation}-${t.toLocation}`)).size}</div>
           </div>
         </div>
       )}
 
       {showForm ? (
-        <div className="animate-fadeInUp" style={{ background: 'white', borderRadius: 28, padding: 24, border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 40px rgba(0,0,0,0.05)', maxWidth: 600, margin: '0 auto' }}>
+        <div className="animate-fadeInUp trip-form-card">
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
             <Navigation size={22} color="var(--primary)" /> Add Trip Details
           </h2>
@@ -178,9 +178,7 @@ export default function TripManagement() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div className="form-group">
                 <label className="form-label">Date</label>
-                <div style={{ position: 'relative' }}>
-                   <input type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="form-input" required />
-                </div>
+                <input type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="form-input" required />
               </div>
               <div className="form-group">
                 <label className="form-label">Select Vehicle</label>
@@ -208,7 +206,7 @@ export default function TripManagement() {
                 <input type="number" value={formData.numberOfTrips} onChange={e => setFormData({...formData, numberOfTrips: e.target.value})} placeholder="1" className="form-input" min="1" required />
               </div>
               <div className="form-group">
-                <label className="form-label">Amount (₹) (Optional)</label>
+                <label className="form-label">Amount (₹)</label>
                 <input type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} placeholder="1500" className="form-input" />
               </div>
             </div>
@@ -221,92 +219,61 @@ export default function TripManagement() {
       ) : (
         <>
           {/* Search bar */}
-          <div style={{ background: 'white', borderRadius: 20, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, border: '1px solid rgba(0,0,0,0.05)' }}>
+          <div className="search-container">
             <Search size={20} color="#9CA3AF" />
             <input 
               value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Search by location or vehicle number..." 
-              style={{ border: 'none', background: 'transparent', flex: 1, height: 40, outline: 'none', fontSize: '0.9rem' }} 
+              placeholder="Search by location or vehicle..." 
+              className="search-input"
             />
           </div>
 
           {/* Trips List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="trips-list">
             {filteredTrips.length > 0 ? filteredTrips.map((trip) => (
-              <div key={trip.id} className="animate-fadeInUp" style={{ background: 'white', borderRadius: 24, padding: 18, display: 'flex', alignItems: 'center', gap: 16, border: '1px solid rgba(0,0,0,0.03)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
-                {/* Icon wrapper */}
-                <div style={{ width: 48, height: 48, borderRadius: 16, background: '#F5F3FF', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Truck size={22} />
-                </div>
-
-                {/* Main info */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '1rem', fontWeight: 900, color: '#0F0D2E', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {trip.fromLocation} <ArrowRight size={14} color="#9CA3AF" /> {trip.toLocation}
+              <div key={trip.id} className="animate-fadeInUp trip-card-mobile">
+                <div className="trip-card-main">
+                  <div className="trip-route">
+                    <span className="location">{trip.fromLocation}</span>
+                    <ArrowRight size={14} className="route-arrow" />
+                    <span className="location">{trip.toLocation}</span>
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: '#6B7280', display: 'flex', flexWrap: 'wrap', gap: '8px 16px', marginTop: 4 }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Hash size={12} /> {trip.vehicleNumber}</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Calendar size={12} /> {dayjs(trip.date).format('DD MMM YYYY')}</span>
-                    <span style={{ background: '#F3F4F6', color: '#374151', padding: '2px 8px', borderRadius: 6, fontWeight: 700, fontSize: '0.7rem' }}>{trip.numberOfTrips} TRIP(S)</span>
-                  </div>
-                </div>
-
-                {/* Action Area (Chalan + Amount + Delete) */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingLeft: 16, borderLeft: '1px solid #F3F4F6', marginLeft: 8 }}>
                   
-                  {/* Chalan Photo Capture UI */}
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div className="trip-meta-grid">
+                    <div className="meta-item"><Hash size={12} /> {trip.vehicleNumber}</div>
+                    <div className="meta-item"><Calendar size={12} /> {dayjs(trip.date).format('DD MMM')}</div>
+                    <div className="trip-badge">{trip.numberOfTrips} TRIP(S)</div>
+                  </div>
+                </div>
+
+                <div className="trip-card-actions">
+                  <div className="action-left">
                     {trip.chalanImage ? (
-                      <div 
-                        onClick={() => { setPreviewImage(trip.chalanImage); setIsPreviewOpen(true); }}
-                        style={{ width: 44, height: 44, borderRadius: 12, overflow: 'hidden', cursor: 'pointer', border: '2px solid #7C3AED', position: 'relative', boxShadow: '0 4px 12px rgba(124, 58, 237, 0.2)' }}
-                      >
-                        <img src={trip.chalanImage} alt="Chalan" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: '0.2s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}>
-                           <Eye size={14} color="white" />
-                        </div>
-                        <button 
-                          onClick={(e) => removePhoto(e, trip.id)}
-                          style={{ position: 'absolute', top: 0, right: 0, background: '#EF4444', border: 'none', color: 'white', padding: '1px 3px', borderRadius: '0 0 0 6px' }}
-                        >
-                          <X size={8} />
+                      <div className="chalan-thumb" onClick={() => { setPreviewImage(trip.chalanImage); setIsPreviewOpen(true); }}>
+                        <img src={trip.chalanImage} alt="Chalan" />
+                        <button className="remove-photo-btn" onClick={(e) => removePhoto(e, trip.id)} aria-label="Remove photo">
+                          <X size={10} />
                         </button>
                       </div>
                     ) : (
-                      <button 
-                        onClick={() => handlePhotoCapture(trip.id)}
-                        title="Click to capture Chalan photo"
-                        style={{ width: 44, height: 44, borderRadius: 12, background: '#F9FAFB', border: '1px dashed #D1D5DB', color: '#9CA3AF', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', gap: 1, transition: '0.2s' }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = '#7C3AED'; e.currentTarget.style.color = '#7C3AED'; e.currentTarget.style.background = '#F5F3FF'; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = '#D1D5DB'; e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.background = '#F9FAFB'; }}
-                      >
+                      <button className="upload-chalan-btn" onClick={() => handlePhotoCapture(trip.id)}>
                         <Camera size={16} />
-                        <span style={{ fontSize: '0.55rem', fontWeight: 800 }}>CHALAN</span>
+                        <span>CHALAN</span>
                       </button>
                     )}
+                    {trip.amount && <div className="trip-amount">₹{parseFloat(trip.amount).toLocaleString()}</div>}
                   </div>
-
-                  {/* Amount & Delete */}
-                  <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4, minWidth: 80 }}>
-                    {trip.amount && <div style={{ fontSize: '1rem', fontWeight: 900, color: '#0F0D2E' }}>₹{parseFloat(trip.amount).toLocaleString()}</div>}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <button 
-                        onClick={() => handleDelete(trip.id)} 
-                        style={{ width: 32, height: 32, borderRadius: 10, border: 'none', background: 'transparent', color: '#EF4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s' }} 
-                        onMouseEnter={e => { e.currentTarget.style.background = '#FEF2F2'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
+                  
+                  <button className="delete-trip-btn" onClick={() => handleDelete(trip.id)} aria-label="Delete trip">
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               </div>
             )) : (
-              <div style={{ textAlign: 'center', padding: '60px 20px', background: 'white', borderRadius: 28, color: '#9CA3AF' }}>
-                <Truck size={48} style={{ opacity: 0.2, marginBottom: 12 }} />
-                <div style={{ fontSize: '1rem', fontWeight: 700 }}>No trips recorded yet</div>
-                <p style={{ fontSize: '0.875rem' }}>Start by logging a new trip today</p>
+              <div className="empty-state">
+                <Truck size={48} className="empty-icon" />
+                <div className="empty-title">No trips recorded yet</div>
+                <p className="empty-subtitle">Start by logging a new trip today</p>
               </div>
             )}
           </div>
@@ -315,44 +282,73 @@ export default function TripManagement() {
 
       {/* Photo Preview Modal */}
       {isPreviewOpen && (
-        <div 
-          className="animate-fadeIn"
-          style={{ position: 'fixed', inset: 0, background: 'rgba(15, 13, 46, 0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, backdropFilter: 'blur(8px)' }}
-          onClick={() => setIsPreviewOpen(false)}
-        >
-          <div 
-            style={{ position: 'relative', maxWidth: '100%', maxHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-              <button 
-                onClick={() => setIsPreviewOpen(false)}
-                style={{ background: 'white', border: 'none', borderRadius: 12, height: 40, padding: '0 16px', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-              >
-                <X size={18} /> Close
-              </button>
-            </div>
-            <img 
-              src={previewImage} 
-              alt="Chalan Preview" 
-              style={{ maxWidth: '90vw', maxHeight: '80vh', borderRadius: 24, boxShadow: '0 20px 50px rgba(0,0,0,0.5)', objectFit: 'contain', border: '4px solid white' }} 
-            />
-            <div style={{ marginTop: 20, color: 'white', fontWeight: 700, fontSize: '0.9rem', background: 'rgba(255,255,255,0.1)', padding: '8px 20px', borderRadius: 20 }}>
-              Chalan Proof Capture
-            </div>
+        <div className="preview-modal" onClick={() => setIsPreviewOpen(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <button className="close-preview-btn" onClick={() => setIsPreviewOpen(false)}>
+              <X size={20} />
+            </button>
+            <img src={previewImage} alt="Chalan Preview" className="preview-img" />
           </div>
         </div>
       )}
 
-      {/* Hidden File Input for Capture */}
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        style={{ display: 'none' }} 
-        accept="image/*" 
-        capture="environment" 
-        onChange={onFileChange} 
-      />
+      {/* Hidden File Input */}
+      <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" capture="environment" onChange={onFileChange} />
+
+      <style>{`
+        .trip-mgmt-container { padding-bottom: 24px; }
+        .trip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+        .trip-title { fontSize: 1.25rem; font-weight: 900; color: #0F0D2E; margin: 0; }
+        .trip-subtitle { color: #6B7280; font-size: 0.8125rem; margin-top: 2px; }
+        .add-trip-btn { height: 44px; border-radius: 12px; padding: 0 16px; display: flex; alignItems: center; gap: 8px; font-weight: 700; font-size: 0.875rem; }
+        
+        .stats-grid-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 18px; padding: 16px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .stat-card.accent { background: #EEF2FF; border-color: #E0E7FF; }
+        .stat-label { color: #6B7280; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
+        .accent .stat-label { color: #4F46E5; }
+        .stat-value { font-size: 1.25rem; font-weight: 900; color: #0F0D2E; }
+        .accent .stat-value { color: #4338CA; }
+
+        .search-container { background: white; border-radius: 16px; padding: 0 16px; display: flex; align-items: center; gap: 10px; margin-bottom: 16px; border: 1.5px solid #F1F5F9; }
+        .search-input { border: none; background: transparent; flex: 1; height: 44px; outline: none; font-size: 0.875rem; font-weight: 500; }
+        
+        .trips-list { display: flex; flex-direction: column; gap: 12px; }
+        .trip-card-mobile { background: white; border-radius: 20px; padding: 16px; border: 1px solid #F1F5F9; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .trip-card-main { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #F1F5F9; }
+        .trip-route { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .location { font-size: 0.9375rem; font-weight: 800; color: #0F0D2E; }
+        .route-arrow { color: #94A3B8; }
+        
+        .trip-meta-grid { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+        .meta-item { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #64748B; font-weight: 600; }
+        .trip-badge { background: #F8FAFC; color: #475569; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 0.625rem; letter-spacing: 0.02em; }
+        
+        .trip-card-actions { display: flex; align-items: center; justify-content: space-between; }
+        .action-left { display: flex; align-items: center; gap: 12px; }
+        .chalan-thumb { width: 42px; height: 42px; border-radius: 10px; overflow: hidden; position: relative; border: 1.5px solid #7C3AED; }
+        .chalan-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .remove-photo-btn { position: absolute; top: 0; right: 0; background: #EF4444; border: none; color: white; border-radius: 0 0 0 4px; padding: 1px 2px; }
+        
+        .upload-chalan-btn { height: 42px; border-radius: 10px; padding: 0 10px; border: 1.5px dashed #CBD5E1; background: #F8FAFC; color: #64748B; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+        .upload-chalan-btn span { font-size: 0.5rem; font-weight: 800; }
+        
+        .trip-amount { font-size: 0.9375rem; font-weight: 900; color: #0F0D2E; }
+        .delete-trip-btn { color: #FDA4AF; padding: 8px; transition: 0.2s; border: none; background: transparent; }
+        .delete-trip-btn:active { color: #EF4444; transform: scale(0.9); }
+        
+        .empty-state { text-align: center; padding: 40px 20px; }
+        .empty-icon { opacity: 0.1; margin-bottom: 8px; color: #0F0D2E; }
+        .empty-title { font-size: 0.9375rem; font-weight: 700; color: #334155; }
+        .empty-subtitle { font-size: 0.8125rem; color: #64748B; margin-top: 4px; }
+        
+        .preview-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(4px); }
+        .modal-content { position: relative; width: 100%; max-width: 400px; }
+        .preview-img { width: 100%; border-radius: 16px; border: 3px solid white; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .close-preview-btn { position: absolute; top: -50px; right: 0; background: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        
+        .trip-form-card { background: white; border-radius: 24px; padding: 20px; border: 1px solid #F1F5F9; }
+      `}</style>
     </div>
   )
 }

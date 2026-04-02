@@ -17,43 +17,41 @@ function TransportInvoice({ bill, business, onPayOnline }) {
   return (
     <div className="invoice-wrap" style={{ color: '#000', fontFamily: 'Inter, sans-serif', padding: '10px' }}>
       {/* Top Header Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', border: '1px solid #ccc', borderRadius: '2px 2px 0 0' }}>
-        <div style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1.2fr 1fr', border: '1px solid #ccc', borderRadius: window.innerWidth < 640 ? '8px' : '2px 2px 0 0' }}>
+        <div style={{ padding: window.innerWidth < 640 ? '12px' : '20px', display: 'flex', alignItems: 'center', gap: 12 }}>
            {business?.logoUrl 
-             ? <img src={business.logoUrl} style={{ width: 80, height: 60, objectFit: 'contain' }} />
-             : <div style={{ minWidth: 60, height: 60, background: '#eee', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 900 }}>T</div>
+             ? <img src={business.logoUrl} style={{ width: window.innerWidth < 640 ? 50 : 80, height: window.innerWidth < 640 ? 40 : 60, objectFit: 'contain' }} />
+             : <div style={{ minWidth: 40, height: 40, background: '#eee', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 900 }}>T</div>
            }
            <div>
-             <h1 style={{ fontSize: '2.4rem', fontWeight: 950, margin: 0, letterSpacing: '-0.04em', lineHeight: 0.9 }}>{business?.businessName || 'BUSINESS'}</h1>
-             <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#444', textTransform: 'capitalize', marginTop: 8 }}>{business?.slogan || 'Move What Matters'}</p>
+             <h1 style={{ fontSize: window.innerWidth < 640 ? '1.5rem' : '2.4rem', fontWeight: 950, margin: 0, letterSpacing: '-0.04em', lineHeight: 0.9 }}>{business?.businessName?.toUpperCase() || 'BUSINESS'}</h1>
+             <p style={{ fontSize: '0.65rem', fontWeight: 600, color: '#444', textTransform: 'capitalize', marginTop: 4 }}>{business?.slogan || 'Move What Matters'}</p>
            </div>
         </div>
-        <div style={{ borderLeft: '1px solid #ccc' }}>
-           <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', borderBottom: '1px solid #ccc' }}>
-             <div style={{ padding: '14px 12px', background: '#fff', fontWeight: 600, fontSize: '0.85rem' }}>Bill No.:</div>
-             <div style={{ padding: '14px 12px', fontWeight: 800, fontSize: '0.95rem', borderLeft: '1px solid #eee' }}>{bill.invoiceNo}</div>
+        <div style={{ borderLeft: window.innerWidth < 640 ? 'none' : '1px solid #ccc', borderTop: window.innerWidth < 640 ? '1px solid #ccc' : 'none' }}>
+           <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', borderBottom: '1px solid #ccc' }}>
+             <div style={{ padding: '10px', background: '#fff', fontWeight: 600, fontSize: '0.75rem' }}>Bill No.:</div>
+             <div style={{ padding: '10px', fontWeight: 800, fontSize: '0.85rem', borderLeft: '1px solid #eee' }}>{bill.invoiceNo}</div>
            </div>
-           <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr' }}>
-             <div style={{ padding: '14px 12px', background: '#fff', fontWeight: 600, fontSize: '0.85rem' }}>Date :</div>
-             <div style={{ padding: '14px 12px', fontWeight: 800, fontSize: '0.95rem', borderLeft: '1px solid #eee' }}>{dayjs(bill.billDate).format('DD/MM/YYYY')}</div>
+           <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr' }}>
+             <div style={{ padding: '10px', background: '#fff', fontWeight: 600, fontSize: '0.75rem' }}>Date :</div>
+             <div style={{ padding: '10px', fontWeight: 800, fontSize: '0.85rem', borderLeft: '1px solid #eee' }}>{dayjs(bill.billDate).format('DD/MM/YYYY')}</div>
            </div>
         </div>
       </div>
 
       {/* From / To Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: '1px solid #ccc', borderTop: 'none' }}>
-        <div style={{ padding: '12px 16px', borderRight: '1px solid #ccc' }}>
-          <div style={{ fontSize: '0.85rem', fontWeight: 800, marginBottom: 4 }}>From : <span style={{ fontWeight: 900, textTransform: 'uppercase' }}>{business?.businessName}</span></div>
-          <div style={{ fontSize: '0.75rem', color: '#333', lineHeight: 1.5 }}>
-            {business?.address}<br/>
-            Email : {business?.email}<br/>
+      <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', border: '1px solid #ccc', borderTop: 'none' }}>
+        <div style={{ padding: '10px 12px', borderRight: window.innerWidth < 640 ? 'none' : '1px solid #ccc', borderBottom: window.innerWidth < 640 ? '1px solid #ccc' : 'none' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 800, marginBottom: 4 }}>From : <span style={{ fontWeight: 900 }}>{business?.businessName}</span></div>
+          <div style={{ fontSize: '0.65rem', color: '#333', lineHeight: 1.4 }}>
+            {business?.address?.substring(0, 80)}<br/>
             Mob : {business?.phone}
-            {business?.panNo && <span><br/>PAN No : {business?.panNo}</span>}
           </div>
         </div>
-        <div style={{ padding: '12px 16px' }}>
-          <div style={{ fontSize: '0.85rem', fontWeight: 800, marginBottom: 4 }}>Billed To : <span style={{ fontWeight: 900, textTransform: 'uppercase' }}>{bill.billedToName}</span></div>
-          <div style={{ fontSize: '0.75rem', color: '#333', lineHeight: 1.5 }}>{bill.billedToAddress}</div>
+        <div style={{ padding: '10px 12px' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 800, marginBottom: 4 }}>Billed To : <span style={{ fontWeight: 900 }}>{bill.billedToName}</span></div>
+          <div style={{ fontSize: '0.65rem', color: '#333', lineHeight: 1.4 }}>{bill.billedToAddress?.substring(0, 80)}</div>
         </div>
       </div>
 
@@ -139,39 +137,37 @@ function GarageInvoice({ bill, business, onPayOnline }) {
   return (
     <div className="garage-invoice-wrap" style={{ color: '#000', fontFamily: 'Inter, sans-serif' }}>
       {/* Top Banner */}
-      <div style={{ background: themeColor, padding: '24px 30px', borderRadius: '8px 8px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ background: themeColor, padding: window.innerWidth < 640 ? '16px' : '24px 30px', borderRadius: '8px 8px 0 0', display: 'flex', flexDirection: window.innerWidth < 640 ? 'column' : 'row', justifyContent: 'space-between', alignItems: window.innerWidth < 640 ? 'flex-start' : 'center', gap: 12 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#111' }}>Repair Estimate</h1>
-          <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, opacity: 0.85, color: '#333' }}>{business?.slogan || 'Restoring Vehicles, Reviving Peace of Mind'}</p>
+          <h1 style={{ margin: 0, fontSize: window.innerWidth < 640 ? '1.5rem' : '2rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#111' }}>Repair Estimate</h1>
+          <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, opacity: 0.85, color: '#333' }}>{business?.slogan || 'Restoring Vehicles, Reviving Peace of Mind'}</p>
         </div>
-        <div style={{ textAlign: 'right' }}>
-           <div style={{ fontWeight: 900, fontSize: '1.25rem', color: '#111' }}>{business?.businessName?.toUpperCase() || 'AUTO REPAIRS'}</div>
-           <div style={{ fontSize: '0.75rem', fontWeight: 700, marginTop: 4 }}>Bill No: {bill.invoiceNo}</div>
+        <div style={{ textAlign: window.innerWidth < 640 ? 'left' : 'right' }}>
+           <div style={{ fontWeight: 900, fontSize: '1.125rem', color: '#111' }}>{business?.businessName?.toUpperCase() || 'AUTO REPAIRS'}</div>
+           <div style={{ fontSize: '0.7rem', fontWeight: 700, marginTop: 4 }}>Bill No: {bill.invoiceNo}</div>
         </div>
       </div>
 
-      <div style={{ padding: '30px', border: '1px solid #eee', borderTop: 'none', borderRadius: '0 0 8px 8px', background: 'white' }}>
+      <div style={{ padding: window.innerWidth < 640 ? '12px' : '30px', border: '1px solid #eee', borderTop: 'none', borderRadius: '0 0 8px 8px', background: 'white' }}>
         
         {/* Info Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 30, marginBottom: 30 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: window.innerWidth < 640 ? 20 : 30, marginBottom: 30 }}>
           {/* Customer Info */}
           <div>
-            <div style={{ background: themeColor, padding: '4px 10px', display: 'inline-block', fontWeight: 800, fontSize: '0.75rem', marginBottom: 10, borderRadius: 2 }}>Customer Information</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '0.85rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Name:</span> <span>{bill.customerName}</span></div>
-              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Address:</span> <span>{bill.customerAddress || '—'}</span></div>
-              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Phone:</span> <span>{bill.customerPhone}</span></div>
-              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Email:</span> <span>{bill.customerEmail || '—'}</span></div>
+            <div style={{ background: themeColor, padding: '4px 10px', display: 'inline-block', fontWeight: 800, fontSize: '0.7rem', marginBottom: 10, borderRadius: 2 }}>Customer Information</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '0.8125rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Name:</span> <span>{bill.customerName}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Address:</span> <span>{bill.customerAddress || '—'}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Phone:</span> <span>{bill.customerPhone}</span></div>
             </div>
           </div>
           {/* Vehicle Info */}
           <div>
-            <div style={{ background: themeColor, padding: '4px 10px', display: 'inline-block', fontWeight: 800, fontSize: '0.75rem', marginBottom: 10, borderRadius: 2 }}>Vehicle Information</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '0.85rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Make:</span> <span>{bill.vehicleCompany || '—'}</span></div>
-              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Model:</span> <span>{bill.vehicleModel || '—'}</span></div>
-              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Model Year:</span> <span>{bill.vehicleYear || '—'}</span></div>
-              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr' }}><span style={{ fontWeight: 700 }}>Reg No:</span> <span style={{ fontWeight: 800 }}>{bill.vehicleNo?.toUpperCase()}</span></div>
+            <div style={{ background: themeColor, padding: '4px 10px', display: 'inline-block', fontWeight: 800, fontSize: '0.7rem', marginBottom: 10, borderRadius: 2 }}>Vehicle Information</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '0.8125rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Make:</span> <span>{bill.vehicleCompany || '—'}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Model:</span> <span>{bill.vehicleModel || '—'}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Reg No:</span> <span style={{ fontWeight: 800 }}>{bill.vehicleNo?.toUpperCase()}</span></div>
             </div>
           </div>
         </div>
@@ -182,19 +178,19 @@ function GarageInvoice({ bill, business, onPayOnline }) {
           <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
             <thead>
               <tr style={{ background: themeColor }}>
-                <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #ddd', fontSize: '0.75rem', fontWeight: 800 }}>Description</th>
-                <th style={{ padding: '12px', textAlign: 'center', border: '1px solid #ddd', fontSize: '0.75rem', fontWeight: 800, width: '15%' }}>Quantity</th>
-                <th style={{ padding: '12px', textAlign: 'right', border: '1px solid #ddd', fontSize: '0.75rem', fontWeight: 800, width: '20%' }}>Unit Price (₹)</th>
-                <th style={{ padding: '12px', textAlign: 'right', border: '1px solid #ddd', fontSize: '0.75rem', fontWeight: 800, width: '20%' }}>Total Price (₹)</th>
+                <th style={{ padding: window.innerWidth < 640 ? '8px' : '12px', textAlign: 'left', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800 }}>Description</th>
+                <th style={{ padding: window.innerWidth < 640 ? '8px' : '12px', textAlign: 'center', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800, width: '15%' }}>Qty</th>
+                <th style={{ padding: window.innerWidth < 640 ? '8px' : '12px', textAlign: 'right', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800, width: '20%' }}>Rate</th>
+                <th style={{ padding: window.innerWidth < 640 ? '8px' : '12px', textAlign: 'right', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800, width: '20%' }}>Total</th>
               </tr>
             </thead>
             <tbody>
               {items.map((item, i) => (
                 <tr key={i}>
-                  <td style={{ padding: '10px 12px', border: '1px solid #ddd', fontSize: '0.85rem' }}>{item.description}</td>
-                  <td style={{ padding: '10px 12px', border: '1px solid #ddd', fontSize: '0.85rem', textAlign: 'center' }}>{item.qty || 1}</td>
-                  <td style={{ padding: '10px 12px', border: '1px solid #ddd', fontSize: '0.85rem', textAlign: 'right' }}>{parseFloat(item.rate || item.amount).toLocaleString()}</td>
-                  <td style={{ padding: '10px 12px', border: '1px solid #ddd', fontSize: '0.85rem', textAlign: 'right', fontWeight: 600 }}>{parseFloat(item.amount).toLocaleString()}</td>
+                  <td style={{ padding: window.innerWidth < 640 ? '6px 8px' : '10px 12px', border: '1px solid #ddd', fontSize: '0.75rem' }}>{item.description}</td>
+                  <td style={{ padding: window.innerWidth < 640 ? '6px 8px' : '10px 12px', border: '1px solid #ddd', fontSize: '0.75rem', textAlign: 'center' }}>{item.qty || 1}</td>
+                  <td style={{ padding: window.innerWidth < 640 ? '6px 8px' : '10px 12px', border: '1px solid #ddd', fontSize: '0.75rem', textAlign: 'right' }}>{parseFloat(item.rate || item.amount).toLocaleString()}</td>
+                  <td style={{ padding: window.innerWidth < 640 ? '6px 8px' : '10px 12px', border: '1px solid #ddd', fontSize: '0.75rem', textAlign: 'right', fontWeight: 600 }}>{parseFloat(item.amount).toLocaleString()}</td>
                 </tr>
               ))}
               <tr>
@@ -206,19 +202,18 @@ function GarageInvoice({ bill, business, onPayOnline }) {
         </div>
 
         {/* Footer info splits */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 40, borderTop: '2px solid #222', paddingTop: 20 }}>
-          <div style={{ border: '1px solid #ddd', padding: 16, borderRadius: 6, background: '#fafafa' }}>
-             <h4 style={{ margin: '0 0 10px 0', fontSize: '0.8rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Terms and Conditions</h4>
-             <p style={{ margin: 0, fontSize: '0.7rem', color: '#555', lineHeight: 1.6 }}>
-                By signing below, the customer agrees to the repair estimate and authorizes {business?.businessName || 'the garage'} to proceed with repairs, understanding that additional costs may apply after detailed assessment. This estimate is valid for 30 days from the bill date.
+        <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1.4fr 1fr', gap: window.innerWidth < 640 ? 20 : 40, borderTop: '2px solid #222', paddingTop: 20 }}>
+          <div style={{ border: '1px solid #ddd', padding: 12, borderRadius: 6, background: '#fafafa' }}>
+             <h4 style={{ margin: '0 0 10px 0', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Terms and Conditions</h4>
+             <p style={{ margin: 0, fontSize: '0.65rem', color: '#555', lineHeight: 1.6 }}>
+                By signing, customer authorizes {business?.businessName || 'garage'} to proceed with repairs. Estimate valid for 30 days.
              </p>
           </div>
-          <div style={{ textAlign: 'right', paddingRight: 10 }}>
-             <div style={{ marginBottom: 40 }}>
-                <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 800 }}>Customer Signature: ____________________</p>
-                <p style={{ margin: '15px 0 0 0', fontSize: '0.85rem', fontWeight: 800 }}>Date: ____________________</p>
+          <div style={{ textAlign: window.innerWidth < 640 ? 'left' : 'right', paddingRight: window.innerWidth < 640 ? 0 : 10 }}>
+             <div style={{ marginBottom: window.innerWidth < 640 ? 20 : 40 }}>
+                <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 800 }}>Customer Signature: ____________________</p>
+                <p style={{ margin: '15px 0 0 0', fontSize: '0.8rem', fontWeight: 800 }}>Date: ____________________</p>
              </div>
-             <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 800, color: '#888' }}>Processed by {business?.businessName}</p>
           </div>
         </div>
 
@@ -290,41 +285,41 @@ export default function BillDetail() {
   }
 
   return (
-    <div className="page-wrapper animate-fadeIn" style={{ maxWidth: 740, margin: '0 auto', paddingBottom: 60 }}>
+    <div className="page-wrapper animate-fadeIn" style={{ maxWidth: 740, margin: '0 auto', paddingBottom: 60, overflowX: 'hidden' }}>
 
       {/* Top bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
         <button onClick={() => navigate('/bills')} style={{ width: 36, height: 36, borderRadius: 10, border: 'none', background: 'rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6B7280' }}>
           <ArrowLeft size={18} />
         </button>
-        <div style={{ flex: 1 }}>
-          <h2 style={{ fontWeight: 800, fontSize: '1.0625rem', color: '#0F0D2E', margin: 0 }}>#{bill.invoiceNo}</h2>
-          <p style={{ fontSize: '0.8rem', color: '#6B7280', margin: 0 }}>{dayjs(bill.billDate || bill.createdAt).format('DD MMM YYYY')}</p>
+        <div style={{ flex: 1, minWidth: window.innerWidth < 640 ? '100%' : 150, order: window.innerWidth < 640 ? 3 : 2 }}>
+          <h2 style={{ fontWeight: 800, fontSize: window.innerWidth < 640 ? '0.9rem' : '1.1rem', color: '#0F0D2E', margin: 0 }}>#{bill.invoiceNo}</h2>
+          <p style={{ fontSize: '0.75rem', color: '#6B7280', margin: 0 }}>{dayjs(bill.billDate || bill.createdAt).format('DD MMM YYYY')}</p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 6, marginLeft: window.innerWidth < 640 ? 0 : 'auto', order: window.innerWidth < 640 ? 2 : 3 }}>
           <button id="btn-delete-bill" onClick={handleDelete} style={{ width: 36, height: 36, borderRadius: 10, border: 'none', background: '#FEE2E2', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Trash2 size={16} color="#DC2626" />
           </button>
-          <button id="btn-print-bill" onClick={handlePrint} className="btn-icon" style={{ background: 'white', borderRadius: 12, width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #EEE' }}>
+          <button id="btn-print-bill" onClick={handlePrint} className="btn-icon" style={{ background: 'white', borderRadius: 12, width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #EEE' }}>
             <Printer size={18} />
           </button>
           <PDFDownloadLink
             document={<PDFInvoice bill={bill} business={user} />}
             fileName={`Invoice_${bill.invoiceNo}.pdf`}
             className="btn btn-primary"
-            style={{ padding: '0 16px', borderRadius: 14, height: 44, display: 'flex', alignItems: 'center', gap: 8 }}
+            style={{ padding: window.innerWidth < 640 ? '0 10px' : '0 12px', borderRadius: 12, height: 40, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8125rem' }}
           >
             {({ loading }) => (
               <>
-                <Download size={18} />
-                {loading ? '...' : 'PDF'}
+                <Download size={16} />
+                {loading ? '...' : (window.innerWidth < 640 ? 'PDF' : 'Download PDF')}
               </>
             )}
           </PDFDownloadLink>
         </div>
       </div>
 
-      <div ref={printRef} style={{ background: 'white', borderRadius: 28, padding: '32px', boxShadow: '0 10px 40px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.03)' }}>
+      <div ref={printRef} className="invoice-container" style={{ background: 'white', borderRadius: 24, padding: '24px 16px', boxShadow: '0 10px 40px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.03)', overflowX: 'auto' }}>
         {bill.type === 'transport'
           ? <TransportInvoice bill={bill} business={user} onPayOnline={() => setIsPayModalOpen(true)} />
           : <GarageInvoice bill={bill} business={user} onPayOnline={() => setIsPayModalOpen(true)} />}

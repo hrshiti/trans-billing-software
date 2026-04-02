@@ -60,10 +60,10 @@ export default function MobileHeader({
               background: 'rgba(255,255,255,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <span style={{ color: 'white', fontSize: '0.6rem', fontWeight: 800 }}>BP</span>
+              <span style={{ color: 'white', fontSize: '0.6rem', fontWeight: 800 }}>TR</span>
             </div>
             <span style={{ color: 'white', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '-0.01em' }}>
-              BillPro
+              TRANS
             </span>
           </div>
         )}

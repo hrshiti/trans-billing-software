@@ -49,36 +49,36 @@ function BillCard({ bill, onClick, onDelete }) {
 
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-          <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F0D2E' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 800, fontSize: '0.85rem', color: '#0F0D2E', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {bill.invoiceNo}
           </span>
           <span style={{
-            fontSize: '0.65rem', fontWeight: 800, padding: '3px 8px', borderRadius: 99,
-            background: status.bg, color: status.color, textTransform: 'uppercase'
+            fontSize: '0.6rem', fontWeight: 800, padding: '2px 6px', borderRadius: 6,
+            background: status.bg, color: status.color, textTransform: 'uppercase', flexShrink: 0
           }}>{status.label}</span>
         </div>
-        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1F2937', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div style={{ fontSize: window.innerWidth < 640 ? '0.8rem' : '0.85rem', fontWeight: 700, color: '#1F2937', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {partyName}
         </div>
-        <div style={{ fontSize: '0.75rem', color: '#9CA3AF', fontWeight: 500 }}>
-          {dayjs(bill.billDate || bill.createdAt).format('DD MMM YYYY')} • {subInfo}
+        <div style={{ fontSize: '0.7rem', color: '#9CA3AF', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {dayjs(bill.billDate || bill.createdAt).format('DD MMM')} • {subInfo}
         </div>
       </div>
 
       {/* Amount + actions */}
-      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-        <div style={{ fontWeight: 900, fontSize: '1.05rem', color: '#0F0D2E', marginBottom: 6 }}>
+      <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
+        <div style={{ fontWeight: 900, fontSize: window.innerWidth < 640 ? '0.95rem' : '1.1rem', color: '#0F0D2E', marginBottom: 6 }}>
           ₹{(bill.grandTotal || 0).toLocaleString()}
         </div>
-        <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
           <button onClick={e => { e.stopPropagation(); onClick(bill) }}
-            style={{ width: 32, height: 32, border: 'none', background: '#F3F4F6', borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Eye size={14} color="#6B7280" />
+            style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Eye size={12} color="#6B7280" />
           </button>
           <button onClick={e => { e.stopPropagation(); onDelete(bill.id) }}
-            style={{ width: 32, height: 32, border: 'none', background: '#FEE2E2', borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Trash2 size={14} color="#DC2626" />
+            style={{ width: 28, height: 28, border: 'none', background: '#FEE2E2', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Trash2 size={12} color="#DC2626" />
           </button>
         </div>
       </div>
@@ -144,23 +144,27 @@ export default function BillList() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, gap: 12 }}>
         <div style={{ minWidth: 0 }}>
-          <h2 style={{ fontWeight: 900, fontSize: '1.5rem', color: '#0F0D2E', margin: 0 }}>Bills</h2>
-          <p style={{ fontSize: '0.85rem', color: '#6B7280', margin: 0 }}>{totals.count} invoices managed</p>
+          <h2 style={{ fontWeight: 900, fontSize: window.innerWidth < 640 ? '1.25rem' : '1.5rem', color: '#0F0D2E', margin: 0 }}>Bills</h2>
+          <p style={{ fontSize: '0.8rem', color: '#6B7280', margin: 0 }}>{totals.count} managed</p>
         </div>
-        <button className="btn btn-primary btn-lg" onClick={() => navigate('/bills/new')} style={{ borderRadius: 16 }}>
-          <Plus size={20} /> <span className="hide-mobile">Add New</span>
+        <button 
+          className={window.innerWidth < 640 ? "btn btn-primary btn-sm" : "btn btn-primary btn-lg"} 
+          onClick={() => navigate('/bills/new')} 
+          style={{ borderRadius: 12, height: window.innerWidth < 640 ? 40 : 'auto', padding: window.innerWidth < 640 ? '0 12px' : '14px 28px' }}
+        >
+          <Plus size={window.innerWidth < 640 ? 18 : 20} /> <span className="hide-mobile">Add New</span>
         </button>
       </div>
 
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-        <div style={{ background: '#F0FDF4', borderRadius: 24, padding: '16px', border: '1px solid #DCFCE7' }}>
-           <p style={{ fontSize: '0.7rem', fontWeight: 800, color: '#15803D', textTransform: 'uppercase', marginBottom: 4 }}>Paid In</p>
-           <p style={{ fontSize: '1.25rem', fontWeight: 900, color: '#16A34A', margin: 0 }}>₹{totals.paid.toLocaleString()}</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+        <div style={{ background: '#F0FDF4', borderRadius: 20, padding: window.innerWidth < 640 ? '12px' : '16px', border: '1px solid #DCFCE7' }}>
+           <p style={{ fontSize: '0.65rem', fontWeight: 800, color: '#15803D', textTransform: 'uppercase', marginBottom: 4 }}>Paid In</p>
+           <p style={{ fontSize: window.innerWidth < 640 ? '1.1rem' : '1.25rem', fontWeight: 900, color: '#16A34A', margin: 0 }}>₹{totals.paid.toLocaleString()}</p>
         </div>
-        <div style={{ background: '#FEF2F2', borderRadius: 24, padding: '16px', border: '1px solid #FEE2E2' }}>
-           <p style={{ fontSize: '0.7rem', fontWeight: 800, color: '#B91C1C', textTransform: 'uppercase', marginBottom: 4 }}>Pending</p>
-           <p style={{ fontSize: '1.25rem', fontWeight: 900, color: '#DC2626', margin: 0 }}>₹{totals.pending.toLocaleString()}</p>
+        <div style={{ background: '#FEF2F2', borderRadius: 20, padding: window.innerWidth < 640 ? '12px' : '16px', border: '1px solid #FEE2E2' }}>
+           <p style={{ fontSize: '0.65rem', fontWeight: 800, color: '#B91C1C', textTransform: 'uppercase', marginBottom: 4 }}>Pending</p>
+           <p style={{ fontSize: window.innerWidth < 640 ? '1.1rem' : '1.25rem', fontWeight: 900, color: '#DC2626', margin: 0 }}>₹{totals.pending.toLocaleString()}</p>
         </div>
       </div>
 

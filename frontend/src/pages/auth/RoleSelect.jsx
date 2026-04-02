@@ -7,23 +7,23 @@ import logo from '../../assets/trans-logo.png'
 const roles = [
   {
     id: 'transport',
-    icon: '🚛',
+    icon: <Truck size={24} />,
     iconColor: '#F59E0B',
-    iconBg: '#FEF3C7',
+    iconBg: '#FFFBEB',
     title: 'Transporter',
     titleHi: 'ट्रांसपोर्ट',
-    desc: 'Manage trips, vehicles & transport billing',
+    desc: 'Manage trips, vehicles & billing',
     features: ['Trip management', 'Vehicle fleet', 'Route billing', 'Chalan upload'],
   },
   {
     id: 'garage',
-    icon: '🔧',
+    icon: <Wrench size={24} />,
     iconColor: '#7C3AED',
-    iconBg: '#EDE9FE',
+    iconBg: '#F5F3FF',
     title: 'Garage Owner',
     titleHi: 'गैरेज',
-    desc: 'Manage vehicle services & repair billing',
-    features: ['Service records', 'Spare parts', 'Service reminders', 'Repair invoices'],
+    desc: 'Manage services & repair billing',
+    features: ['Service records', 'Spare parts', 'Reminders', 'Repair invoices'],
   },
 ]
 
@@ -36,7 +36,6 @@ export default function RoleSelect() {
   const handleContinue = async () => {
     if (!selected) return
     setLoading(true)
-    // Simulate save delay
     await new Promise(r => setTimeout(r, 600))
     setRole(selected)
     navigate(`/register/${selected}`, { replace: true })
@@ -45,18 +44,18 @@ export default function RoleSelect() {
   return (
     <>
       {/* Header */}
-      <div className="auth-card-header">
+      <div className="auth-card-header" style={{ marginBottom: 10 }}>
         <div style={{
-          width: 56, height: 56, borderRadius: 16, overflow: 'hidden',
+          width: 44, height: 44, borderRadius: 12, overflow: 'hidden',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          marginBottom: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+          boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+          margin: '0 auto 8px'
         }}>
           <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
-        <h2 className="auth-card-title">Choose Your Role</h2>
-        <p className="auth-card-subtitle">
-          Select what best describes your business.<br />
-          You can't change this later.
+        <h2 className="auth-card-title" style={{ fontSize: '1.15rem' }}>Choose Your Role</h2>
+        <p className="auth-card-subtitle" style={{ fontSize: '0.75rem', marginTop: 2 }}>
+          Select what best describes your business.
         </p>
       </div>
 
@@ -66,42 +65,27 @@ export default function RoleSelect() {
           <button
             key={role.id}
             id={`btn-role-${role.id}`}
-            className={`role-card animate-fadeInUp stagger-${idx + 1}`}
+            className={`role-card animate-fadeInUp stagger-${idx + 1} ${selected === role.id ? 'selected' : ''}`}
             onClick={() => setSelected(role.id)}
-            style={{
-              border: selected === role.id
-                ? '2px solid var(--primary)'
-                : '2px solid var(--border)',
-              background: selected === role.id ? 'var(--primary-lighter)' : 'var(--surface)',
-              cursor: 'pointer',
-              fontFamily: 'Inter, sans-serif',
-              position: 'relative',
-              transition: 'all 0.2s ease',
-            }}
           >
-            {/* Check mark */}
-            {selected === role.id && (
-              <div style={{
-                position: 'absolute', top: 8, right: 8,
-                color: 'var(--primary)'
-              }}>
-                <CheckCircle2 size={18} fill="var(--primary-lighter)" />
-              </div>
-            )}
-
             {/* Icon */}
-            <div className="role-icon" style={{ background: role.iconBg }}>
-              <span style={{ fontSize: '1.75rem' }}>{role.icon}</span>
+            <div className="role-icon" style={{ background: role.iconBg, color: role.iconColor }}>
+              {role.icon}
             </div>
 
-            {/* Title */}
-            <div className="role-title">{role.title}</div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 2 }}>
-              {role.titleHi}
+            {/* Info container */}
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div className="role-title">
+                  {role.title}
+                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block', fontWeight: 500 }}>
+                    {role.titleHi}
+                  </span>
+                </div>
+                {selected === role.id && <CheckCircle2 size={18} color="var(--primary)" fill="white" />}
+              </div>
+              <div className="role-desc">{role.desc}</div>
             </div>
-
-            {/* Desc */}
-            <div className="role-desc" style={{ marginTop: 8 }}>{role.desc}</div>
           </button>
         ))}
       </div>
@@ -109,20 +93,22 @@ export default function RoleSelect() {
       {/* Features preview */}
       {selected && (
         <div
-          className="animate-fadeInUp card-flat"
+          className="animate-fadeInUp"
           style={{
-            padding: 16, borderRadius: 12, marginBottom: 16,
-            background: 'var(--primary-lighter)',
-            border: '1px solid #DDD6FE'
+            padding: '12px 16px', borderRadius: '16px', marginBottom: 12,
+            background: 'white',
+            border: '1px solid var(--primary-lighter)',
+            boxShadow: '0 2px 10px rgba(124, 58, 237, 0.05)'
           }}
         >
-          <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--primary-dark)', marginBottom: 10 }}>
-            ✅ Included features:
+          <p style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ background: 'var(--primary)', color: 'white', width: 16, height: 16, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px' }}>✓</span>
+            Included Features:
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 12px' }}>
             {roles.find(r => r.id === selected)?.features.map(f => (
-              <div key={f} style={{ fontSize: '0.75rem', color: 'var(--primary-dark)', display: 'flex', gap: 6, alignItems: 'center' }}>
-                <CheckCircle2 size={12} /> {f}
+              <div key={f} style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'flex', gap: 6, alignItems: 'center', fontWeight: 500 }}>
+                <div style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--primary)', opacity: 0.4 }}></div> {f}
               </div>
             ))}
           </div>
@@ -130,18 +116,25 @@ export default function RoleSelect() {
       )}
 
       {/* Continue button */}
-      <button
-        id="btn-role-continue"
-        className="btn btn-primary btn-lg btn-full"
-        onClick={handleContinue}
-        disabled={!selected || loading}
-      >
-        {loading ? (
-          <><Loader2 size={18} className="spin" /> Setting up...</>
-        ) : (
-          <>Continue as {roles.find(r => r.id === selected)?.title || '...'} <ArrowRight size={18} /></>
-        )}
-      </button>
+      <div style={{ marginTop: 8 }}>
+        <button
+          id="btn-role-continue"
+          className="btn btn-primary"
+          style={{ 
+            width: '100%', height: 46, borderRadius: 12, fontSize: '0.875rem', fontWeight: 800,
+            boxShadow: selected ? '0 6px 15px rgba(124, 58, 237, 0.2)' : 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+          }}
+          onClick={handleContinue}
+          disabled={!selected || loading}
+        >
+          {loading ? (
+            <><Loader2 size={16} className="spin" /> Setting up...</>
+          ) : (
+            <>Continue <ArrowRight size={16} /></>
+          )}
+        </button>
+      </div>
 
       <style>{`
         .spin { animation: spin 0.8s linear infinite; }

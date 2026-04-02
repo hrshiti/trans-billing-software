@@ -91,7 +91,7 @@ export default function BusinessProfile() {
       <form onSubmit={handleSubmit(onSubmit)}>
 
         {/* Branding Assets */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: 14, marginBottom: 14 }}>
            {/* Logo */}
            <div style={{ background: 'white', borderRadius: 24, padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.04)', textAlign: 'center' }}>
               <div style={{ position: 'relative', width: 80, height: 80, margin: '0 auto 12px' }}>
@@ -139,7 +139,7 @@ export default function BusinessProfile() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1.5fr', gap: 12 }}>
               <Field label="Owner Name" error={errors.name} required>
                 <input {...register('name', { required: 'Name required' })} placeholder="Full Name" className="form-input" />
               </Field>
@@ -153,7 +153,7 @@ export default function BusinessProfile() {
                  <input {...register('slogan')} placeholder="e.g. Move What Matters" className="form-input" />
                </div>
             </Field>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: 12 }}>
               <Field label="Phone Number" error={errors.phone} required>
                 <input type="tel" {...register('phone', { required: 'Phone required' })} placeholder="98765 43210" className="form-input" inputMode="numeric" />
               </Field>
@@ -177,7 +177,7 @@ export default function BusinessProfile() {
                  <Field label="Detailed Address">
                     <textarea {...register('address')} placeholder="B-107, Raj Sapphire, Vapi" className="form-input" style={{ minHeight: 60 }} />
                  </Field>
-                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                 <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: 10 }}>
                     <Field label="City"><input {...register('city')} placeholder="Vapi" className="form-input" /></Field>
                     <Field label="Pincode"><input {...register('pincode')} placeholder="396191" className="form-input" maxLength={6} inputMode="numeric" /></Field>
                  </div>
@@ -203,13 +203,13 @@ export default function BusinessProfile() {
         </div>
 
         {/* Buttons */}
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ display: 'flex', flexDirection: window.innerWidth < 640 ? 'column-reverse' : 'row', gap: 12 }}>
           <button type="button" className="btn btn-ghost btn-full" onClick={() => navigate('/profile')}>Cancel</button>
           <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={isSubmitting}>
             {isSubmitting
               ? <><Loader2 size={18} className="spin" /> Updating…</>
               : saved ? <><CheckCircle2 size={18} /> Profile Saved!</>
-              : <><CheckCircle2 size={18} /> Update Business Profile</>}
+              : <><CheckCircle2 size={18} /> Update Profile</>}
           </button>
         </div>
       </form>

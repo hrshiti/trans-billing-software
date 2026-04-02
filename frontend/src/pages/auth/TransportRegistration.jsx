@@ -27,31 +27,36 @@ function DocUploadField({ label, icon: Icon, register, name, required }) {
   return (
     <div style={{ position: 'relative' }}>
       <label style={{ 
-        display: 'flex', flexDirection: 'column', gap: 5, padding: '10px 12px', 
-        border: '1.5px dashed #E2E8F0', borderRadius: '12px', background: '#F8FAFC',
+        display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', 
+        border: '1.5px dashed #E2E8F0', borderRadius: '14px', background: '#F8FAFC',
         cursor: 'pointer', transition: 'all 0.2s', borderStyle: hasFile ? 'solid' : 'dashed',
         borderColor: hasFile ? '#16A34A' : '#E2E8F0',
-        backgroundColor: hasFile ? '#F0FDF4' : '#F8FAFC'
+        backgroundColor: hasFile ? '#F0FDF4' : '#F8FAFC',
+        minHeight: 52
       }} className="hover:border-purple-300 hover:bg-purple-50">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ 
-            width: 30, height: 30, borderRadius: 9, background: 'white', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', color: hasFile ? '#16A34A' : '#7C3AED',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
-          }}>
-            {hasFile ? <Check size={14} /> : <Icon size={14} />}
-          </div>
-          <span style={{ fontSize: '0.72rem', fontWeight: 750, color: '#1E293B' }}>{label}</span>
+        <div style={{ 
+          width: 32, height: 32, borderRadius: 10, background: 'white', 
+          display: 'flex', alignItems: 'center', justifyContent: 'center', 
+          color: hasFile ? '#16A34A' : '#7C3AED',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+          flexShrink: 0
+        }}>
+          {hasFile ? <Check size={16} /> : <Icon size={16} />}
         </div>
+        
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#1E293B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+          <div style={{ fontSize: '0.6rem', color: hasFile ? '#16A34A' : '#94A3B8', fontWeight: 600 }}>
+            {hasFile ? 'File selected' : 'Upload proof'}
+          </div>
+        </div>
+
         <input 
           type="file" 
           {...register(name, { required: required && `${label} is required` })}
           onChange={(e) => setHasFile(e.target.files.length > 0)}
           style={{ position: 'absolute', opacity: 0, inset: 0, cursor: 'pointer' }} 
         />
-        <div style={{ fontSize: '0.58rem', color: hasFile ? '#16A34A' : '#94A3B8', fontWeight: 600, marginLeft: 38 }}>
-          {hasFile ? 'Uploaded' : 'Select file'}
-        </div>
       </label>
     </div>
   )
@@ -70,6 +75,7 @@ export default function TransportRegistration() {
       businessName: '',
       phone: user?.phone || '',
       address: '',
+      aadharNo: '',
       panNo: '',
       bankAccNo: '',
       bankIfsc: '',
@@ -77,8 +83,13 @@ export default function TransportRegistration() {
   })
 
   const handleNext = async () => {
-    const isValid = await trigger(['name', 'businessName', 'address', 'panNo', 'bankAccNo', 'bankIfsc']);
-    if (isValid) setStep(2);
+    if (step === 1) {
+      const isValid = await trigger(['name', 'phone', 'address', 'businessName']);
+      if (isValid) setStep(2);
+    } else if (step === 2) {
+      const isValid = await trigger(['aadharNo', 'panNo', 'bankAccNo', 'bankIfsc']);
+      if (isValid) setStep(3);
+    }
   }
 
   const onSubmit = async (data) => {
@@ -89,160 +100,197 @@ export default function TransportRegistration() {
   }
 
   return (
-    <div className="animate-fadeIn" style={{ maxWidth: 640, margin: '0 auto', padding: '0 0 10px' }}>
+    <div className="animate-fadeIn" style={{ maxWidth: 640, margin: '0 auto', paddingBottom: 20 }}>
       {/* Header Info */}
-      <div style={{ textAlign: 'center', marginBottom: 16 }}>
+      <div style={{ textAlign: 'center', marginBottom: 12 }}>
         <div style={{ 
-          width: 56, height: 56, borderRadius: 20, background: 'white',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px',
+          width: 50, height: 50, borderRadius: 16, background: 'white',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px',
           boxShadow: '0 8px 30px rgba(0,0,0,0.06)', position: 'relative'
         }}>
           <img src={logo} alt="Logo" style={{ width: '70%', height: '70%', objectFit: 'contain' }} />
-          <div style={{ position: 'absolute', bottom: -4, right: -4, width: 20, height: 20, borderRadius: '50%', background: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', border: '3px solid white' }}>
-            <Check size={10} strokeWidth={4} />
+          <div style={{ position: 'absolute', bottom: -3, right: -3, width: 18, height: 18, borderRadius: '50%', background: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', border: '2px solid white' }}>
+            <Check size={9} strokeWidth={4} />
           </div>
         </div>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', marginBottom: 2 }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', marginBottom: 2 }}>
           Setup Your Transport
         </h2>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 6 }}>
-          <div style={{ height: 4, width: 32, borderRadius: 2, background: step === 1 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
-          <div style={{ height: 4, width: 32, borderRadius: 2, background: step === 2 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 4 }}>
+          <div style={{ height: 4, width: 28, borderRadius: 2, background: step >= 1 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
+          <div style={{ height: 4, width: 28, borderRadius: 2, background: step >= 2 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
+          <div style={{ height: 4, width: 28, borderRadius: 2, background: step >= 3 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
         </div>
-        <p style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: 500 }}>
-           {step === 1 ? 'Enter your business information' : 'Upload required documents for verification'}
+        <p style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 500, margin: 0 }}>
+           {step === 1 && 'Basic business information'}
+           {step === 2 && 'KYC & Bank details'}
+           {step === 3 && 'Upload required documents'}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} style={{ background: 'white', padding: '20px 24px', borderRadius: 24, border: '1px solid #F1F5F9', boxShadow: '0 15px 40px rgba(0,0,0,0.03)' }}>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ background: 'white', padding: '16px 20px', borderRadius: 24, border: '1px solid #F1F5F9', boxShadow: '0 15px 40px rgba(0,0,0,0.03)', margin: '0 10px' }}>
         
         {step === 1 && (
-          <div className="animate-slideInRight">
-            {/* Section 1: Business Profile */}
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                 <div style={{ width: 5, height: 14, background: '#7C3AED', borderRadius: 2 }} />
-                 <span style={{ fontSize: '0.8rem', fontWeight: 850, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Business Identity</span>
+          <div className="animate-fadeIn">
+            {/* Step 1: Basic Info */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                 <div style={{ width: 4, height: 12, background: '#7C3AED', borderRadius: 2 }} />
+                 <span style={{ fontSize: '0.75rem', fontWeight: 850, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Basic Information</span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="grid sm-grid-cols-2 gap-2">
                 <Field label="Owner Name" error={errors.name} required>
                   <div className="input-group">
-                    <span className="input-prefix"><User size={15} /></span>
-                    <input {...register('name', { required: 'Owner name is required' })} placeholder="Full Name" className="form-input" style={{ borderRadius: 9, height: 40, fontSize: '0.875rem' }} />
+                    <span className="input-prefix"><User size={14} /></span>
+                    <input {...register('name', { required: 'Owner name is required' })} placeholder="Full Name" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
                   </div>
                 </Field>
                 
                 <Field label="Contact Number" error={errors.phone} required>
                   <div className="input-group">
-                    <span className="input-prefix"><Phone size={15} /></span>
-                    <input {...register('phone', { required: 'Phone is required' })} placeholder="Phone Number" className="form-input" readOnly style={{ borderRadius: 9, height: 40, fontSize: '0.875rem', background: '#F8FAFC' }} />
+                    <span className="input-prefix"><Phone size={14} /></span>
+                    <input {...register('phone', { required: 'Phone is required' })} placeholder="Phone Number" className="form-input" readOnly style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem', background: '#F8FAFC' }} />
                   </div>
                 </Field>
-              </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <Field label="Transport Name" error={errors.businessName} required sublabel="Trade Name">
                   <div className="input-group">
-                    <span className="input-prefix"><Truck size={15} /></span>
-                    <input {...register('businessName', { required: 'Business name is required' })} placeholder="e.g. Radhe Logistics" className="form-input" style={{ borderRadius: 9, height: 40, fontSize: '0.875rem' }} />
-                  </div>
-                </Field>
-
-                <Field label="PAN Number" error={errors.panNo} required>
-                  <div className="input-group">
-                    <span className="input-prefix"><FileText size={15} /></span>
-                    <input {...register('panNo', { 
-                      required: 'PAN is required',
-                      pattern: { value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, message: 'Invalid PAN format (ABCDE1234F)' }
-                    })} 
-                    onInput={(e) => {
-                      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
-                    }}
-                    placeholder="ABCDE1234F" className="form-input" style={{ borderRadius: 9, height: 40, fontSize: '0.875rem', textTransform: 'uppercase' }} />
+                    <span className="input-prefix"><Truck size={14} /></span>
+                    <input {...register('businessName', { required: 'Business name is required' })} placeholder="e.g. Radhe Logistics" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
                   </div>
                 </Field>
               </div>
 
               <Field label="Office Address" error={errors.address} required>
                 <div className="input-group">
-                  <span className="input-prefix" style={{ top: 12, transform: 'none' }}><MapPin size={15} /></span>
-                  <textarea {...register('address', { required: 'Address is required' })} placeholder="Complete Office Address" className="form-input" style={{ minHeight: 60, paddingTop: 8, borderRadius: 9, fontSize: '0.875rem' }} />
+                  <span className="input-prefix" style={{ top: 10, transform: 'none' }}><MapPin size={14} /></span>
+                  <textarea {...register('address', { required: 'Address is required' })} placeholder="Complete Office Address" className="form-input" style={{ minHeight: 50, paddingTop: 6, borderRadius: 9, fontSize: '0.8125rem' }} />
                 </div>
               </Field>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <Field label="Bank Account No" error={errors.bankAccNo} required>
-                  <div className="input-group">
-                    <span className="input-prefix"><CreditCard size={15} /></span>
-                    <input {...register('bankAccNo', { 
-                      required: 'Account no is required',
-                      pattern: { value: /^[0-9]{9,18}$/, message: 'Invalid Account Number (9-18 digits)' }
-                    })} 
-                    onInput={(e) => {
-                      e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 18);
-                    }}
-                    placeholder="Account Number" className="form-input" style={{ borderRadius: 9, height: 40, fontSize: '0.875rem' }} />
-                  </div>
-                </Field>
-
-                <Field label="IFSC Code" error={errors.bankIfsc} required>
-                  <div className="input-group">
-                    <span className="input-prefix"><Building2 size={15} /></span>
-                    <input {...register('bankIfsc', { 
-                      required: 'IFSC is required',
-                      pattern: { value: /^[A-Z]{4}0[A-Z0-9]{6}$/i, message: 'Invalid IFSC (e.g. SBIN0123456)' }
-                    })} 
-                    onInput={(e) => {
-                      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11);
-                    }}
-                    placeholder="Bank IFSC" className="form-input" style={{ borderRadius: 9, height: 40, fontSize: '0.875rem', textTransform: 'uppercase' }} />
-                  </div>
-                </Field>
-              </div>
             </div>
 
-            <button type="button" onClick={handleNext} className="btn btn-primary btn-lg btn-full" style={{ borderRadius: 12, height: 48, fontSize: '0.875rem', fontWeight: 800 }}>
+            <button type="button" onClick={handleNext} className="btn btn-primary btn-lg btn-full" style={{ borderRadius: 16, height: 48, fontSize: '0.875rem', fontWeight: 800 }}>
               Next Step <ArrowRight size={18} />
             </button>
           </div>
         )}
 
         {step === 2 && (
-          <div className="animate-slideInRight">
-            {/* Section 2: Document Proofs */}
-            <div style={{ marginBottom: 16, padding: '16px 18px', background: '#F1F5F9', borderRadius: 18 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-                 <Files size={15} color="#7C3AED" />
-                 <span style={{ fontSize: '0.8rem', fontWeight: 850, color: '#1E293B' }}>Required Documents</span>
+          <div className="animate-fadeIn">
+            {/* Step 2: KYC & Bank */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                 <div style={{ width: 4, height: 12, background: '#7C3AED', borderRadius: 2 }} />
+                 <span style={{ fontSize: '0.75rem', fontWeight: 850, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>KYC & Bank Details</span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div className="grid sm-grid-cols-2 gap-2">
+                <Field label="Aadhar Number" error={errors.aadharNo} required>
+                  <div className="input-group">
+                    <span className="input-prefix"><Shield size={14} /></span>
+                    <input {...register('aadharNo', { 
+                      required: 'Aadhar No is required',
+                      pattern: { value: /^[0-9]{12}$/, message: 'Invalid Aadhar (12 digits)' }
+                    })} 
+                    onInput={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 12)}
+                    placeholder="1234 5678 9012" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
+                  </div>
+                </Field>
+
+                <Field label="PAN Number" error={errors.panNo} required>
+                  <div className="input-group">
+                    <span className="input-prefix"><FileText size={14} /></span>
+                    <input {...register('panNo', { 
+                      required: 'PAN is required',
+                      pattern: { value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, message: 'Invalid PAN' }
+                    })} 
+                    onInput={(e) => {
+                      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+                    }}
+                    placeholder="ABCDE1234F" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem', textTransform: 'uppercase' }} />
+                  </div>
+                </Field>
+
+                <Field label="Bank Account No" error={errors.bankAccNo} required>
+                  <div className="input-group">
+                    <span className="input-prefix"><CreditCard size={14} /></span>
+                    <input {...register('bankAccNo', { 
+                      required: 'Account no is required',
+                      pattern: { value: /^[0-9]{9,18}$/, message: 'Invalid length' }
+                    })} 
+                    placeholder="Account Number" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
+                  </div>
+                </Field>
+
+                <Field label="IFSC Code" error={errors.bankIfsc} required>
+                  <div className="input-group">
+                    <span className="input-prefix"><Building2 size={14} /></span>
+                    <input {...register('bankIfsc', { 
+                      required: 'IFSC is required',
+                      pattern: { value: /^[A-Z]{4}0[A-Z0-9]{6}$/i, message: 'Invalid IFSC' }
+                    })} 
+                    placeholder="Bank IFSC" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem', textTransform: 'uppercase' }} />
+                  </div>
+                </Field>
+              </div>
+            </div>
+
+            <div className="btn-group btn-group-mobile-row" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <button 
+                type="button" 
+                onClick={() => setStep(1)} 
+                className="btn" 
+                style={{ flex: 1, height: 48, borderRadius: 16, fontSize: '0.875rem', fontWeight: 600, background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#64748B' }}
+              >
+                Back
+              </button>
+              <button 
+                type="button" 
+                onClick={handleNext} 
+                className="btn btn-primary" 
+                style={{ flex: 2, height: 48, borderRadius: 16, fontSize: '0.875rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              >
+                Next Step <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="animate-fadeIn">
+            {/* Step 3: Document Proofs */}
+            <div style={{ marginBottom: 12, padding: '12px 14px', background: '#F1F5F9', borderRadius: 18 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                 <Files size={14} color="#7C3AED" />
+                 <span style={{ fontSize: '0.75rem', fontWeight: 850, color: '#1E293B' }}>Required Documents</span>
+              </div>
+
+              <div className="grid sm-grid-cols-2 gap-2">
                 <DocUploadField label="Aadhar Card" icon={FileText} register={register} name="docAadhar" required />
                 <DocUploadField label="PAN Card" icon={FileText} register={register} name="docPan" required />
                 <DocUploadField label="Passport Photo" icon={Image} register={register} name="docPhoto" required />
                 <DocUploadField label="Vehicle RC" icon={Truck} register={register} name="docRc" required />
                 <DocUploadField label="Vehicle Insurance" icon={Shield} register={register} name="docInsurance" required />
               </div>
-              
-              <div style={{ marginTop: 10, padding: '6px 10px', background: 'rgba(124, 58, 237, 0.05)', borderRadius: 9, display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-                 <Info size={11} color="#7C3AED" style={{ marginTop: 2 }} />
-                 <p style={{ fontSize: '0.6rem', color: '#6B7280', margin: 0, lineHeight: 1.3 }}>
-                    Documents are used for verification purposes. Maximum size 5MB.
-                 </p>
-              </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button type="button" onClick={() => setStep(1)} className="btn btn-outline" style={{ flex: 1, borderRadius: 12, height: 46, fontSize: '0.875rem', fontWeight: 800, border: '1px solid #E2E8F0' }}>
+            <div className="btn-group btn-group-mobile-row" style={{ marginTop: 10, display: 'flex', gap: 10, alignItems: 'center' }}>
+              <button 
+                type="button" 
+                onClick={() => setStep(2)} 
+                className="btn" 
+                style={{ flex: 1, height: 48, borderRadius: 16, fontSize: '0.875rem', fontWeight: 600, background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#64748B' }}
+              >
                 Back
               </button>
-              <button type="submit" className="btn btn-primary btn-lg" disabled={loading} style={{ flex: 2, borderRadius: 12, height: 46, fontSize: '0.875rem', fontWeight: 800 }}>
-                {loading ? (
-                  <><Loader2 size={16} className="spin" /> Verifying...</>
-                ) : (
-                  <>Setup My Business <ArrowRight size={16} /></>
-                )}
+              <button 
+                type="submit" 
+                className="btn btn-primary" 
+                disabled={loading} 
+                style={{ flex: 2, height: 48, borderRadius: 16, fontSize: '0.875rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              >
+                {loading ? <Loader2 size={18} className="spin" /> : <>Setup Business <ArrowRight size={18} /></>}
               </button>
             </div>
           </div>

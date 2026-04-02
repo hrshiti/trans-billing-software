@@ -109,40 +109,41 @@ export default function OTPVerify() {
   const displayError = localError || error
 
   return (
-    <div className="animate-fadeIn" style={{ maxWidth: 440, margin: '0 auto' }}>
+    <div className="animate-fadeIn" style={{ maxWidth: 440, margin: '0 auto', paddingBottom: 20 }}>
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
         <div style={{ 
-          width: 72, height: 72, borderRadius: 24, background: '#F5F3FF',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
+          width: 60, height: 60, borderRadius: 20, background: '#F5F3FF',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px',
           boxShadow: '0 8px 30px rgba(124, 58, 237, 0.1)', position: 'relative'
         }}>
-          <ShieldCheck size={32} color="#7C3AED" strokeWidth={2.5} />
+          <ShieldCheck size={28} color="#7C3AED" strokeWidth={2.5} />
           <div style={{ 
-            position: 'absolute', bottom: -5, right: -5, width: 24, height: 24, 
+            position: 'absolute', bottom: -4, right: -4, width: 22, height: 22, 
             borderRadius: '50%', background: '#7C3AED', display: 'flex', 
             alignItems: 'center', justifyContent: 'center', color: 'white', border: '3px solid white' 
           }}>
-            <Check size={14} strokeWidth={4} />
+            <Check size={12} strokeWidth={4} />
           </div>
         </div>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', marginBottom: 8 }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', marginBottom: 6 }}>
           Verify OTP
         </h2>
-        <p style={{ fontSize: '0.9375rem', color: '#64748B', fontWeight: 500 }}>
+        <p style={{ fontSize: '0.875rem', color: '#64748B', fontWeight: 500 }}>
           We sent a 6-digit code to<br />
-          <strong style={{ color: '#1E293B', fontSize: '1rem' }}>{displayPhone}</strong>
+          <strong style={{ color: '#1E293B', fontSize: '0.9375rem' }}>{displayPhone}</strong>
         </p>
       </div>
 
       {/* Form Card */}
       <div style={{ 
-        background: 'white', padding: 32, borderRadius: 28, 
-        border: '1px solid #F1F5F9', boxShadow: '0 20px 50px rgba(0,0,0,0.04)' 
+        background: 'white', padding: '24px 20px', borderRadius: 28, 
+        border: '1px solid #F1F5F9', boxShadow: '0 20px 50px rgba(0,0,0,0.04)',
+        margin: '0 10px'
       }}>
         {/* OTP Boxes */}
         <div className="form-group" style={{ marginBottom: 24 }}>
-          <div className="otp-grid" onPaste={handlePaste} style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+          <div className="otp-grid" onPaste={handlePaste}>
             {otp.map((digit, i) => (
               <input
                 key={i}
@@ -154,14 +155,11 @@ export default function OTPVerify() {
                 value={digit}
                 onChange={e => handleChange(i, e.target.value)}
                 onKeyDown={e => handleKeyDown(i, e)}
+                className={`otp-input ${digit ? 'filled' : ''}`}
                 style={{
-                  width: 50, height: 60, borderRadius: 16, border: '2px solid #F1F5F9',
-                  textAlign: 'center', fontSize: '1.5rem', fontWeight: 700, outline: 'none',
-                  transition: 'all 0.2s', background: digit ? '#F5F3FF' : 'white',
+                  background: digit ? '#F5F3FF' : 'white',
                   borderColor: digit ? '#7C3AED' : (displayError ? '#FECACA' : '#F1F5F9'),
-                  color: '#1E293B'
                 }}
-                className={digit ? 'filled' : ''}
                 autoComplete={i === 0 ? 'one-time-code' : 'off'}
               />
             ))}
@@ -190,9 +188,9 @@ export default function OTPVerify() {
         </button>
 
         {/* Actions */}
-        <div style={{
+        <div className="otp-actions" style={{
           display: 'flex', justifyContent: 'space-between',
-          alignItems: 'center', marginTop: 24
+          alignItems: 'center', marginTop: 24, gap: 10
         }}>
           <button
             id="btn-change-number"
@@ -200,14 +198,15 @@ export default function OTPVerify() {
             className="btn btn-ghost"
             style={{ 
               display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
-              fontSize: '0.85rem', fontWeight: 700, color: '#64748B', border: '1px solid #F1F5F9', borderRadius: 12
+              fontSize: '0.85rem', fontWeight: 700, color: '#64748B', border: '1px solid #F1F5F9', borderRadius: 12,
+              whiteSpace: 'nowrap'
             }}
           >
-            <ArrowLeft size={16} /> Change Number
+            <ArrowLeft size={16} /> <span className="hide-xs">Change Number</span><span className="show-xs">Back</span>
           </button>
 
           {timer > 0 ? (
-            <div style={{ fontSize: '0.85rem', color: '#94A3B8', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.85rem', color: '#94A3B8', fontWeight: 600, whiteSpace: 'nowrap' }}>
               Resend in <span style={{ color: '#7C3AED' }}>{timer}s</span>
             </div>
           ) : (
@@ -218,7 +217,8 @@ export default function OTPVerify() {
               className="btn btn-ghost"
               style={{ 
                 display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
-                fontSize: '0.85rem', fontWeight: 700, color: '#7C3AED', border: '1px solid #EDE9FE', borderRadius: 12
+                fontSize: '0.85rem', fontWeight: 700, color: '#7C3AED', border: '1px solid #EDE9FE', borderRadius: 12,
+                whiteSpace: 'nowrap'
               }}
             >
               <RefreshCw size={16} className={resending ? 'spin' : ''} />
@@ -231,10 +231,56 @@ export default function OTPVerify() {
       <style>{`
         .spin { animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        input:focus { 
+        
+        .otp-grid {
+          display: flex;
+          gap: 12px;
+          justify-content: center;
+        }
+
+        .otp-input {
+          width: 54px;
+          height: 64px;
+          border-radius: 16px;
+          border: 2px solid #F1F5F9;
+          text-align: center;
+          font-size: 1.6rem;
+          font-weight: 800;
+          outline: none;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          color: #0F172A;
+          -webkit-appearance: none;
+        }
+
+        .otp-input:focus { 
           border-color: #7C3AED !important; 
           box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1) !important;
           background: #F5F3FF !important;
+          transform: translateY(-2px);
+        }
+
+        .show-xs { display: none; }
+
+        @media (max-width: 480px) {
+          .otp-grid { gap: 8px; }
+          .otp-input {
+            width: 45px;
+            height: 56px;
+            font-size: 1.4rem;
+            border-radius: 12px;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .otp-grid { gap: 6px; }
+          .otp-input {
+            width: 40px;
+            height: 52px;
+            font-size: 1.25rem;
+            border-radius: 10px;
+          }
+          .hide-xs { display: none; }
+          .show-xs { display: inline; }
         }
       `}</style>
     </div>

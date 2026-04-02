@@ -10,20 +10,20 @@ const styles = StyleSheet.create({
   page: { padding: 30, fontSize: 10, color: '#000', fontFamily: 'Helvetica' },
   
   // Header
-  header: { flexDirection: 'row', border: 1, borderColor: '#ccc' },
-  headerGarage: { flexDirection: 'row', backgroundColor: '#FFB800', border: 0, padding: 20, borderRadius: 4, marginBottom: 15 },
+  header: { flexDirection: 'row', borderWidth: 1, borderColor: '#ccc' },
+  headerGarage: { flexDirection: 'row', backgroundColor: '#FFB800', borderWidth: 0, padding: 20, borderRadius: 4, marginBottom: 15 },
   logoBox: { width: '55%', padding: 15, flexDirection: 'row', alignItems: 'center' },
   logo: { width: 70, height: 50, objectFit: 'contain', marginRight: 15 },
   brandName: { fontSize: 28, fontWeight: 'bold', letterSpacing: -1 },
   slogan: { fontSize: 9, color: '#444', marginTop: 5 },
   
-  metaBox: { width: '45%', borderLeft: 1, borderColor: '#ccc' },
-  metaRow: { flexDirection: 'row', borderBottom: 1, borderColor: '#ccc', height: 40, alignItems: 'center' },
+  metaBox: { width: '45%', borderLeftWidth: 1, borderColor: '#ccc' },
+  metaRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#ccc', height: 40, alignItems: 'center' },
   metaLabel: { width: 80, paddingLeft: 10, fontWeight: 'bold' },
   metaVal: { paddingLeft: 10, fontWeight: 'bold' },
 
   // Addressing Info Area
-  addressArea: { flexDirection: 'row', border: 1, borderTop: 0, borderColor: '#ccc', marginBottom: 15 },
+  addressArea: { flexDirection: 'row', borderWidth: 1, borderTopWidth: 0, borderColor: '#ccc', marginBottom: 15 },
   addressAreaGarage: { flexDirection: 'row', gap: 20, marginBottom: 20 },
   addrCol: { width: '50%', padding: 12 },
   addrColGarage: { width: '50%' },
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   tableHeader: { 
     flexDirection: 'row', 
     backgroundColor: '#fdf7f2', 
-    borderBottom: 1, 
+    borderBottomWidth: 1, 
     borderColor: '#ccc',
     padding: '8 4',
     textAlign: 'center',
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   tableRow: { 
     flexDirection: 'row', 
-    borderBottom: 1, 
+    borderBottomWidth: 1, 
     borderColor: '#ccc', 
     padding: '8 4',
     alignItems: 'center',
@@ -76,18 +76,18 @@ const styles = StyleSheet.create({
   colAmountGarage: { width: '20%', textAlign: 'right', fontWeight: 'bold' },
 
   // Footer Total Row
-  totalRowArea: { flexDirection: 'row', border: 1, borderTop: 0, borderColor: '#ccc' },
+  totalRowArea: { flexDirection: 'row', borderWidth: 1, borderTopWidth: 0, borderColor: '#ccc' },
   gratitudeBanner: { width: '67%', backgroundColor: '#F3811E', color: 'white', padding: 12, textAlign: 'center', fontWeight: 'bold', fontSize: 10 },
-  totalLabelBox: { width: '18%', backgroundColor: '#f9f9f9', padding: 12, textAlign: 'center', borderLeft: 1, borderRight: 1, borderColor: '#ccc', fontWeight: 'bold' },
+  totalLabelBox: { width: '18%', backgroundColor: '#f9f9f9', padding: 12, textAlign: 'center', borderLeftWidth: 1, borderRightWidth: 1, borderColor: '#ccc', fontWeight: 'bold' },
   totalValBox: { width: '15%', padding: 12, textAlign: 'right', fontWeight: 'bold', fontSize: 12 },
   
-  totalRowGarage: { flexDirection: 'row', border: 1, borderColor: '#ccc', marginTop: -1 },
+  totalRowGarage: { flexDirection: 'row', borderWidth: 1, borderColor: '#ccc', marginTop: -1 },
   totalLabelGarage: { width: '80%', padding: 10, fontWeight: 'bold', textAlign: 'left' },
   totalValueGarage: { width: '20%', padding: 10, textAlign: 'right', fontWeight: 'bold', fontSize: 11, backgroundColor: '#f9f9f9' },
 
   // Bank Section
-  bankSection: { marginTop: 15, border: 1, borderColor: '#ccc' },
-  bankHeader: { backgroundColor: '#fdf3f0', padding: '4 10', fontSize: 8, fontWeight: 'bold' },
+  bankSection: { marginTop: 15, borderWidth: 1, borderColor: '#ccc' },
+  bankHeader: { backgroundColor: '#fdf3f0', padding: '4 10', fontSize: 8, fontWeight: 'bold', borderBottomWidth: 1, borderColor: '#ccc' },
   bankContent: { padding: 10 },
   bankGrid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
   bankItem: { width: '48%', flexDirection: 'row' },
@@ -98,10 +98,10 @@ const styles = StyleSheet.create({
   footerSection: { marginTop: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   footerBrand: { fontSize: 12, fontWeight: 'bold' },
   signBox: { width: 180, textAlign: 'center' },
-  signLine: { borderTop: 1, borderColor: '#000', marginTop: 35, marginBottom: 5 },
+  signLine: { borderTopWidth: 1, borderColor: '#000', marginTop: 35, marginBottom: 5 },
   signLabel: { fontSize: 8.5, fontWeight: 'bold' },
   
-  termsBoxGarage: { width: '60%', border: 1, borderColor: '#ddd', padding: 10, borderRadius: 4, backgroundColor: '#fafafa' },
+  termsBoxGarage: { width: '60%', borderWidth: 1, borderColor: '#ddd', padding: 10, borderRadius: 4, backgroundColor: '#fafafa' },
   footerStripeGarage: { height: 12, backgroundColor: '#FFB800', marginTop: 20, borderRadius: 2 }
 });
 
@@ -134,7 +134,7 @@ export const PDFInvoice = ({ bill, business }) => {
                 <Text style={styles.metaLabel}>Bill No.:</Text>
                 <Text style={styles.metaVal}>{bill.invoiceNo}</Text>
               </View>
-              <View style={[styles.metaRow, { borderBottom: 0 }]}>
+              <View style={[styles.metaRow, { borderBottomWidth: 0 }]}>
                 <Text style={styles.metaLabel}>Date :</Text>
                 <Text style={styles.metaVal}>{dayjs(bill.billDate).format('DD/MM/YYYY')}</Text>
               </View>
@@ -155,7 +155,7 @@ export const PDFInvoice = ({ bill, business }) => {
 
         {/* Info/Addressing */}
         <View style={isTransport ? styles.addressArea : styles.addressAreaGarage}>
-          <View style={isTransport ? [styles.addrCol, { borderRight: 1, borderColor: '#ccc' }] : styles.addrColGarage}>
+          <View style={isTransport ? [styles.addrCol, { borderRightWidth: 1, borderColor: '#ccc' }] : styles.addrColGarage}>
             <Text style={isTransport ? styles.addrLabel : styles.addrLabelGarage}>Customer Information</Text>
             <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Name:</Text> {bill.customerName || bill.billedToName}</Text>
             <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Address:</Text> {bill.customerAddress || bill.billedToAddress}</Text>
@@ -179,7 +179,7 @@ export const PDFInvoice = ({ bill, business }) => {
         {isTransport && <View style={styles.summaryBanner}><Text>Billing Summary</Text></View>}
 
         {/* Table Content */}
-        <View style={{ border: 1, borderColor: '#ccc', borderTop: isTransport ? 0 : 1 }}>
+        <View style={{ borderWidth: 1, borderColor: '#ccc', borderTopWidth: isTransport ? 0 : 1 }}>
           <View style={isTransport ? styles.tableHeader : styles.tableHeaderGarage}>
             {isTransport ? (
               <>

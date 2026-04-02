@@ -69,14 +69,14 @@ export default function GarageDashboard() {
       {/* Banner */}
       <div style={{ background: 'linear-gradient(135deg, #10B981, #059669)', borderRadius: 24, padding: '24px', color: 'white', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0 }}>Garage Dashboard</h1>
-          <p style={{ fontSize: '0.875rem', opacity: 0.9, marginTop: 4 }}>Manage job cards, spares, and customer vehicle services</p>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'white' }}>Garage Dashboard</h1>
+          <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.95)', marginTop: 4 }}>Manage job cards, spares, and customer vehicle services</p>
         </div>
         <Wrench size={64} color="rgba(255,255,255,0.1)" style={{ position: 'absolute', bottom: -12, right: 12, transform: 'rotate(-15deg)' }} />
       </div>
 
       {/* Stats Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 20 }}>
+      <div className="stats-grid" style={{ marginBottom: 20 }}>
         {stats.map(s => (
           <div key={s.label} className="card" style={{ padding: '16px 14px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', position: 'relative' }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
@@ -210,8 +210,12 @@ export default function GarageDashboard() {
          </div>
       )}
 
-      <button onClick={() => navigate('/bills/new')} className="btn btn-primary btn-lg" style={{ position: 'fixed', bottom: 84, right: 20, borderRadius: 20, boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)', zIndex: 100 }}>
-        <Plus size={20} /> New Job Card
+      <button 
+        onClick={() => navigate('/bills/new')} 
+        className="btn btn-primary btn-lg btn-fab-mobile" 
+        style={{ position: 'fixed', bottom: 84, right: 20, borderRadius: 20, boxShadow: '0 8px 24px rgba(124, 58, 237, 0.3)', zIndex: 100, display: 'flex', alignItems: 'center', gap: 8 }}
+      >
+        <Plus size={20} /> <span className="fab-text">New Job Card</span>
       </button>
 
       <style>{`
@@ -226,6 +230,18 @@ export default function GarageDashboard() {
             75% { transform: rotate(10deg); }
          }
          .shake { animation: shake 0.5s infinite; }
+         
+         @media (max-width: 640px) {
+            .btn-fab-mobile {
+               padding: 0 16px !important;
+               height: 48px !important;
+               border-radius: 16px !important;
+            }
+            .btn-fab-mobile .fab-text {
+               font-size: 0.8125rem;
+               font-weight: 800;
+            }
+         }
       `}</style>
       <div style={{ height: 20 }} />
     </div>

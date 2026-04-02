@@ -40,60 +40,61 @@ export default function Login() {
   }
 
   return (
-    <div className="animate-fadeIn" style={{ maxWidth: 440, margin: '0 auto', padding: '0 10px' }}>
+    <div className="animate-fadeIn login-container" style={{ maxWidth: 420, margin: '0 auto', paddingBottom: 20 }}>
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 24 }}>
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
         <div style={{ 
-          width: 64, height: 64, borderRadius: 24, background: 'white',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px',
-          boxShadow: '0 12px 36px rgba(0,0,0,0.06)', position: 'relative',
+          width: 54, height: 54, borderRadius: 18, background: 'white',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.06)', position: 'relative',
           border: '1px solid #F1F5F9'
         }}>
-          <img src={logo} alt="Logo" style={{ width: '70%', height: '70%', objectFit: 'contain' }} />
+          <img src={logo} alt="Logo" style={{ width: '65%', height: '65%', objectFit: 'contain' }} />
           <div style={{ 
-            position: 'absolute', bottom: -5, right: -5, width: 24, height: 24, 
+            position: 'absolute', bottom: -3, right: -3, width: 20, height: 20, 
             borderRadius: '50%', background: '#7C3AED', display: 'flex', 
-            alignItems: 'center', justifyContent: 'center', color: 'white', border: '3px solid white',
-            boxShadow: '0 4px 10px rgba(124, 58, 237, 0.4)'
+            alignItems: 'center', justifyContent: 'center', color: 'white', border: '2.5px solid white'
           }}>
-            <Check size={14} strokeWidth={4} />
+            <Check size={11} strokeWidth={4} />
           </div>
         </div>
         <h2 style={{ 
-          fontSize: '1.75rem', fontWeight: 950, color: '#0F172A', letterSpacing: '-0.04em', marginBottom: 8,
+          fontSize: '1.5rem', fontWeight: 950, color: '#0F172A', letterSpacing: '-0.04em', marginBottom: 4,
           background: 'linear-gradient(to right, #0F172A, #4C1D95)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
         }}>
           Welcome to TRANS
         </h2>
-        <p style={{ fontSize: '0.9rem', color: '#64748B', fontWeight: 500, lineHeight: 1.4 }}>
+        <p style={{ fontSize: '0.8125rem', color: '#64748B', fontWeight: 600, lineHeight: 1.4 }}>
           Enter your mobile number to get started.<br />
-          We'll send you a <span style={{ color: '#7C3AED', fontWeight: 700 }}>6-digit OTP</span>.
+          We'll send you a <span style={{ color: '#7C3AED', fontWeight: 800 }}>6-digit OTP</span>.
         </p>
       </div>
 
       {/* Main Login Card */}
       <div style={{ 
-        background: 'white', padding: '28px 24px', borderRadius: 28, 
-        border: '1px solid #F1F5F9', boxShadow: '0 25px 60px rgba(0,0,0,0.04)',
-        position: 'relative', overflow: 'hidden'
+        background: 'white', padding: '24px 20px', borderRadius: 28, 
+        border: '1px solid #F1F5F9', boxShadow: '0 20px 50px rgba(0,0,0,0.03)',
+        position: 'relative'
       }}>
-        {/* Subtle decorative glow */}
-        <div style={{ position: 'absolute', top: -50, right: -50, width: 100, height: 100, borderRadius: '50%', background: 'rgba(124, 58, 237, 0.03)', filter: 'blur(40px)' }} />
-
-        <div className="form-group" style={{ marginBottom: 24 }}>
-          <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 750, color: '#334155', marginBottom: 10, display: 'block', letterSpacing: '0.02em' }}>
-            MOBILE NUMBER
+        <div className="form-group" style={{ marginBottom: 20 }}>
+          <label style={{ fontSize: '0.75rem', fontWeight: 850, color: '#1E293B', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6, opacity: 0.8 }}>
+            <Phone size={13} color="#7C3AED" /> MOBILE NUMBER
           </label>
-          <div className="phone-input-wrap" style={{ 
-            height: 52, borderRadius: 16, overflow: 'hidden', border: '2px solid',
+          
+          <div style={{ 
+            height: 54, borderRadius: 16, display: 'flex', overflow: 'hidden', border: '2px solid',
             borderColor: error ? '#FECACA' : (isFocused ? '#7C3AED' : '#F1F5F9'),
-            background: error ? '#FEF2F2' : (isFocused ? '#F5F3FF' : 'white'),
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            boxShadow: isFocused && !error ? '0 0 0 4px rgba(124, 58, 237, 0.1)' : 'none'
+            background: error ? '#FEF2F2' : (isFocused ? '#FDFDFF' : '#F9FAFB'),
+            transition: 'all 0.25s ease',
+            boxShadow: isFocused && !error ? '0 4px 12px rgba(124, 58, 237, 0.08)' : 'none'
           }}>
-            <div className="phone-code" style={{ padding: '0 16px', background: error ? '#FEE2E2' : '#F8FAFC', borderRight: '2px solid', borderColor: error ? '#FECACA' : '#F1F5F9', height: '100%', display: 'flex', alignItems: 'center' }}>
-               <span style={{ fontSize: '1rem' }}>🇮🇳</span>
-               <span style={{ fontWeight: 800, color: '#1E293B', marginLeft: 6, fontSize: '0.9rem' }}>+91</span>
+            <div style={{ 
+              padding: '0 14px', background: error ? '#FEE2E2' : '#F1F5F9', 
+              borderRight: '1px solid', borderColor: error ? '#FECACA' : '#E2E8F0',
+              height: '100%', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0
+            }}>
+               <span style={{ fontSize: '0.9rem' }}>🇮🇳</span>
+               <span style={{ fontWeight: 900, color: '#0F172A', fontSize: '0.875rem' }}>+91</span>
             </div>
             <input
               id="phone-input"
@@ -108,70 +109,60 @@ export default function Login() {
                 if (error) setError('')
               }}
               onKeyDown={handleKeyDown}
-              autoFocus
-              className="form-input"
-              style={{ border: 'none', height: '100%', fontSize: '1.05rem', fontWeight: 700, padding: '0 16px', color: '#0F172A', outline: 'none' }}
+              className="login-input"
+              style={{ border: 'none', background: 'transparent', width: '100%', height: '100%', fontSize: '1.0625rem', fontWeight: 800, padding: '0 16px', color: '#0F172A', outline: 'none' }}
             />
           </div>
+          
           {error && (
-            <span className="form-error" style={{ marginTop: 8, color: '#DC2626', fontSize: '0.75rem', fontWeight: 650, display: 'flex', alignItems: 'center', gap: 6, animation: 'shake 0.4s ease' }}>
+            <div style={{ marginTop: 8, color: '#DC2626', fontSize: '0.7rem', fontWeight: 750, display: 'flex', alignItems: 'center', gap: 4, paddingLeft: 4 }}>
               <AlertCircle size={14} /> {error}
-            </span>
+            </div>
           )}
         </div>
 
         <button
           id="btn-send-otp"
-          className="btn btn-primary btn-lg btn-full"
           onClick={handleSend}
           disabled={sendingOTP || phone.replace(/\D/g, '').length < 10}
+          className="btn btn-primary"
           style={{ 
-            height: 52, borderRadius: 16, fontSize: '0.95rem', fontWeight: 850, 
-            background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 50%, #4C1D95 100%)', 
-            boxShadow: '0 10px 25px rgba(124, 58, 237, 0.3)',
-            transform: 'scale(1)',
-            transition: 'all 0.3s'
+            height: 50, width: '100%', borderRadius: 14, fontSize: '0.9rem', fontWeight: 900, 
+            background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)', 
+            boxShadow: '0 8px 24px rgba(124, 58, 237, 0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+            border: 'none', color: 'white', cursor: 'pointer', transition: '0.2s'
           }}
-          onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-          onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}
         >
           {sendingOTP ? (
-            <><Loader2 size={20} className="spin" /> Sending...</>
+            <><Loader2 size={18} className="spin" /> Sending...</>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              Send Authentication OTP <ArrowRight size={20} strokeWidth={2.5} />
-            </div>
+            <>Get Authentication OTP <ArrowRight size={18} strokeWidth={2.5} /></>
           )}
         </button>
 
-        {/* Footer info */}
-        <p style={{
-          textAlign: 'center', fontSize: '0.75rem',
-          color: '#94A3B8', marginTop: 24, fontWeight: 500, lineHeight: 1.4
-        }}>
-          By continuing, you agree to our{' '}
-          <a href="#" className="hover:text-purple-700" style={{ color: '#7C3AED', fontWeight: 700, textDecoration: 'none', borderBottom: '1px solid rgba(124, 58, 237, 0.1)' }}>Terms</a> &{' '}
-          <a href="#" className="hover:text-purple-700" style={{ color: '#7C3AED', fontWeight: 700, textDecoration: 'none', borderBottom: '1px solid rgba(124, 58, 237, 0.1)' }}>Privacy Policy</a>
+        <p style={{ textAlign: 'center', fontSize: '0.7rem', color: '#94A3B8', marginTop: 18, fontWeight: 600, lineHeight: 1.5 }}>
+          Authorized access only. By continuing you agree to<br/>
+          <span style={{ color: '#7C3AED', textDecoration: 'underline', textDecorationColor: 'rgba(124, 58, 237, 0.2)' }}>Terms of Service</span> and <span style={{ color: '#7C3AED', textDecoration: 'underline', textDecorationColor: 'rgba(124, 58, 237, 0.2)' }}>Privacy Policy</span>.
         </p>
       </div>
 
-      {/* Enhanced Demo Section */}
+      {/* Demo Section */}
       <div style={{
-        marginTop: 18, padding: '12px 16px', borderRadius: 16,
-        background: 'rgba(124, 58, 237, 0.03)', border: '1px dashed #DDD6FE',
-        display: 'flex', alignItems: 'center', gap: 12,
-        boxShadow: 'inset 0 2px 4px rgba(124, 58, 237, 0.02)'
+        marginTop: 14, padding: '10px 14px', borderRadius: 16,
+        background: 'white', border: '1.5px dashed #DDD6FE',
+        display: 'flex', alignItems: 'center', gap: 10,
+        boxShadow: '0 4px 12px rgba(124, 58, 237, 0.04)'
       }}>
         <div style={{ 
-          width: 32, height: 32, borderRadius: 10, background: 'white', 
-          display: 'flex', alignItems: 'center', justifyContent: 'center', 
-          boxShadow: '0 4px 10px rgba(124, 58, 237, 0.1)', border: '1px solid #EDE9FE' 
+          width: 30, height: 30, borderRadius: 10, background: '#F5F2FF', 
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
         }}>
-           <ShieldCheck size={18} color="#7C3AED" />
+           <ShieldCheck size={16} color="#7C3AED" />
         </div>
-        <div>
-          <p style={{ fontSize: '0.7rem', color: '#6D28D9', fontWeight: 750, margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Demo Access</p>
-          <p style={{ fontSize: '0.75rem', color: '#4C1D95', fontWeight: 500, margin: '2px 0 0 0' }}>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ fontSize: '0.65rem', color: '#7C3AED', fontWeight: 850, margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Demo Access</p>
+          <p style={{ fontSize: '0.72rem', color: '#4C1D95', fontWeight: 600, margin: '1px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             Any 10 digits → OTP is <strong style={{ color: '#7C3AED', fontSize: '0.85rem' }}>123456</strong>
           </p>
         </div>
@@ -180,13 +171,16 @@ export default function Login() {
       <style>{`
         .spin { animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .btn:active { transform: scale(0.97); }
+        .login-input::placeholder { color: #CBD5E1; font-weight: 500; }
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
           25% { transform: translateX(-4px); }
           75% { transform: translateX(4px); }
         }
-        .form-input:focus { box-shadow: none !important; }
-        .hover\\:text-purple-700:hover { color: #4C1D95 !important; border-bottom-color: #4C1D95 !important; }
+        @media (max-width: 400px) {
+           .login-container { transform: scale(0.95); margin-top: -10px; }
+        }
       `}</style>
     </div>
   )
