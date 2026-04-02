@@ -37,8 +37,8 @@ export default function Sidebar() {
   const transportItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/bills', icon: Receipt, label: 'Invoices & Bills' },
-    { to: '/parties', icon: Users, label: 'Parties / Clients' },
-    { to: '/transport/vehicles', icon: Truck, label: 'Manage Fleet' },
+    { to: '/parties', icon: Users, label: 'Parties' },
+    { to: '/transport/vehicles', icon: Truck, label: 'Vehicles' },
     { to: '/transport/trips', icon: MapPin || Monitor, label: 'Trip Management' },
     { to: '/finance', icon: Banknote || Receipt, label: 'Finance & Payments' },
     { to: '/profile', icon: UserCircle, label: 'Profile' },
