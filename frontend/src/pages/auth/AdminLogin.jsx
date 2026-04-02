@@ -43,16 +43,17 @@ export default function AdminLogin() {
       {/* Branding / Header */}
       <div className="auth-card-header" style={{ textAlign: 'center' }}>
         <div style={{
-          width: 64, height: 64, borderRadius: 16, overflow: 'hidden',
+          width: 72, height: 72, borderRadius: 20, background: 'white',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 20px',
-          boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+          margin: '0 auto 16px',
+          boxShadow: '0 12px 30px rgba(0,0,0,0.08)',
+          padding: 10
         }}>
-          <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
-        <h2 className="auth-card-title" style={{ fontSize: '1.5rem', letterSpacing: '-0.02em' }}>Admin Portal</h2>
-        <p className="auth-card-subtitle">
-          Authorized personnel only. Please enter your secure administrative credentials to access the console.
+        <h2 className="auth-card-title" style={{ fontSize: '1.75rem', fontWeight: 900, color: '#1E1B4B', letterSpacing: '-0.04em', marginBottom: 8 }}>Admin Portal</h2>
+        <p className="auth-card-subtitle" style={{ fontSize: '0.875rem', color: '#6B7280', maxWidth: '340px', margin: '0 auto 32px', lineHeight: 1.5 }}>
+          Authorized personnel only. Enter your secure administrative credentials to access the console.
         </p>
       </div>
 
@@ -136,38 +137,38 @@ export default function AdminLogin() {
       </form>
 
       {/* Alternative Login */}
-      <div style={{ marginTop: 24, textAlign: 'center', borderTop: '1px solid #F3F4F6', paddingTop: 24 }}>
-        <p style={{ fontSize: '0.875rem', color: '#6B7280', marginBottom: 16 }}>Are you a business owner?</p>
+      <div style={{ 
+        marginTop: 32, padding: '24px 20px', borderRadius: 20, 
+        background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)', 
+        textAlign: 'center', border: '1px solid #E2E8F0'
+      }}>
+        <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#64748B', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Are you a business owner?
+        </p>
         <button 
           onClick={() => navigate('/login')}
-          className="btn btn-ghost"
           style={{ 
-            fontWeight: 700, color: '#4F46E5', fontSize: '0.875rem',
-            background: '#F5F3FF', padding: '8px 20px', borderRadius: 10
+            width: '100%', height: 44, borderRadius: 12, background: 'white',
+            border: '1px solid #E2E8F0', color: '#4F46E5', fontSize: '0.875rem',
+            fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
           }}
+          onMouseOver={(e) => { e.currentTarget.style.borderColor = '#4F46E5'; e.currentTarget.style.background = '#F5F3FF'; }}
+          onMouseOut={(e) => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.background = 'white'; }}
         >
           User OTP Login
         </button>
       </div>
 
       {/* Security Disclaimer */}
-      <p style={{ 
-        textAlign: 'center', fontSize: '0.7rem', color: '#9CA3AF', 
-        marginTop: 32, lineHeight: 1.5, padding: '0 20px'
-      }}>
-        All administrative actions are logged and strictly monitored. Unauthorized access attempts will be permanently blocked.
-      </p>
-
-      {/* Demo Credentials Hint */}
-      <div style={{
-        marginTop: 20, padding: '12px', borderRadius: 12,
-        background: '#F8FAFC', border: '1px solid #E2E8F0'
-      }}>
-        <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: 6 }}>Demo Admin Access</div>
-        <div style={{ fontSize: '0.75rem', color: '#1E293B' }}>
-          Email: <code style={{ fontWeight: 700 }}>admin@billpro.com</code><br/>
-          Pass: <code style={{ fontWeight: 700 }}>admin123</code>
+      <div style={{ marginTop: 28, textAlign: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#9CA3AF', marginBottom: 8 }}>
+           <ShieldCheck size={12} />
+           <span style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Secure Environment</span>
         </div>
+        <p style={{ fontSize: '0.7rem', color: '#9CA3AF', lineHeight: 1.5, padding: '0 20px', margin: 0 }}>
+          All administrative actions are logged and strictly monitored. Unauthorized access attempts will be permanently blocked.
+        </p>
       </div>
 
       <style>{`

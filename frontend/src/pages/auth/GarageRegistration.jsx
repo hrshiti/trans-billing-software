@@ -64,16 +64,20 @@ export default function GarageRegistration() {
   const [step, setStep] = useState(1)
 
   const { register, handleSubmit, formState: { errors }, trigger } = useForm({
+    mode: 'onChange',
     defaultValues: {
       name: user?.name || '',
       businessName: '',
       phone: user?.phone || '',
       address: '',
+      panNo: '',
+      bankAccNo: '',
+      bankIfsc: '',
     }
   })
 
   const handleNext = async () => {
-    const isValid = await trigger(['name', 'businessName', 'address']);
+    const isValid = await trigger(['name', 'businessName', 'address', 'panNo', 'bankAccNo', 'bankIfsc']);
     if (isValid) setStep(2);
   }
 
@@ -137,19 +141,65 @@ export default function GarageRegistration() {
                 </Field>
               </div>
 
-              <Field label="Garage Name" error={errors.businessName} required sublabel="Trade Name">
-                <div className="input-group">
-                  <span className="input-prefix"><Wrench size={15} /></span>
-                  <input {...register('businessName', { required: 'Garage name is required' })} placeholder="e.g. Maruti Seva Sadan" className="form-input" style={{ borderRadius: 9, height: 40, fontSize: '0.875rem' }} />
-                </div>
-              </Field>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <Field label="Garage Name" error={errors.businessName} required sublabel="Trade Name">
+                  <div className="input-group">
+                    <span className="input-prefix"><Wrench size={15} /></span>
+                    <input {...register('businessName', { required: 'Garage name is required' })} placeholder="e.g. Maruti Seva Sadan" className="form-input" style={{ borderRadius: 9, height: 40, fontSize: '0.875rem' }} />
+                  </div>
+                </Field>
+
+                <Field label="PAN Number" error={errors.panNo} required>
+                  <div className="input-group">
+                    <span className="input-prefix"><FileText size={15} /></span>
+                    <input {...register('panNo', { 
+                      required: 'PAN is required',
+                      pattern: { value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, message: 'Invalid PAN format (ABCDE1234F)' }
+                    })} 
+                    onInput={(e) => {
+                      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+                    }}
+                    placeholder="ABCDE1234F" className="form-input" style={{ borderRadius: 9, height: 40, fontSize: '0.875rem', textTransform: 'uppercase' }} />
+                  </div>
+                </Field>
+              </div>
 
               <Field label="Workshop Address" error={errors.address} required>
-                <div className="input-group" style={{ alignItems: 'flex-start' }}>
-                  <span className="input-prefix" style={{ marginTop: 10 }}><MapPin size={15} /></span>
+                <div className="input-group">
+                  <span className="input-prefix" style={{ top: 12, transform: 'none' }}><MapPin size={15} /></span>
                   <textarea {...register('address', { required: 'Address is required' })} placeholder="Complete Workshop Address" className="form-input" style={{ minHeight: 60, paddingTop: 8, borderRadius: 9, fontSize: '0.875rem' }} />
                 </div>
               </Field>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <Field label="Bank Account No" error={errors.bankAccNo} required>
+                  <div className="input-group">
+                    <span className="input-prefix"><CreditCard size={15} /></span>
+                    <input {...register('bankAccNo', { 
+                      required: 'Account no is required',
+                      pattern: { value: /^[0-9]{9,18}$/, message: 'Invalid Account Number (9-18 digits)' }
+                    })} 
+                    onInput={(e) => {
+                      e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 18);
+                    }}
+                    placeholder="Account Number" className="form-input" style={{ borderRadius: 9, height: 40, fontSize: '0.875rem' }} />
+                  </div>
+                </Field>
+
+                <Field label="IFSC Code" error={errors.bankIfsc} required>
+                  <div className="input-group">
+                    <span className="input-prefix"><Building2 size={15} /></span>
+                    <input {...register('bankIfsc', { 
+                      required: 'IFSC is required',
+                      pattern: { value: /^[A-Z]{4}0[A-Z0-9]{6}$/i, message: 'Invalid IFSC (e.g. SBIN0123456)' }
+                    })} 
+                    onInput={(e) => {
+                      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11);
+                    }}
+                    placeholder="Bank IFSC" className="form-input" style={{ borderRadius: 9, height: 40, fontSize: '0.875rem', textTransform: 'uppercase' }} />
+                  </div>
+                </Field>
+              </div>
             </div>
 
             <button type="button" onClick={handleNext} className="btn btn-primary btn-lg btn-full" style={{ borderRadius: 12, height: 48, fontSize: '0.875rem', fontWeight: 800 }}>
@@ -173,7 +223,6 @@ export default function GarageRegistration() {
                 <DocUploadField label="Address Proof" icon={MapPin} register={register} name="docAddress" required />
                 <DocUploadField label="Passport Photo" icon={Image} register={register} name="docPhoto" required />
                 <DocUploadField label="GST Certificate" icon={Building2} register={register} name="docGst" required />
-                <DocUploadField label="Bank Details" icon={CreditCard} register={register} name="docBank" required />
               </div>
               
               <div style={{ marginTop: 10, padding: '6px 10px', background: 'rgba(124, 58, 237, 0.05)', borderRadius: 9, display: 'flex', gap: 6, alignItems: 'flex-start' }}>
