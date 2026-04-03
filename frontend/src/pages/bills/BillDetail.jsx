@@ -15,7 +15,7 @@ function TransportInvoice({ bill, business, onPayOnline }) {
   const accent = '#F3811E' // Radhe Tempo Orange
 
   return (
-    <div className="invoice-wrap" style={{ color: '#000', fontFamily: 'Inter, sans-serif', padding: '10px' }}>
+    <div className="invoice-wrap" style={{ color: '#000', fontFamily: 'Inter, sans-serif', padding: '10px', minHeight: '800px', backgroundColor: '#fff' }}>
       {/* Top Header Section */}
       <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 190px', border: '1px solid #ccc', borderRadius: window.innerWidth < 640 ? '8px' : '2px 2px 0 0' }}>
         <div style={{ padding: window.innerWidth < 640 ? '10px' : '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
