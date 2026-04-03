@@ -144,7 +144,7 @@ function GarageInvoice({ bill, business, onPayOnline }) {
   return (
     <div className="garage-invoice-wrap" style={{ color: '#000', fontFamily: 'Inter, sans-serif' }}>
       {/* Top Banner */}
-      <div style={{ background: themeColor, padding: window.innerWidth < 640 ? '16px' : '24px 30px', borderRadius: '8px 8px 0 0', display: 'flex', flexDirection: window.innerWidth < 640 ? 'column' : 'row', justifyContent: 'space-between', alignItems: window.innerWidth < 640 ? 'flex-start' : 'center', gap: 12 }}>
+      <div style={{ background: themeColor, padding: window.innerWidth < 640 ? '10px 15px' : '12px 30px', borderRadius: '8px 8px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: window.innerWidth < 640 ? '1.5rem' : '2rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#111' }}>Repair Estimate</h1>
           <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, opacity: 0.85, color: '#333' }}>{business?.slogan || 'Restoring Vehicles, Reviving Peace of Mind'}</p>
@@ -179,37 +179,61 @@ function GarageInvoice({ bill, business, onPayOnline }) {
           </div>
         </div>
 
+        {/* Grey horizontal line */}
+        <div style={{ borderTop: '1px solid #ddd', margin: '20px 0' }} />
+
         {/* Repair Details Table */}
         <div style={{ marginBottom: 30 }}>
           <div style={{ background: themeColor, padding: '4px 10px', display: 'inline-block', fontWeight: 800, fontSize: '0.75rem', marginBottom: 10, borderRadius: 2 }}>Repair Details</div>
           <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
             <thead>
               <tr style={{ background: themeColor }}>
-                <th style={{ padding: window.innerWidth < 640 ? '8px' : '12px', textAlign: 'left', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800 }}>Description</th>
-                <th style={{ padding: window.innerWidth < 640 ? '8px' : '12px', textAlign: 'center', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800, width: '15%' }}>Qty</th>
-                <th style={{ padding: window.innerWidth < 640 ? '8px' : '12px', textAlign: 'right', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800, width: '20%' }}>Rate</th>
-                <th style={{ padding: window.innerWidth < 640 ? '8px' : '12px', textAlign: 'right', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800, width: '20%' }}>Total</th>
+                <th style={{ padding: window.innerWidth < 640 ? '5px' : '8px', textAlign: 'left', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800 }}>Description</th>
+                <th style={{ padding: window.innerWidth < 640 ? '5px' : '8px', textAlign: 'center', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800, width: '15%' }}>Qty</th>
+                <th style={{ padding: window.innerWidth < 640 ? '5px' : '8px', textAlign: 'right', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800, width: '20%' }}>Rate</th>
+                <th style={{ padding: window.innerWidth < 640 ? '5px' : '8px', textAlign: 'right', border: '1px solid #ddd', fontSize: '0.7rem', fontWeight: 800, width: '20%' }}>Total</th>
               </tr>
             </thead>
             <tbody>
               {items.map((item, i) => (
                 <tr key={i}>
-                  <td style={{ padding: window.innerWidth < 640 ? '6px 8px' : '10px 12px', border: '1px solid #ddd', fontSize: '0.75rem' }}>{item.description}</td>
-                  <td style={{ padding: window.innerWidth < 640 ? '6px 8px' : '10px 12px', border: '1px solid #ddd', fontSize: '0.75rem', textAlign: 'center' }}>{item.qty || 1}</td>
-                  <td style={{ padding: window.innerWidth < 640 ? '6px 8px' : '10px 12px', border: '1px solid #ddd', fontSize: '0.75rem', textAlign: 'right' }}>{parseFloat(item.rate || item.amount).toLocaleString()}</td>
-                  <td style={{ padding: window.innerWidth < 640 ? '6px 8px' : '10px 12px', border: '1px solid #ddd', fontSize: '0.75rem', textAlign: 'right', fontWeight: 600 }}>{parseFloat(item.amount).toLocaleString()}</td>
+                  <td style={{ padding: window.innerWidth < 640 ? '4px 6px' : '6px 10px', border: '1px solid #ddd', fontSize: '0.75rem' }}>{item.description}</td>
+                  <td style={{ padding: window.innerWidth < 640 ? '4px 6px' : '6px 10px', border: '1px solid #ddd', fontSize: '0.75rem', textAlign: 'center' }}>{item.qty || 1}</td>
+                  <td style={{ padding: window.innerWidth < 640 ? '4px 6px' : '6px 10px', border: '1px solid #ddd', fontSize: '0.75rem', textAlign: 'right' }}>{parseFloat(item.rate || item.amount).toLocaleString()}</td>
+                  <td style={{ padding: window.innerWidth < 640 ? '4px 6px' : '6px 10px', border: '1px solid #ddd', fontSize: '0.75rem', textAlign: 'right', fontWeight: 600 }}>{parseFloat(item.amount).toLocaleString()}</td>
                 </tr>
               ))}
               <tr>
-                <td colSpan="3" style={{ padding: '12px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 800 }}>Total</td>
-                <td style={{ padding: '12px', border: '1px solid #ddd', textAlign: 'right', fontWeight: 950, fontSize: '1.25rem', background: '#fcfcfc' }}>₹{bill.subtotal?.toLocaleString()}</td>
+                <td colSpan="3" style={{ padding: '6px 10px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 800 }}>Total</td>
+                <td style={{ padding: '6px 10px', border: '1px solid #ddd', textAlign: 'right', fontWeight: 950, fontSize: '1.25rem', background: '#fcfcfc' }}>₹{bill.subtotal?.toLocaleString()}</td>
               </tr>
             </tbody>
           </table>
         </div>
 
+        {/* Payment & Notes Section */}
+        <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1.1fr 0.9fr', gap: 30, marginBottom: 20 }}>
+          <div>
+            <h4 style={{ margin: '0 0 10px 0', fontSize: '0.85rem', fontWeight: 800 }}>Payment Information</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr' }}><span style={{ color: '#666' }}>Payment Method:</span> <span style={{ fontWeight: 700 }}>{bill.paymentMethod || 'Online Payment'}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr' }}><span style={{ color: '#666' }}>Payment Date:</span> <span style={{ fontWeight: 700 }}>{bill.paymentDate ? dayjs(bill.paymentDate).format('MMMM DD, YYYY') : dayjs(bill.billDate).format('MMMM DD, YYYY')}</span></div>
+              {bill.transactionId && <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr' }}><span style={{ color: '#666' }}>Transaction ID:</span> <span style={{ fontWeight: 700 }}>{bill.transactionId}</span></div>}
+            </div>
+          </div>
+          <div>
+            <h4 style={{ margin: '0 0 10px 0', fontSize: '0.85rem', fontWeight: 800 }}>Additional Notes</h4>
+            <p style={{ margin: 0, fontSize: '0.75rem', color: '#444', lineHeight: 1.5 }}>
+              {bill.notes || 'Estimate based on current damage assessment. Costs may vary due to part availability and repair complexity. Taxes and fees not included. Valid for 30 days.'}
+            </p>
+          </div>
+        </div>
+
+        {/* Another grey horizontal line */}
+        <div style={{ borderTop: '1px solid #ddd', margin: '20px 0' }} />
+
         {/* Footer info splits */}
-        <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1.4fr 1fr', gap: window.innerWidth < 640 ? 20 : 40, borderTop: '2px solid #222', paddingTop: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1.4fr 1fr', gap: window.innerWidth < 640 ? 20 : 40, borderTop: '1px solid #ddd', paddingTop: 20 }}>
           <div style={{ border: '1px solid #ddd', padding: 12, borderRadius: 6, background: '#fafafa' }}>
              <h4 style={{ margin: '0 0 10px 0', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Terms and Conditions</h4>
              <p style={{ margin: 0, fontSize: '0.65rem', color: '#555', lineHeight: 1.6 }}>
