@@ -10,11 +10,21 @@ const uid = () => `bill_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
 const generateInvoiceNo = (existing = []) => {
   const prefix = 'BP'
   const ym = dayjs().format('YYMM')
-  const max = existing
-    .map(b => parseInt(b.invoiceNo?.replace(/\D/g, '') || '0'))
+  const fullPrefix = `${prefix}${ym}`
+  
+  // Filter for bills from the current month and extract their numeric counter
+  const counters = existing
+    .filter(b => b.invoiceNo?.startsWith(fullPrefix))
+    .map(b => {
+      const counterStr = b.invoiceNo.slice(fullPrefix.length)
+      // Ignore corrupted numbers (too long or scientific notation)
+      if (counterStr.length > 6 || counterStr.includes('.') || counterStr.includes('e')) return 0
+      return parseInt(counterStr) || 0
+    })
     .filter(Boolean)
-  const next = max.length ? Math.max(...max) + 1 : 1
-  return `${prefix}${ym}${String(next).padStart(3, '0')}`
+
+  const next = counters.length ? Math.max(...counters) + 1 : 1
+  return `${fullPrefix}${String(next).padStart(3, '0')}`
 }
 
 export function BillProvider({ children }) {
