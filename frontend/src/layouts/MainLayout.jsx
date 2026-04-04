@@ -26,7 +26,7 @@ const pageMeta = {
 }
 
 export default function MainLayout() {
-  const { sidebarCollapsed } = useApp()
+  const { sidebarCollapsed, mobileMenuOpen, closeMobileMenu } = useApp()
   const location = useLocation()
 
   const meta = pageMeta[location.pathname] || { title: 'TRANS', subtitle: null }
@@ -41,6 +41,12 @@ export default function MainLayout() {
 
   return (
     <div className="app-layout">
+      {/* Mobile Drawer Backdrop */}
+      <div 
+        className={`mobile-overlay ${mobileMenuOpen ? 'active' : ''}`} 
+        onClick={closeMobileMenu}
+      />
+
       {/* Desktop Sidebar */}
       <Sidebar />
 

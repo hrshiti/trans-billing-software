@@ -14,7 +14,7 @@ import logo from '../../assets/trans-logo.png'
 
 export default function Sidebar() {
   const { logout, user, isAdmin } = useAuth()
-  const { sidebarCollapsed, toggleSidebar } = useApp()
+  const { sidebarCollapsed, toggleSidebar, mobileMenuOpen, closeMobileMenu } = useApp()
   const { mode, switchMode } = useAdmin()
   const navigate = useNavigate()
 
@@ -110,12 +110,27 @@ export default function Sidebar() {
 
   const navItems = isAdmin ? adminItems : (user?.role === 'transport' ? transportItems : garageItems)
 
-  const sidebarCls = `sidebar ${sidebarCollapsed ? 'collapsed' : ''}`
+  const sidebarCls = `sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${mobileMenuOpen ? 'mobile-open' : ''}`
 
   return (
-    <aside className={sidebarCls} style={{ zIndex: 100 }}>
+    <aside className={sidebarCls} style={{ zIndex: 400 }}>
+      {/* ── Close Button (Mobile Only) ── */}
+      {mobileMenuOpen && (
+        <button 
+          onClick={closeMobileMenu}
+          className="mobile-close-btn"
+          style={{
+            position: 'absolute', top: 20, right: 20, width: 36, height: 36, borderRadius: 10,
+            background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
+          }}
+        >
+          <LogOut size={20} style={{ transform: 'rotate(180deg)' }} />
+        </button>
+      )}
+
       {/* ── Branding ── */}
-      <div className="flex items-center gap-3 px-6 pt-10 pb-6" style={{ cursor: 'pointer', marginBottom: 10 }} onClick={() => navigate('/dashboard')}>
+      <div className="flex items-center gap-3 px-6 pt-10 pb-6" style={{ cursor: 'pointer', marginBottom: 10 }} onClick={() => { navigate('/dashboard'); closeMobileMenu(); }}>
         <div style={{
           width: 42, height: 42, borderRadius: 12, overflow: 'hidden',
           display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.4s'
@@ -226,14 +241,14 @@ export default function Sidebar() {
               })}
             >
               {({ isActive }) => (
-                <>
+                <div onClick={closeMobileMenu} style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
                   <item.icon size={20} className="nav-icon" color={isActive ? 'white' : 'rgba(255,255,255,0.6)'} />
-                  {!sidebarCollapsed && (
+                  {(!sidebarCollapsed || mobileMenuOpen) && (
                     <span className="nav-label" style={{ fontSize: '0.875rem', fontWeight: 650, color: isActive ? 'white' : 'rgba(255,255,255,0.8)' }}>
                       {item.label}
                     </span>
                   )}
-                </>
+                </div>
               )}
             </NavLink>
           )
@@ -262,10 +277,14 @@ export default function Sidebar() {
         </button>
       </div>
 
-      <button onClick={toggleSidebar} style={{
-        position: 'absolute', top: 50, right: -12, width: 24, height: 24, borderRadius: '50%', background: accentColor, border: '2px solid #111',
-        color: 'white', cursor: 'pointer', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center'
-      }}>
+      <button 
+        className="sidebar-toggle-btn"
+        onClick={toggleSidebar} 
+        style={{
+          position: 'absolute', top: 50, right: -12, width: 24, height: 24, borderRadius: '50%', background: accentColor, border: '2px solid #111',
+          color: 'white', cursor: 'pointer', zIndex: 401, display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}
+      >
         {sidebarCollapsed ? <ChevronRight size={14} strokeWidth={3} /> : <ChevronLeft size={14} strokeWidth={3} />}
       </button>
 

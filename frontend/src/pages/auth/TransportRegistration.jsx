@@ -217,8 +217,9 @@ export default function TransportRegistration() {
                     <span className="input-prefix"><CreditCard size={14} /></span>
                     <input {...register('bankAccNo', { 
                       required: 'Account no is required',
-                      pattern: { value: /^[0-9]{9,18}$/, message: 'Invalid length' }
+                      pattern: { value: /^[0-9]{9,18}$/, message: 'Invalid length (9-18 digits)' }
                     })} 
+                    onInput={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 18)}
                     placeholder="Account Number" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
                   </div>
                 </Field>

@@ -16,13 +16,10 @@ export default function BottomNav() {
   const leftItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Home' },
     { to: '/bills',     icon: FileText,        label: 'Bills' },
-    { to: isTransport ? '/transport/vehicles' : '/garage/vehicles', icon: Truck, label: 'Vehicles' },
   ]
 
   const rightItems = [
-    { to: isTransport ? '/transport/trips' : '/garage/services', icon: isTransport ? MapPin : Wrench, label: isTransport ? 'Trips' : 'Services' },
     { to: '/parties',   icon: Users,           label: 'Parties' },
-    { to: '/finance' ,  icon: Banknote,        label: 'Finance' },
     { to: '/profile',   icon: UserCircle,      label: 'Profile' },
   ]
 

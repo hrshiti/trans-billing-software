@@ -4,6 +4,7 @@ const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [viewMode, setViewMode] = useState(
     () => localStorage.getItem('view_mode') || 'transport'
   )
@@ -12,6 +13,8 @@ export function AppProvider({ children }) {
   )
 
   const toggleSidebar = () => setSidebarCollapsed(p => !p)
+  const toggleMobileMenu = () => setMobileMenuOpen(p => !p)
+  const closeMobileMenu = () => setMobileMenuOpen(false)
 
   const switchViewMode = (mode) => {
     setViewMode(mode)
@@ -30,6 +33,9 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       sidebarCollapsed,
       toggleSidebar,
+      mobileMenuOpen,
+      toggleMobileMenu,
+      closeMobileMenu,
       viewMode,
       switchViewMode,
       language,

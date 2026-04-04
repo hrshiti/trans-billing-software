@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Bell, Search } from 'lucide-react'
+import { ArrowLeft, Bell, Search, Menu } from 'lucide-react'
+import { useApp } from '../../context/AppContext'
 
 /**
  * MobileHeader — shown only on mobile (< 768px)
@@ -12,12 +13,14 @@ export default function MobileHeader({
   showNotif = true,
 }) {
   const navigate = useNavigate()
+  const { toggleMobileMenu } = useApp()
   const handleBack = () => { if (onBack) onBack(); else navigate(-1) }
 
   return (
     <header
       className="mobile-header fixed top-0 left-0 right-0"
       style={{
+        position: 'fixed',
         background: 'rgba(240, 239, 234, 0.75)', /* blends with --bg */
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
@@ -49,22 +52,35 @@ export default function MobileHeader({
             <ArrowLeft size={20} strokeWidth={2.5} />
           </button>
         ) : (
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            background: 'linear-gradient(135deg, #1E1B4B, #4C1D95)',
-            padding: '4px 12px 4px 8px',
-            borderRadius: 99,
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button
+              onClick={toggleMobileMenu}
+              style={{
+                width: 34, height: 34, borderRadius: 10,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(0,0,0,0.05)', border: 'none', cursor: 'pointer',
+                color: 'var(--text-primary)',
+              }}
+            >
+              <Menu size={20} />
+            </button>
             <div style={{
-              width: 22, height: 22, borderRadius: 6,
-              background: 'rgba(255,255,255,0.2)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: 'linear-gradient(135deg, #1E1B4B, #4C1D95)',
+              padding: '4px 12px 4px 8px',
+              borderRadius: 99,
             }}>
-              <span style={{ color: 'white', fontSize: '0.6rem', fontWeight: 800 }}>TR</span>
+              <div style={{
+                width: 22, height: 22, borderRadius: 6,
+                background: 'rgba(255,255,255,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <span style={{ color: 'white', fontSize: '0.66rem', fontWeight: 900 }}>TR</span>
+              </div>
+              <span style={{ color: 'white', fontSize: '0.875rem', fontWeight: 800, letterSpacing: '-0.01em' }}>
+                TRANS
+              </span>
             </div>
-            <span style={{ color: 'white', fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '-0.01em' }}>
-              TRANS
-            </span>
           </div>
         )}
 
