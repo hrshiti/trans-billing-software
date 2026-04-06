@@ -327,9 +327,11 @@ function GarageInvoice({ bill, business, onPayOnline }) {
                 <span style={{ fontSize: '0.6rem', color: '#888', marginTop: 2 }}>Your Name</span>
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginTop: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>Date:</span>
-              <div style={{ borderBottom: '1.5px solid #333', flex: 1 }} />
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, borderBottom: '1.5px solid #333', flex: 1, paddingBottom: 2 }}>
+                {dayjs(bill.billDate).format('DD/MM/YYYY')}
+              </span>
             </div>
           </div>
         </div>
