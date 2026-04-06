@@ -20,10 +20,13 @@ function TransportInvoice({ bill, business, onPayOnline }) {
       {/* Top Header Section */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', border: '1px solid #ccc', borderRadius: '4px 4px 0 0' }}>
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-           {business?.logoUrl 
-             ? <img src={business.logoUrl} style={{ width: 60, height: 45, objectFit: 'contain' }} />
-             : <div style={{ minWidth: 40, height: 40, background: '#eee', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 900 }}>{(business?.businessName || 'T')[0]}</div>
-           }
+            {/* Logo / Placeholder Box */}
+            <div style={{ width: 52, height: 52, background: 'white', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden', border: '1.5px solid #F1F5F9' }}>
+               {business?.logoUrl 
+                 ? <img src={business.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                 : <span style={{ fontSize: '1.4rem', fontWeight: 950, color: '#000' }}>{(business?.businessName || 'B')[0]}</span>
+               }
+            </div>
            <div style={{ flex: 1, textAlign: 'center' }}>
              <h1 style={{ fontSize: '1.4rem', fontWeight: 950, margin: 0, letterSpacing: '-0.04em', lineHeight: 0.9 }}>{business?.businessName?.toUpperCase() || 'KHAN TRANSPORT'}</h1>
              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
@@ -72,7 +75,7 @@ function TransportInvoice({ bill, business, onPayOnline }) {
       </div>
 
       {/* Table grid */}
-      <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc', borderTop: 'none' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc', borderTop: 'none', marginBottom: 0 }}>
         <thead>
           <tr style={{ background: '#fdf7f2' }}>
             {['No.', 'Date', 'Company (From)', 'Company (To)', 'Chalan No.', 'Amount'].map((h, i) => (
@@ -129,7 +132,7 @@ function TransportInvoice({ bill, business, onPayOnline }) {
       </table>
 
       {/* Combined Bank Details & Signature Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '60% 40%', marginTop: 4, alignItems: 'end' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '60% 40%', marginTop: 8, alignItems: 'start' }}>
         {/* Bank Details Box */}
         <div style={{ border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden' }}>
            <div style={{ background: '#fdf3f0', padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, borderBottom: '1px solid #ccc' }}>BANK DETAILS :</div>
@@ -137,20 +140,16 @@ function TransportInvoice({ bill, business, onPayOnline }) {
               {/* Mapping for both bankDetails object and legacy top-level fields */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                  <div style={{ fontSize: '0.65rem' }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>A/c No:</span><br/>
-                    <span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountNumber || business?.bankAccNo || ''}</span>
+                    <span style={{ fontWeight: 600, color: '#555' }}>A/c No : </span><span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountNumber || business?.bankAccNo || ''}</span>
                  </div>
                  <div style={{ fontSize: '0.65rem' }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>IFSC :</span><br/>
-                    <span style={{ fontWeight: 900 }}>{business?.bankDetails?.ifsc || business?.bankIfsc || ''}</span>
+                    <span style={{ fontWeight: 600, color: '#555' }}>IFSC : </span><span style={{ fontWeight: 900 }}>{(business?.bankDetails?.ifsc || business?.bankIfsc || '').toUpperCase()}</span>
                  </div>
                  <div style={{ fontSize: '0.65rem', marginTop: 3 }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>Name :</span><br/>
-                    <span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountName || business?.name || ''}</span>
+                    <span style={{ fontWeight: 600, color: '#555' }}>Name : </span><span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountName || business?.name || ''}</span>
                  </div>
                  <div style={{ fontSize: '0.65rem', marginTop: 3 }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>Bank :</span><br/>
-                    <span style={{ fontWeight: 900 }}>{business?.bankDetails?.bankName || business?.bankName || ''}</span>
+                    <span style={{ fontWeight: 600, color: '#555' }}>Bank : </span><span style={{ fontWeight: 900 }}>{business?.bankDetails?.bankName || business?.bankName || ''}</span>
                  </div>
               </div>
            </div>
@@ -193,16 +192,25 @@ function GarageInvoice({ bill, business, onPayOnline }) {
           <h1 style={{ margin: 0, fontSize: window.innerWidth < 640 ? '1.5rem' : '2rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#111' }}>Repair Estimate</h1>
           <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, opacity: 0.85, color: '#333' }}>{business?.slogan || 'Restoring Vehicles, Reviving Peace of Mind'}</p>
         </div>
-        <div style={{ textAlign: window.innerWidth < 640 ? 'left' : 'right' }}>
-           <div style={{ fontWeight: 900, fontSize: '1.125rem', color: '#111' }}>{business?.businessName?.toUpperCase() || 'AUTO REPAIRS'}</div>
-           <div style={{ fontSize: '0.7rem', fontWeight: 700, marginTop: 4 }}>Bill No: {bill.invoiceNo}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Logo */}
+          <div style={{ width: 44, height: 44, borderRadius: 8, background: 'rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+            {business?.logoUrl
+              ? <img src={business.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <span style={{ fontSize: '1.2rem', fontWeight: 950, color: '#111' }}>{(business?.businessName || 'A')[0]}</span>
+            }
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontWeight: 900, fontSize: '1.125rem', color: '#111' }}>{business?.businessName?.toUpperCase() || 'AUTO REPAIRS'}</div>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, marginTop: 4 }}>Bill No: {bill.invoiceNo}</div>
+          </div>
         </div>
       </div>
 
       <div style={{ padding: window.innerWidth < 640 ? '12px' : '30px', border: '1px solid #eee', borderTop: 'none', borderRadius: '0 0 8px 8px', background: 'white' }}>
         
         {/* Info Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', gap: window.innerWidth < 640 ? 20 : 30, marginBottom: 30 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 30, marginBottom: 30 }}>
           {/* Customer Info */}
           <div>
             <div style={{ background: themeColor, padding: '4px 10px', display: 'inline-block', fontWeight: 800, fontSize: '0.7rem', marginBottom: 10, borderRadius: 2 }}>Customer Information</div>
@@ -250,9 +258,29 @@ function GarageInvoice({ bill, business, onPayOnline }) {
                   <td style={{ padding: window.innerWidth < 640 ? '4px 6px' : '6px 10px', border: '1px solid #ddd', fontSize: '0.75rem', textAlign: 'right', fontWeight: 600 }}>{parseFloat(item.amount).toLocaleString()}</td>
                 </tr>
               ))}
+              {/* Parts Subtotal */}
               <tr>
-                <td colSpan="3" style={{ padding: '6px 10px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 800 }}>Total</td>
-                <td style={{ padding: '6px 10px', border: '1px solid #ddd', textAlign: 'right', fontWeight: 950, fontSize: '1.25rem', background: '#fcfcfc' }}>₹{bill.subtotal?.toLocaleString()}</td>
+                <td colSpan="3" style={{ padding: '4px 10px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 700, color: '#555', fontSize: '0.7rem' }}>Parts Subtotal</td>
+                <td style={{ padding: '4px 10px', border: '1px solid #ddd', textAlign: 'right', fontWeight: 700, fontSize: '0.7rem' }}>₹{bill.partsTotal?.toLocaleString()}</td>
+              </tr>
+              {/* Labour Charge - only show if > 0 */}
+              {parseFloat(bill.labor || 0) > 0 && (
+                <tr>
+                  <td colSpan="3" style={{ padding: '4px 10px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 700, color: '#555', fontSize: '0.7rem' }}>Labour Charge</td>
+                  <td style={{ padding: '4px 10px', border: '1px solid #ddd', textAlign: 'right', fontWeight: 700, fontSize: '0.7rem' }}>₹{parseFloat(bill.labor).toLocaleString()}</td>
+                </tr>
+              )}
+              {/* GST - only show if > 0 */}
+              {parseFloat(bill.gstAmount || 0) > 0 && (
+                <tr>
+                  <td colSpan="3" style={{ padding: '4px 10px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 700, color: '#555', fontSize: '0.7rem' }}>GST ({bill.gstPercent}%)</td>
+                  <td style={{ padding: '4px 10px', border: '1px solid #ddd', textAlign: 'right', fontWeight: 700, fontSize: '0.7rem' }}>₹{parseFloat(bill.gstAmount).toLocaleString()}</td>
+                </tr>
+              )}
+              {/* Grand Total */}
+              <tr>
+                <td colSpan="3" style={{ padding: '5px 10px', border: '1px solid #ddd', textAlign: 'left', fontWeight: 800, fontSize: '0.75rem' }}>Grand Total</td>
+                <td style={{ padding: '5px 10px', border: '1px solid #ddd', textAlign: 'right', fontWeight: 950, fontSize: '0.95rem', background: '#fcfcfc' }}>₹{bill.grandTotal?.toLocaleString()}</td>
               </tr>
             </tbody>
           </table>
@@ -279,27 +307,6 @@ function GarageInvoice({ bill, business, onPayOnline }) {
         {/* Another grey horizontal line */}
         <div style={{ borderTop: '1px solid #ddd', margin: '20px 0' }} />
 
-        {/* Bank Details Section */}
-        <div style={{ border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden', marginBottom: 20 }}>
-           <div style={{ background: '#fdf3f0', padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, borderBottom: '1px solid #ccc' }}>BANK DETAILS :</div>
-           <div style={{ padding: '10px 12px', backgroundColor: '#fff' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                 <div style={{ fontSize: '0.7rem' }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>A/c No:</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountNumber || ''}</span>
-                 </div>
-                 <div style={{ fontSize: '0.7rem' }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>IFSC :</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.ifsc || ''}</span>
-                 </div>
-                 <div style={{ fontSize: '0.7rem', marginTop: 4 }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>Name :</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountName || ''}</span>
-                 </div>
-                 <div style={{ fontSize: '0.7rem', marginTop: 4 }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>Bank :</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.bankName || ''}</span>
-                 </div>
-              </div>
-           </div>
-        </div>
-
         {/* Footer info splits */}
         <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1.4fr 1fr', gap: window.innerWidth < 640 ? 20 : 40, borderTop: '1px solid #ddd', paddingTop: 20 }}>
           <div style={{ border: '1px solid #ddd', padding: 12, borderRadius: 6, background: '#fafafa' }}>
@@ -308,27 +315,23 @@ function GarageInvoice({ bill, business, onPayOnline }) {
                 By signing, customer authorizes {business?.businessName || 'garage'} to proceed with repairs. Estimate valid for 30 days.
              </p>
           </div>
-          <div style={{ textAlign: window.innerWidth < 640 ? 'left' : 'right', paddingRight: window.innerWidth < 640 ? 0 : 10 }}>
-             <div style={{ marginBottom: window.innerWidth < 640 ? 20 : 40 }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 800 }}>Customer Signature: ____________________</p>
-                <p style={{ margin: '15px 0 0 0', fontSize: '0.8rem', fontWeight: 800 }}>Date: ____________________</p>
-             </div>
+          <div style={{ paddingTop: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 4 }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, whiteSpace: 'nowrap' }}>Customer Signature:</span>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 100 }}>
+                <div style={{ height: 32 }} />
+                <div style={{ borderBottom: '1.5px solid #333', width: '100%' }} />
+                <span style={{ fontSize: '0.6rem', color: '#888', marginTop: 2 }}>Your Name</span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginTop: 10 }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>Date:</span>
+              <div style={{ borderBottom: '1.5px solid #333', flex: 1 }} />
+            </div>
           </div>
         </div>
 
-        {bill.status !== 'paid' && (
-          <button 
-            onClick={onPayOnline}
-            style={{
-              marginTop: 25, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              padding: '14px', background: 'linear-gradient(135deg, #16A34A, #15803D)', color: 'white',
-              border: 'none', borderRadius: 14, fontWeight: 800, fontSize: '1rem', cursor: 'pointer',
-              boxShadow: '0 4px 15px rgba(22, 163, 74, 0.3)'
-            }}
-          >
-            <CreditCard size={20} /> Direct Online Payment
-          </button>
-        )}
+
       </div>
       
       {/* Footer stripe */}

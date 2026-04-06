@@ -95,8 +95,37 @@ export default function GarageRegistration() {
 
   const onSubmit = async (data) => {
     setLoading(true)
+    
+    // Process logo file if exists
+    let logoUrl = null;
+    if (data.docLogo && data.docLogo[0]) {
+      const reader = new FileReader();
+      const filePromise = new Promise((resolve) => {
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(data.docLogo[0]);
+      });
+      logoUrl = await filePromise;
+    }
+
     await new Promise(r => setTimeout(r, 1200))
-    updateProfile({ ...data, setupComplete: true })
+    
+    // Nest bank details to match profile schema
+    const formattedData = {
+      ...data,
+      logoUrl, // Save the Logo DataURL
+      bankDetails: {
+        accountName: data.name, // default to owner name
+        accountNumber: data.bankAccNo,
+        ifsc: data.bankIfsc?.toUpperCase(),
+        bankName: data.bankName
+      }
+    }
+    delete formattedData.bankAccNo
+    delete formattedData.bankIfsc
+    delete formattedData.bankName
+    delete formattedData.docLogo // remove file object
+    
+    updateProfile({ ...formattedData, setupComplete: true })
     navigate('/dashboard', { replace: true })
   }
 
@@ -313,6 +342,7 @@ export default function GarageRegistration() {
                 <DocUploadField label="Address Proof" icon={MapPin} register={register} name="docAddress" required />
                 <DocUploadField label="Passport Photo" icon={Image} register={register} name="docPhoto" required />
                 <DocUploadField label="GST Certificate" icon={Building2} register={register} name="docGst" required />
+                <DocUploadField label="Business Logo" icon={Image} register={register} name="docLogo" required />
               </div>
             </div>
 

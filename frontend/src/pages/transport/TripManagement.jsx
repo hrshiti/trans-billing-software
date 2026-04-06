@@ -2,14 +2,17 @@ import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { 
   Truck, MapPin, Plus, Calendar, Trash2, 
   Search, ArrowLeft, Loader2, CheckCircle2,
-  Navigation, Hash, ArrowRight, Camera, Image as ImageIcon, X, Eye, Upload
+  Navigation, Hash, ArrowRight, Camera, Image as ImageIcon, X, Eye, Upload,
+  FileText, User
 } from 'lucide-react'
 import { useVehicles } from '../../context/VehicleContext'
+import { useParties } from '../../context/PartyContext'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 
 export default function TripManagement() {
   const { vehicles } = useVehicles()
+  const { parties } = useParties()
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
   
@@ -27,6 +30,7 @@ export default function TripManagement() {
   const [formData, setFormData] = useState({
     date: dayjs().format('YYYY-MM-DD'),
     vehicleId: '',
+    partyId: '',
     fromLocation: '',
     toLocation: '',
     numberOfTrips: '',
@@ -54,17 +58,20 @@ export default function TripManagement() {
 
   const handleAddTrip = (e) => {
     e.preventDefault()
-    if (!formData.fromLocation || !formData.toLocation || !formData.vehicleId) {
-      alert("Please fill in main fields")
+    if (!formData.fromLocation || !formData.toLocation || !formData.vehicleId || !formData.partyId) {
+      alert("Please fill in main fields including Account/Party")
       return
     }
 
     const vehicle = vehicles.find(v => v.id === formData.vehicleId)
+    const party = parties.find(p => p.id === formData.partyId)
     const newTrip = {
       id: `trip_${Date.now()}`,
       ...formData,
       numberOfTrips: formData.numberOfTrips || '1',
       vehicleNumber: vehicle?.vehicleNumber || 'Unknown',
+      partyName: party?.name || 'Unknown',
+      billed: false,
       createdAt: new Date().toISOString(),
       chalanImage: null // Initialize with no image
     }
@@ -74,6 +81,7 @@ export default function TripManagement() {
     setFormData({
       date: dayjs().format('YYYY-MM-DD'),
       vehicleId: '',
+      partyId: '',
       fromLocation: '',
       toLocation: '',
       numberOfTrips: '',
@@ -82,8 +90,9 @@ export default function TripManagement() {
   }
 
   const handleDelete = (id) => {
-    if (window.confirm("Delete this trip record?")) {
-      saveTrips(trips.filter(t => t.id !== id))
+    const idsToDelete = id.split(',')
+    if (window.confirm(`Delete ${idsToDelete.length > 1 ? 'this group of trips' : 'this trip'}?`)) {
+      saveTrips(trips.filter(t => !idsToDelete.includes(t.id)))
     }
   }
 
@@ -109,7 +118,7 @@ export default function TripManagement() {
     reader.onloadend = () => {
       const base64String = reader.result
       const updatedTrips = trips.map(t => 
-        t.id === selectedTripId ? { ...t, chalanImage: base64String } : t
+        selectedTripId.split(',').includes(t.id) ? { ...t, chalanImage: base64String } : t
       )
       saveTrips(updatedTrips)
       setSelectedTripId(null)
@@ -121,9 +130,10 @@ export default function TripManagement() {
 
   const removePhoto = (e, tripId) => {
     e.stopPropagation()
+    const idsToRemove = tripId.split(',')
     if (window.confirm("Remove this Chalan photo?")) {
       const updatedTrips = trips.map(t => 
-        t.id === tripId ? { ...t, chalanImage: null } : t
+        idsToRemove.includes(t.id) ? { ...t, chalanImage: null } : t
       )
       saveTrips(updatedTrips)
     }
@@ -132,12 +142,60 @@ export default function TripManagement() {
   // Filter & Search (Mock)
   const [search, setSearch] = useState('')
   const filteredTrips = useMemo(() => {
-    if (!search) return trips
+    // Group by date, vehicle, party
+    const groups = {}
+    trips.forEach(t => {
+      const key = `${t.date}_${t.vehicleId}_${t.partyId}`
+      if (!groups[key]) groups[key] = []
+      groups[key].push(t)
+    })
+
+    const grouped = Object.values(groups).map(group => {
+      // Sort by creation time to get the sequence
+      const sorted = [...group].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      
+      // Combine routes: "A to B + C"
+      let displayFrom = sorted[0].fromLocation
+      let displayTo = sorted[0].toLocation
+      
+      for (let i = 1; i < sorted.length; i++) {
+        const prev = sorted[i-1]
+        const curr = sorted[i]
+        // If the current trip starts where the previous one ended, just add the new destination
+        if (curr.fromLocation.toLowerCase().trim() === prev.toLocation.toLowerCase().trim()) {
+           displayTo += ` + ${curr.toLocation}`
+        } else {
+           displayTo += ` + ${curr.fromLocation} to ${curr.toLocation}`
+        }
+      }
+
+      const totalAmount = sorted.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0)
+      const totalCount = sorted.reduce((sum, t) => sum + (parseInt(t.numberOfTrips) || 1), 0)
+      const allBilled = sorted.every(t => t.billed)
+      
+      // For photo, use the first available chalan image
+      const photo = sorted.find(t => t.chalanImage)?.chalanImage || null
+
+      return {
+        ...sorted[0], // base info
+        id: sorted.map(t => t.id).join(','), // Combined ID for local state tracking
+        amount: totalAmount,
+        numberOfTrips: totalCount,
+        fromLocation: displayFrom,
+        toLocation: displayTo,
+        billed: allBilled,
+        chalanImage: photo,
+        memberIds: sorted.map(t => t.id)
+      }
+    })
+
+    if (!search) return grouped
     const s = search.toLowerCase()
-    return trips.filter(t => 
+    return grouped.filter(t => 
       t.fromLocation.toLowerCase().includes(s) || 
       t.toLocation.toLowerCase().includes(s) ||
-      t.vehicleNumber.toLowerCase().includes(s)
+      t.vehicleNumber.toLowerCase().includes(s) ||
+      t.partyName?.toLowerCase().includes(s)
     )
   }, [trips, search])
 
@@ -150,9 +208,14 @@ export default function TripManagement() {
           <h1 className="trip-title">Detailed Trip Management</h1>
           <p className="trip-subtitle">Track and manage route-wise operations</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn btn-primary add-trip-btn">
-          {showForm ? <><ArrowLeft size={18} /> Cancel</> : <><Plus size={18} /> Log New Trip</>}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={() => navigate('/bills/new?type=transport')} className="btn btn-ghost" style={{ height: 44, borderRadius: 12, padding: '0 16px', fontWeight: 700, fontSize: '0.875rem', border: '1.5px solid #F1F5F9' }}>
+            <FileText size={18} /> Generate Bill
+          </button>
+          <button onClick={() => setShowForm(!showForm)} className="btn btn-primary add-trip-btn">
+            {showForm ? <><ArrowLeft size={18} /> Cancel</> : <><Plus size={18} /> Log New Trip</>}
+          </button>
+        </div>
       </div>
 
       {/* Stats row */}
@@ -163,8 +226,12 @@ export default function TripManagement() {
             <div className="stat-value">{trips.length}</div>
           </div>
           <div className="stat-card accent">
-            <div className="stat-label">Active Routes</div>
-            <div className="stat-value">{new Set(trips.map(t => `${t.fromLocation}-${t.toLocation}`)).size}</div>
+            <div className="stat-label">Pending Trips</div>
+            <div className="stat-value">{trips.filter(t => !t.billed).length}</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label">Billed Trips</div>
+            <div className="stat-value">{trips.filter(t => t.billed).length}</div>
           </div>
         </div>
       )}
@@ -187,6 +254,17 @@ export default function TripManagement() {
                   {vehicles.map(v => <option key={v.id} value={v.id}>{v.vehicleNumber} ({v.vehicleType})</option>)}
                 </select>
               </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Select Account / Party</label>
+              <select value={formData.partyId} onChange={e => setFormData({...formData, partyId: e.target.value})} className="form-input" required>
+                <option value="">— Select Account —</option>
+                {parties.map(p => {
+                  const pendingCount = trips.filter(t => t.partyId === p.id && !t.billed).length
+                  return <option key={p.id} value={p.id}>{p.name} {pendingCount > 0 ? `(${pendingCount} pending)` : ''}</option>
+                })}
+              </select>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -241,8 +319,17 @@ export default function TripManagement() {
                   
                   <div className="trip-meta-grid">
                     <div className="meta-item"><Hash size={12} /> {trip.vehicleNumber}</div>
+                    <div className="meta-item"><User size={12} /> {trip.partyName}</div>
                     <div className="meta-item"><Calendar size={12} /> {dayjs(trip.date).format('DD MMM')}</div>
                     <div className="trip-badge">{trip.numberOfTrips} TRIP(S)</div>
+                    <div style={{ 
+                      fontSize: '0.65rem', fontWeight: 900, 
+                      padding: '2px 8px', borderRadius: 6,
+                      background: trip.billed ? '#DCFCE7' : '#FEF3C7',
+                      color: trip.billed ? '#16A34A' : '#D97706'
+                    }}>
+                      {trip.billed ? 'BILLED' : 'PENDING'}
+                    </div>
                   </div>
                 </div>
 

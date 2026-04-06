@@ -117,13 +117,14 @@ export const PDFInvoice = ({ bill, business }) => {
         {isTransport ? (
           <View style={styles.header}>
             <View style={styles.logoBox}>
-              {business.logoUrl ? (
-                <Image src={business.logoUrl} style={styles.logo} />
-              ) : (
-                <View style={{ width: 60, height: 45, backgroundColor: '#eee', borderRadius: 4, justifyContent: 'center', alignItems: 'center', marginRight: 15 }}>
-                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{(business.businessName || 'B')[0]}</Text>
-                </View>
-              )}
+              {/* Logo / Placeholder Box */}
+              <View style={{ width: 52, height: 52, backgroundColor: '#fff', borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginRight: 15, overflow: 'hidden', borderWidth: 0.5, borderColor: '#eee' }}>
+                {business.logoUrl ? (
+                  <Image src={business.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{(business.businessName || 'B')[0]}</Text>
+                )}
+              </View>
               <View>
                 <Text style={styles.brandName}>{business.businessName?.toUpperCase() || 'BUSINESS'}</Text>
                 <Text style={styles.slogan}>{business.slogan || 'Move What Matters'}</Text>

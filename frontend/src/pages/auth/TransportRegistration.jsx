@@ -107,15 +107,27 @@ export default function TransportRegistration() {
       signatureUrl = await filePromise;
     }
 
+    // Process logo file if exists
+    let logoUrl = null;
+    if (data.docLogo && data.docLogo[0]) {
+      const reader = new FileReader();
+      const filePromise = new Promise((resolve) => {
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(data.docLogo[0]);
+      });
+      logoUrl = await filePromise;
+    }
+
     await new Promise(r => setTimeout(r, 800))
     // Nest bank details to match profile schema
     const formattedData = {
       ...data,
       signatureUrl, // Save the DataURL
+      logoUrl, // Save the Logo DataURL
       bankDetails: {
         accountName: data.name, // default to owner name
         accountNumber: data.bankAccNo,
-        ifsc: data.bankIfsc,
+        ifsc: data.bankIfsc?.toUpperCase(),
         bankName: data.bankName
       }
     }
@@ -123,6 +135,7 @@ export default function TransportRegistration() {
     delete formattedData.bankIfsc
     delete formattedData.bankName
     delete formattedData.docSignature // remove file object
+    delete formattedData.docLogo // remove file object
     updateProfile({ ...formattedData, setupComplete: true })
     navigate('/dashboard', { replace: true })
   }
@@ -281,6 +294,7 @@ export default function TransportRegistration() {
                       required: 'IFSC is required',
                       pattern: { value: /^[A-Z]{4}0[A-Z0-9]{6}$/i, message: 'Invalid IFSC' }
                     })} 
+                    onInput={(e) => e.target.value = e.target.value.toUpperCase()}
                     placeholder="Bank IFSC" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem', textTransform: 'uppercase' }} />
                   </div>
                 </Field>
@@ -334,6 +348,7 @@ export default function TransportRegistration() {
                 <DocUploadField label="Passport Photo" icon={Image} register={register} name="docPhoto" required />
                 <DocUploadField label="Vehicle RC" icon={Truck} register={register} name="docRc" required />
                 <DocUploadField label="Vehicle Insurance" icon={Shield} register={register} name="docInsurance" required />
+                <DocUploadField label="Business Logo" icon={Image} register={register} name="docLogo" required />
                 <DocUploadField label="Authorized Signature" icon={PenTool} register={register} name="docSignature" required />
               </div>
             </div>

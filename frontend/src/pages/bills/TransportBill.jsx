@@ -25,9 +25,10 @@ function Field({ label, error, children, required, style }) {
 function SectionCard({ icon: Icon, iconBg, iconColor, title, children }) {
   return (
     <div style={{
-      background: 'white', borderRadius: 20, padding: '18px 18px 22px',
+      background: 'white', borderRadius: 20, padding: '18px',
       boxShadow: '0 2px 12px rgba(0,0,0,0.05)', marginBottom: 14,
       border: '1px solid rgba(0,0,0,0.04)',
+      width: '100%', boxSizing: 'border-box', overflow: 'hidden'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
         <div style={{ width: 32, height: 32, borderRadius: 8, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -53,6 +54,11 @@ export default function TransportBill() {
   const navigate = useNavigate()
   const [saving, setSaving] = useState(false)
   const [savedBill, setSavedBill] = useState(null)
+  
+  // Account-based billing states
+  const [fromDate, setFromDate] = useState(dayjs().startOf('month').format('YYYY-MM-DD'))
+  const [toDate, setToDate] = useState(dayjs().endOf('month').format('YYYY-MM-DD'))
+  const [hasLoadedTrips, setHasLoadedTrips] = useState(false)
 
   const { register, handleSubmit, watch, setValue, control, formState: { errors } } = useForm({
     defaultValues: {
@@ -118,6 +124,72 @@ export default function TransportBill() {
   const gstAmount = subtotal * (parseFloat(gstPercent) || 0) / 100
   const grandTotal = subtotal + gstAmount
 
+  const loadPendingTrips = () => {
+    if (!partyId) {
+      alert("Please select a party first")
+      return
+    }
+    const saved = localStorage.getItem('transport_trips')
+    if (!saved) {
+      alert("No trips found in system")
+      return
+    }
+    try {
+      const allTrips = JSON.parse(saved)
+      const filtered = allTrips.filter(t => 
+        t.partyId === partyId && 
+        !t.billed &&
+        dayjs(t.date).isAfter(dayjs(fromDate).subtract(1, 'day')) &&
+        dayjs(t.date).isBefore(dayjs(toDate).add(1, 'day'))
+      )
+      
+      if (filtered.length === 0) {
+        alert("No pending trips found for this party in the selected date range.")
+        return
+      }
+
+      // Grouping logic for combined billing
+      const groups = {}
+      filtered.forEach(t => {
+        const key = `${t.date}_${t.vehicleId}`
+        if (!groups[key]) groups[key] = []
+        groups[key].push(t)
+      })
+
+      const formatted = Object.values(groups).map(group => {
+        const sorted = [...group].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+        
+        let displayFrom = sorted[0].fromLocation
+        let displayTo = sorted[0].toLocation
+        for (let i = 1; i < sorted.length; i++) {
+          const prev = sorted[i-1]
+          const curr = sorted[i]
+          if (curr.fromLocation.toLowerCase().trim() === prev.toLocation.toLowerCase().trim()) {
+             displayTo += ` + ${curr.toLocation}`
+          } else {
+             displayTo += ` + ${curr.fromLocation} to ${curr.toLocation}`
+          }
+        }
+
+        const totalAmount = sorted.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0)
+        
+        return {
+          date: sorted[0].date,
+          companyFrom: displayFrom,
+          companyTo: displayTo,
+          chalanNo: '',
+          amount: totalAmount.toString(),
+          tripId: sorted.map(s => s.id).join(',') 
+        }
+      })
+      
+      setValue('items', formatted)
+      setHasLoadedTrips(true)
+    } catch (e) {
+      console.error("Failed to load trips", e)
+    }
+  }
+
   const onSubmit = async (data) => {
     setSaving(true)
     await new Promise(r => setTimeout(r, 800))
@@ -129,6 +201,28 @@ export default function TransportBill() {
       grandTotal,
       status: data.paymentMode === 'paid' ? 'paid' : 'unpaid',
     })
+
+    // Mark trips as billed in localStorage
+    try {
+      const saved = localStorage.getItem('transport_trips')
+      if (saved) {
+        const allTrips = JSON.parse(saved)
+        const billedTripIds = data.items.reduce((acc, it) => {
+          if (it.tripId) {
+            const ids = it.tripId.includes(',') ? it.tripId.split(',') : [it.tripId]
+            return [...acc, ...ids]
+          }
+          return acc
+        }, [])
+        if (billedTripIds.length > 0) {
+          const updated = allTrips.map(t => billedTripIds.includes(t.id) ? { ...t, billed: true } : t)
+          localStorage.setItem('transport_trips', JSON.stringify(updated))
+        }
+      }
+    } catch (e) {
+      console.error("Failed to mark trips as billed", e)
+    }
+
     setSaving(false)
     setSavedBill(bill)
   }
@@ -152,7 +246,7 @@ export default function TransportBill() {
   )
 
   return (
-    <div className="page-wrapper animate-fadeIn" style={{ maxWidth: 800, margin: '0 auto' }}>
+    <div className="page-wrapper animate-fadeIn" style={{ maxWidth: 800, margin: '0 auto', width: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
@@ -172,17 +266,17 @@ export default function TransportBill() {
 
         {/* ── Billed To (Party) ── */}
         <SectionCard icon={User} iconBg="#EDE9FE" iconColor="#7C3AED" title="Billed To (Customer)">
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-4" style={{ width: '100%', minWidth: 0 }}>
             <Field label="Select Party (Quick Fill)">
-              <div style={{ position: 'relative' }}>
-                <select {...register('partyId')} className="form-input" style={{ appearance: 'none', paddingRight: 36 }}>
+              <div style={{ position: 'relative', width: '100%' }}>
+                <select {...register('partyId')} className="form-input" style={{ appearance: 'none', paddingRight: 36, textOverflow: 'ellipsis', overflow: 'hidden' }}>
                   <option value="">— Select party —</option>
                   {parties.map(p => <option key={p.id} value={p.id}>{p.name} ({p.phone})</option>)}
                 </select>
                 <ChevronDown size={15} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
               </div>
             </Field>
-            <div className="grid md-grid-cols-2 gap-3">
+            <div className="grid md-grid-cols-2 gap-3" style={{ width: '100%', minWidth: 0 }}>
               <Field label="Business Name" error={errors.billedToName} required>
                 <input {...register('billedToName', { required: 'Required' })} placeholder="Party Name" className="form-input" />
               </Field>
@@ -208,11 +302,39 @@ export default function TransportBill() {
                 <Field label="GSTIN">
                   <input {...register('billedToGstin')} placeholder="GSTIN" className="form-input" />
                 </Field>
-                <Field label="PAN">
-                  <input {...register('billedToPan')} placeholder="PAN" className="form-input" />
+                <Field label="PAN" error={errors.billedToPan}>
+                  <input 
+                    {...register('billedToPan', { 
+                      pattern: { value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, message: 'Invalid PAN (e.g. ABCDE1234F)' } 
+                    })} 
+                    onInput={e => e.target.value = e.target.value.toUpperCase()}
+                    placeholder="PAN Number" 
+                    className="form-input" 
+                    style={{ textTransform: 'uppercase' }}
+                  />
                 </Field>
               </div>
             </div>
+
+            {partyId && (
+              <div style={{ marginTop: 16, marginBottom: 8, padding: '16px', background: '#F0F9FF', borderRadius: 20, border: '1.5px solid #BAE6FD', boxShadow: '0 4px 12px rgba(2, 132, 199, 0.08)', width: '100%', boxSizing: 'border-box' }} className="animate-fadeIn">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                  <Package size={18} color="#0284C7" />
+                  <span style={{ fontWeight: 800, fontSize: '0.85rem', color: '#0369A1' }}>Fetch Pending Trips (Account Billing)</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <Field label="From Date">
+                    <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} className="form-input" style={{ height: 38, fontSize: '0.8rem' }} />
+                  </Field>
+                  <Field label="To Date">
+                    <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} className="form-input" style={{ height: 38, fontSize: '0.8rem' }} />
+                  </Field>
+                </div>
+                <button type="button" onClick={loadPendingTrips} className="btn btn-primary" style={{ height: 40, width: '100%', fontSize: '0.85rem', background: '#0284C7' }}>
+                  Load Entries for this Period
+                </button>
+              </div>
+            )}
           </div>
         </SectionCard>
 

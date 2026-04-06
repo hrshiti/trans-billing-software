@@ -19,7 +19,7 @@ const mockVerifyOTP = async (phone, otp) => {
       user: {
         id: `user_${phone}`,
         phone,
-        name: savedRole ? 'Business Owner' : null,
+        name: null,
         role: savedRole || null,
         businessName: null,
       }
