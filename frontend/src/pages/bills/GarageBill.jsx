@@ -77,6 +77,7 @@ export default function GarageBill() {
       customerPincode: '',
       customerGstin: '',
       customerPan: '',
+      customerSignatureUrl: '',
       vehicleNo: '', vehicleModel: '', vehicleCompany: '',
       kmReading: '', nextServiceKm: '', nextServiceDate: '',
       paymentMode: 'unpaid',
@@ -109,6 +110,7 @@ export default function GarageBill() {
       setValue('customerPincode', p.pincode || '')
       setValue('customerGstin', p.gstin || '')
       setValue('customerPan', p.pan || '')
+      setValue('customerSignatureUrl', p.signatureUrl || '')
     }
   }, [partyId, parties, setValue])
 
@@ -261,18 +263,15 @@ export default function GarageBill() {
                 )
 
                 return (
-                  <div key={field.id} className="bill-item-row" style={{ 
+                  <div key={field.id} style={{ 
                     display: 'grid', 
-                    gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '2fr 0.6fr 0.8fr 0.8fr 36px', 
+                    gridTemplateColumns: '2fr 0.6fr 0.8fr 0.8fr 36px', 
                     gap: 8, 
-                    background: window.innerWidth < 640 ? '#F8FAFC' : 'transparent',
-                    padding: window.innerWidth < 640 ? '12px' : '0',
-                    borderRadius: '12px',
+                    alignItems: 'center',
                     position: 'relative'
                   }}>
                     {/* Description */}
                     <div style={{ position: 'relative' }}>
-                      {window.innerWidth < 640 && <label className="form-label" style={{ fontSize: '0.65rem', marginBottom: 4, display: 'block' }}>Description</label>}
                       <input
                         {...register(`items.${index}.description`, { required: true })}
                         placeholder="Service / Part name"
@@ -310,35 +309,23 @@ export default function GarageBill() {
                       )}
                     </div>
 
-                    {/* Qty, Rate, Amount Group for Mobile */}
-                    <div className="grid grid-cols-3 sm-grid-cols-4 gap-2" style={{ gridTemplateColumns: window.innerWidth < 640 ? '1fr 1.5fr 1.5fr' : undefined }}>
-                      <div className="flex flex-col gap-1">
-                        {window.innerWidth < 640 && <label className="form-label" style={{ fontSize: '0.65rem' }}>Qty</label>}
-                        <input {...register(`items.${index}.qty`)} type="number" min="0.1" step="0.1" placeholder="1" className="form-input" style={{ fontSize: '0.875rem', padding: '10px', textAlign: 'center' }} inputMode="decimal" />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        {window.innerWidth < 640 && <label className="form-label" style={{ fontSize: '0.65rem' }}>Rate</label>}
-                        <input {...register(`items.${index}.rate`)} type="number" min="0" step="0.01" placeholder="0" className="form-input" style={{ fontSize: '0.875rem', padding: '10px' }} inputMode="decimal" />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        {window.innerWidth < 640 && <label className="form-label" style={{ fontSize: '0.65rem' }}>Total</label>}
-                        <div style={{ background: '#F1F5F9', borderRadius: 10, padding: '10px', fontSize: '0.875rem', fontWeight: 700, color: '#0F0D2E', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', height: '100%' }}>
-                          ₹{parseFloat(items[index]?.amount || 0).toFixed(0)}
-                        </div>
-                      </div>
-                      {/* Delete button on same line for desktop, or top right for mobile */}
-                      <div style={{ 
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        position: window.innerWidth < 640 ? 'absolute' : 'static',
-                        top: 8, right: 8
-                      }}>
-                        <button type="button" onClick={() => fields.length > 1 && remove(index)}
-                          disabled={fields.length === 1}
-                          style={{ width: 32, height: 32, borderRadius: 10, border: 'none', background: fields.length > 1 ? '#FEE2E2' : '#F1F5F9', cursor: fields.length > 1 ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Trash2 size={14} color={fields.length > 1 ? '#DC2626' : '#CBD5E1'} />
-                        </button>
-                      </div>
+                    {/* Qty */}
+                    <input {...register(`items.${index}.qty`)} type="number" min="0.1" step="0.1" placeholder="1" className="form-input" style={{ fontSize: '0.875rem', padding: '10px', textAlign: 'center' }} inputMode="decimal" />
+
+                    {/* Rate */}
+                    <input {...register(`items.${index}.rate`)} type="number" min="0" step="0.01" placeholder="0" className="form-input" style={{ fontSize: '0.875rem', padding: '10px' }} inputMode="decimal" />
+
+                    {/* Amount */}
+                    <div style={{ background: '#F1F5F9', borderRadius: 10, padding: '10px', fontSize: '0.875rem', fontWeight: 700, color: '#0F0D2E', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                      ₹{parseFloat(items[index]?.amount || 0).toFixed(0)}
                     </div>
+
+                    {/* Delete */}
+                    <button type="button" onClick={() => fields.length > 1 && remove(index)}
+                      disabled={fields.length === 1}
+                      style={{ width: 32, height: 32, borderRadius: 10, border: 'none', background: fields.length > 1 ? '#FEE2E2' : '#F1F5F9', cursor: fields.length > 1 ? 'pointer' : 'default', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Trash2 size={14} color={fields.length > 1 ? '#DC2626' : '#CBD5E1'} />
+                    </button>
                   </div>
                 )
               })}

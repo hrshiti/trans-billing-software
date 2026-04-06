@@ -319,7 +319,10 @@ function GarageInvoice({ bill, business, onPayOnline }) {
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 4 }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, whiteSpace: 'nowrap' }}>Customer Signature:</span>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 100 }}>
-                <div style={{ height: 32 }} />
+                {bill.customerSignatureUrl
+                  ? <img src={bill.customerSignatureUrl} alt="Customer Signature" style={{ maxHeight: 50, maxWidth: 140, objectFit: 'contain', marginBottom: 2 }} />
+                  : <div style={{ height: 32 }} />
+                }
                 <div style={{ borderBottom: '1.5px solid #333', width: '100%' }} />
                 <span style={{ fontSize: '0.6rem', color: '#888', marginTop: 2 }}>Your Name</span>
               </div>
