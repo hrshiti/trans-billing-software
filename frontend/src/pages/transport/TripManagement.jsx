@@ -3,7 +3,7 @@ import {
   Truck, MapPin, Plus, Calendar, Trash2, 
   Search, ArrowLeft, Loader2, CheckCircle2,
   Navigation, Hash, ArrowRight, Camera, Image as ImageIcon, X, Eye, Upload,
-  FileText, User
+  FileText, User, ExternalLink
 } from 'lucide-react'
 import { useVehicles } from '../../context/VehicleContext'
 import { useParties } from '../../context/PartyContext'
@@ -208,7 +208,15 @@ export default function TripManagement() {
           <h1 className="trip-title">Detailed Trip Management</h1>
           <p className="trip-subtitle">Track and manage route-wise operations</p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button 
+            onClick={() => window.open('https://checkpost.parivahan.gov.in/checkpost/faces/public/payment/TaxCollectionMainOnline.xhtml#', '_blank')}
+            className="btn btn-ghost"
+            title="Redirects to official government portal for tax payment"
+            style={{ height: 44, borderRadius: 12, padding: '0 14px', fontWeight: 700, fontSize: '0.8rem', border: '1.5px solid #FDE68A', background: '#FFFBEB', color: '#B45309', display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            <ExternalLink size={15} /> Pay Checkpost Tax
+          </button>
           <button onClick={() => navigate('/bills/new?type=transport')} className="btn btn-ghost" style={{ height: 44, borderRadius: 12, padding: '0 16px', fontWeight: 700, fontSize: '0.875rem', border: '1.5px solid #F1F5F9' }}>
             <FileText size={18} /> Generate Bill
           </button>
@@ -351,9 +359,18 @@ export default function TripManagement() {
                     {trip.amount && <div className="trip-amount">₹{parseFloat(trip.amount).toLocaleString()}</div>}
                   </div>
                   
-                  <button className="delete-trip-btn" onClick={() => handleDelete(trip.id)} aria-label="Delete trip">
-                    <Trash2 size={18} />
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <button
+                      onClick={() => window.open('https://checkpost.parivahan.gov.in/checkpost/faces/public/payment/TaxCollectionMainOnline.xhtml#', '_blank')}
+                      title="Pay checkpost tax for this trip on the official government portal"
+                      style={{ height: 34, borderRadius: 9, padding: '0 10px', border: '1.5px solid #FDE68A', background: '#FFFBEB', color: '#B45309', fontWeight: 800, fontSize: '0.65rem', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                    >
+                      <ExternalLink size={12} /> PAY TAX
+                    </button>
+                    <button className="delete-trip-btn" onClick={() => handleDelete(trip.id)} aria-label="Delete trip">
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
               </div>
             )) : (
