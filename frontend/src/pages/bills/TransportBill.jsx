@@ -59,9 +59,16 @@ export default function TransportBill() {
       billDate: dayjs().format('YYYY-MM-DD'),
       partyId: '',
       billedToName: '',
+      billedToPhone: '',
+      billedToEmail: '',
       billedToAddress: '',
+      billedToCity: '',
+      billedToState: '',
+      billedToPincode: '',
+      billedToGstin: '',
+      billedToPan: '',
       items: [
-        { date: dayjs().format('YYYY-MM-DD'), companyFrom: 'RA', companyTo: '', chalanNo: '', amount: '' }
+        { date: dayjs().format('YYYY-MM-DD'), companyFrom: '', companyTo: '', chalanNo: '', amount: '' }
       ],
       loadingCharge: '0', unloadingCharge: '0',
       detentionCharge: '0', otherCharge: '0',
@@ -91,7 +98,14 @@ export default function TransportBill() {
     const p = parties.find(x => x.id === partyId)
     if (p) {
       setValue('billedToName', p.name)
+      setValue('billedToPhone', p.phone || '')
+      setValue('billedToEmail', p.email || '')
       setValue('billedToAddress', p.address || '')
+      setValue('billedToCity', p.city || '')
+      setValue('billedToState', p.state || '')
+      setValue('billedToPincode', p.pincode || '')
+      setValue('billedToGstin', p.gstin || '')
+      setValue('billedToPan', p.pan || '')
     }
   }, [partyId, parties, setValue])
 
@@ -172,61 +186,98 @@ export default function TransportBill() {
               <Field label="Business Name" error={errors.billedToName} required>
                 <input {...register('billedToName', { required: 'Required' })} placeholder="Party Name" className="form-input" />
               </Field>
+              <Field label="Phone" error={errors.billedToPhone}>
+                <input {...register('billedToPhone')} placeholder="Phone" className="form-input" />
+              </Field>
+              <Field label="Email" error={errors.billedToEmail}>
+                <input {...register('billedToEmail')} placeholder="Email" className="form-input" />
+              </Field>
               <Field label="Address">
                 <input {...register('billedToAddress')} placeholder="Party Address" className="form-input" />
               </Field>
+              <Field label="City">
+                <input {...register('billedToCity')} placeholder="City" className="form-input" />
+              </Field>
+              <Field label="State">
+                <input {...register('billedToState')} placeholder="State" className="form-input" />
+              </Field>
+              <Field label="Pincode">
+                <input {...register('billedToPincode')} placeholder="Pincode" className="form-input" />
+              </Field>
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="GSTIN">
+                  <input {...register('billedToGstin')} placeholder="GSTIN" className="form-input" />
+                </Field>
+                <Field label="PAN">
+                  <input {...register('billedToPan')} placeholder="PAN" className="form-input" />
+                </Field>
+              </div>
             </div>
           </div>
         </SectionCard>
 
         {/* ── Billing Summary (Multiple Items) ── */}
         <SectionCard icon={Truck} iconBg="#FEF3C7" iconColor="#D97706" title="Billing Summary (Trips / Chalans)">
-          <div className="table-responsive" style={{ margin: '0 -10px', width: 'calc(100% + 20px)' }}>
-            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px', minWidth: 600 }}>
-              <thead>
-                <tr style={{ textAlign: 'left', color: '#6B7280', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase' }}>
-                  <th style={{ padding: '0 8px' }}>Date</th>
-                  <th style={{ padding: '0 8px' }}>From</th>
-                  <th style={{ padding: '0 8px' }}>To</th>
-                  <th style={{ padding: '0 8px' }}>Chalan No.</th>
-                  <th style={{ padding: '0 8px' }}>Amount (₹)</th>
-                  <th style={{ width: 40 }}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {fields.map((field, index) => (
-                  <tr key={field.id} className="animate-fadeInUp" style={{ animationDelay: `${index * 0.05}s` }}>
-                    <td style={{ padding: '0 4px' }}>
-                      <input type="date" {...register(`items.${index}.date`)} className="form-input" style={{ fontSize: '0.8125rem', padding: '8px' }} />
-                    </td>
-                    <td style={{ padding: '0 4px' }}>
-                      <input {...register(`items.${index}.companyFrom`)} placeholder="RA" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px' }} />
-                    </td>
-                    <td style={{ padding: '0 4px' }}>
-                      <input {...register(`items.${index}.companyTo`)} placeholder="Destination" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px' }} />
-                    </td>
-                    <td style={{ padding: '0 4px' }}>
-                      <input {...register(`items.${index}.chalanNo`)} placeholder="5642" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px' }} />
-                    </td>
-                    <td style={{ padding: '0 4px' }}>
-                      <div className="input-group">
-                        <span className="input-prefix" style={{ fontSize: '0.75rem' }}>₹</span>
-                        <input type="number" {...register(`items.${index}.amount`)} placeholder="1000" className="form-input" style={{ fontSize: '0.8125rem', padding: '8px 8px 8px 32px' }} />
-                      </div>
-                    </td>
-                    <td style={{ padding: '0 4px', textAlign: 'center' }}>
-                      {fields.length > 1 && (
-                        <button type="button" onClick={() => remove(index)} style={{ border: 'none', background: '#FEE2E2', color: '#DC2626', width: 28, height: 28, borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Trash2 size={14} />
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {fields.map((field, index) => (
+              <div key={field.id} className="animate-fadeInUp" style={{ 
+                background: '#F8FAFC', padding: '16px', borderRadius: 20, 
+                border: '1.5px solid #F1F5F9', position: 'relative',
+                animationDelay: `${index * 0.05}s`,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+              }}>
+                {/* Trip Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingBottom: 8, borderBottom: '1px dashed #E2E8F0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 900, color: '#7C3AED', background: '#EDE9FE', padding: '3px 8px', borderRadius: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trip #{index + 1}</span>
+                  </div>
+                  {fields.length > 1 && (
+                    <button type="button" onClick={() => remove(index)} style={{ border: 'none', background: 'transparent', color: '#DC2626', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', fontWeight: 700, padding: 4 }}>
+                      <Trash2 size={14} /> <span className="hidden-xs">Remove</span>
+                    </button>
+                  )}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 16px' }}>
+                  <Field label="Date" style={{ gridColumn: 'span 2' }}>
+                    <div className="input-group">
+                      <span className="input-prefix" style={{ left: 12 }}><Calendar size={14} /></span>
+                      <input type="date" {...register(`items.${index}.date`)} className="form-input" style={{ fontSize: '0.875rem', height: 42 }} />
+                    </div>
+                  </Field>
+
+                  <Field label="From (Origin)" style={{ gridColumn: 'span 1' }}>
+                    <div className="input-group">
+                      <span className="input-prefix" style={{ left: 12 }}><MapPin size={14} /></span>
+                      <input {...register(`items.${index}.companyFrom`)} placeholder="Origin" className="form-input" style={{ fontSize: '0.875rem', height: 42 }} />
+                    </div>
+                  </Field>
+
+                  <Field label="To (Destination)" style={{ gridColumn: 'span 1' }}>
+                    <div className="input-group">
+                      <span className="input-prefix" style={{ left: 12 }}><MapPin size={14} /></span>
+                      <input {...register(`items.${index}.companyTo`)} placeholder="Destination" className="form-input" style={{ fontSize: '0.875rem', height: 42 }} />
+                    </div>
+                  </Field>
+
+                  <Field label="Chalan No." style={{ gridColumn: 'span 1' }}>
+                    <div className="input-group">
+                      <span className="input-prefix" style={{ left: 12 }}><FileText size={14} /></span>
+                      <input {...register(`items.${index}.chalanNo`)} placeholder="e.g. 5642" className="form-input" style={{ fontSize: '0.875rem', height: 42 }} />
+                    </div>
+                  </Field>
+
+                  <Field label="Amount (₹)" style={{ gridColumn: 'span 1' }}>
+                    <div className="input-group">
+                      <span className="input-prefix" style={{ left: 14, fontWeight: 800, color: '#374151', fontSize: '0.9rem' }}>₹</span>
+                      <input type="number" {...register(`items.${index}.amount`)} placeholder="0.00" className="form-input" style={{ fontSize: '0.875rem', height: 42 }} />
+                    </div>
+                  </Field>
+                </div>
+              </div>
+            ))}
           </div>
-          <button type="button" onClick={() => append({ date: dayjs().format('YYYY-MM-DD'), companyFrom: 'RA', companyTo: '', chalanNo: '', amount: '' })} 
+          <button type="button" onClick={() => append({ date: dayjs().format('YYYY-MM-DD'), companyFrom: '', companyTo: '', chalanNo: '', amount: '' })} 
             style={{ 
               marginTop: 12, width: '100%', padding: '12px', borderRadius: 12, border: '2px dashed #E5E7EB', 
               background: '#F9FAFB', fontWeight: 700, fontSize: '0.875rem', color: '#4F46E5', 

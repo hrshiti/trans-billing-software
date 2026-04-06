@@ -79,6 +79,7 @@ export default function GarageRegistration() {
       panNo: '',
       bankAccNo: '',
       bankIfsc: '',
+      bankName: '',
     }
   })
 
@@ -87,7 +88,7 @@ export default function GarageRegistration() {
       const isValid = await trigger(['name', 'phone', 'address', 'businessName']);
       if (isValid) setStep(2);
     } else if (step === 2) {
-      const isValid = await trigger(['aadharNo', 'panNo', 'bankAccNo', 'bankIfsc']);
+      const isValid = await trigger(['aadharNo', 'panNo', 'bankAccNo', 'bankIfsc', 'bankName']);
       if (isValid) setStep(3);
     }
   }
@@ -144,7 +145,18 @@ export default function GarageRegistration() {
                 <Field label="Owner Name" error={errors.name} required>
                   <div className="input-group">
                     <span className="input-prefix"><User size={14} /></span>
-                    <input {...register('name', { required: 'Owner name is required' })} placeholder="Full Name" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
+                    <input 
+                      {...register('name', { 
+                        required: 'Owner name is required',
+                        pattern: { value: /^[A-Z][a-z]+(\s[A-Z][a-z]+)+$/, message: 'Please enter full name (First Last)' }
+                      })} 
+                      onInput={(e) => {
+                        e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, '').replace(/\b\w/g, c => c.toUpperCase());
+                      }}
+                      placeholder="Full Name" 
+                      className="form-input" 
+                      style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} 
+                    />
                   </div>
                 </Field>
                 
@@ -158,7 +170,18 @@ export default function GarageRegistration() {
                 <Field label="Garage Name" error={errors.businessName} required sublabel="Trade Name">
                   <div className="input-group">
                     <span className="input-prefix"><Wrench size={14} /></span>
-                    <input {...register('businessName', { required: 'Garage name is required' })} placeholder="e.g. Radhe Motors" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
+                    <input 
+                      {...register('businessName', { 
+                        required: 'Garage name is required',
+                        minLength: { value: 3, message: 'Minimum 3 characters required' }
+                      })} 
+                      onInput={(e) => {
+                        e.target.value = e.target.value.replace(/\b\w/g, c => c.toUpperCase());
+                      }}
+                      placeholder="e.g. Radhe Motors" 
+                      className="form-input" 
+                      style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} 
+                    />
                   </div>
                 </Field>
               </div>
@@ -238,6 +261,17 @@ export default function GarageRegistration() {
                       e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11);
                     }}
                     placeholder="Bank IFSC" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem', textTransform: 'uppercase' }} />
+                  </div>
+                </Field>
+
+                <Field label="Bank Name" error={errors.bankName} required>
+                  <div className="input-group">
+                    <span className="input-prefix"><Building2 size={14} /></span>
+                    <input {...register('bankName', { required: 'Bank name is required' })} 
+                    onInput={(e) => {
+                      e.target.value = e.target.value.replace(/\b\w/g, c => c.toUpperCase());
+                    }}
+                    placeholder="e.g. State Bank of India" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
                   </div>
                 </Field>
               </div>

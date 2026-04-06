@@ -141,6 +141,9 @@ export default function AddParty() {
               <input
                 id="field-party-name"
                 {...register('name', { required: 'Party name is required' })}
+                onInput={(e) => {
+                  e.target.value = e.target.value.replace(/\b\w/g, c => c.toUpperCase());
+                }}
                 placeholder="e.g. Ramesh Traders"
                 className={`form-input ${errors.name ? 'error' : ''}`}
               />
@@ -193,16 +196,22 @@ export default function AddParty() {
               <input
                 id="field-party-address"
                 {...register('address')}
+                onInput={(e) => {
+                  e.target.value = e.target.value.replace(/\b\w/g, c => c.toUpperCase());
+                }}
                 placeholder="Building, Street, Area"
                 className="form-input"
               />
             </Field>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <Field label="City" error={errors.city}>
+              <Field label="City" error={errors.city} required>
                 <input
                   id="field-party-city"
-                  {...register('city')}
+                  {...register('city', { required: 'City is required' })}
+                  onInput={(e) => {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, '').replace(/\b\w/g, c => c.toUpperCase());
+                  }}
                   placeholder="Ahmedabad"
                   className="form-input"
                 />
@@ -221,11 +230,11 @@ export default function AddParty() {
               </Field>
             </div>
 
-            <Field label="State" error={errors.state}>
+            <Field label="State" error={errors.state} required>
               <div style={{ position: 'relative' }}>
                 <select
                   id="field-party-state"
-                  {...register('state')}
+                  {...register('state', { required: 'State is required' })}
                   className="form-input"
                   style={{ appearance: 'none', paddingRight: 36 }}
                 >

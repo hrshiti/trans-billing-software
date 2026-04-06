@@ -44,19 +44,12 @@ export default function Login() {
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: 20 }}>
         <div style={{ 
-          width: 54, height: 54, borderRadius: 18, background: 'white',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.06)', position: 'relative',
-          border: '1px solid #F1F5F9'
+          width: 95, height: 95, borderRadius: 28, background: 'white',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px',
+          boxShadow: '0 12px 36px rgba(0,0,0,0.1)', position: 'relative',
+          border: '1.5px solid #F1F5F9'
         }}>
-          <img src={logo} alt="Logo" style={{ width: '65%', height: '65%', objectFit: 'contain' }} />
-          <div style={{ 
-            position: 'absolute', bottom: -3, right: -3, width: 20, height: 20, 
-            borderRadius: '50%', background: '#7C3AED', display: 'flex', 
-            alignItems: 'center', justifyContent: 'center', color: 'white', border: '2.5px solid white'
-          }}>
-            <Check size={11} strokeWidth={4} />
-          </div>
+          <img src={logo} alt="Logo" style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
         </div>
         <h2 style={{ 
           fontSize: '1.5rem', fontWeight: 950, color: '#0F172A', letterSpacing: '-0.04em', marginBottom: 4,

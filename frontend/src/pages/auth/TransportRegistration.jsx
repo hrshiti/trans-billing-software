@@ -7,7 +7,7 @@ import logo from '../../assets/trans-logo.png'
 
 function Field({ label, error, children, required, sublabel }) {
   return (
-    <div className="form-group" style={{ marginBottom: 12 }}>
+    <div className="form-group" style={{ marginBottom: 8 }}>
       {label && (
         <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 650, color: '#374151', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
           {label} {required && <span style={{ color: 'var(--danger)', marginLeft: 2 }}>*</span>}
@@ -32,7 +32,7 @@ function DocUploadField({ label, icon: Icon, register, name, required }) {
         cursor: 'pointer', transition: 'all 0.2s', borderStyle: hasFile ? 'solid' : 'dashed',
         borderColor: hasFile ? '#16A34A' : '#E2E8F0',
         backgroundColor: hasFile ? '#F0FDF4' : '#F8FAFC',
-        minHeight: 52
+        minHeight: 44
       }} className="hover:border-purple-300 hover:bg-purple-50">
         <div style={{ 
           width: 32, height: 32, borderRadius: 10, background: 'white', 
@@ -79,6 +79,7 @@ export default function TransportRegistration() {
       panNo: '',
       bankAccNo: '',
       bankIfsc: '',
+      bankName: '',
     }
   })
 
@@ -87,7 +88,7 @@ export default function TransportRegistration() {
       const isValid = await trigger(['name', 'phone', 'address', 'businessName']);
       if (isValid) setStep(2);
     } else if (step === 2) {
-      const isValid = await trigger(['aadharNo', 'panNo', 'bankAccNo', 'bankIfsc']);
+      const isValid = await trigger(['aadharNo', 'panNo', 'bankAccNo', 'bankIfsc', 'bankName']);
       if (isValid) setStep(3);
     }
   }
@@ -95,14 +96,27 @@ export default function TransportRegistration() {
   const onSubmit = async (data) => {
     setLoading(true)
     await new Promise(r => setTimeout(r, 1200))
-    updateProfile({ ...data, setupComplete: true })
+    // Nest bank details to match profile schema
+    const formattedData = {
+      ...data,
+      bankDetails: {
+        accountName: data.name, // default to owner name
+        accountNumber: data.bankAccNo,
+        ifsc: data.bankIfsc,
+        bankName: data.bankName
+      }
+    }
+    delete formattedData.bankAccNo
+    delete formattedData.bankIfsc
+    delete formattedData.bankName
+    updateProfile({ ...formattedData, setupComplete: true })
     navigate('/dashboard', { replace: true })
   }
 
   return (
     <div className="animate-fadeIn" style={{ maxWidth: 640, margin: '0 auto', paddingBottom: 20 }}>
       {/* Header Info */}
-      <div style={{ textAlign: 'center', marginBottom: 12 }}>
+      <div style={{ textAlign: 'center', marginBottom: 6 }}>
         <div style={{ 
           width: 50, height: 50, borderRadius: 16, background: 'white',
           display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px',
@@ -113,10 +127,10 @@ export default function TransportRegistration() {
             <Check size={9} strokeWidth={4} />
           </div>
         </div>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', marginBottom: 2 }}>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 900, color: '#0F172A', letterSpacing: '-0.02em', marginBottom: 1 }}>
           Setup Your Transport
         </h2>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 2 }}>
           <div style={{ height: 4, width: 28, borderRadius: 2, background: step >= 1 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
           <div style={{ height: 4, width: 28, borderRadius: 2, background: step >= 2 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
           <div style={{ height: 4, width: 28, borderRadius: 2, background: step >= 3 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
@@ -128,12 +142,12 @@ export default function TransportRegistration() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} style={{ background: 'white', padding: '16px 20px', borderRadius: 24, border: '1px solid #F1F5F9', boxShadow: '0 15px 40px rgba(0,0,0,0.03)', margin: '0 10px' }}>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ background: 'white', padding: '12px 16px', borderRadius: 24, border: '1px solid #F1F5F9', boxShadow: '0 15px 40px rgba(0,0,0,0.03)', margin: '0 10px' }}>
         
         {step === 1 && (
           <div className="animate-fadeIn">
             {/* Step 1: Basic Info */}
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                  <div style={{ width: 4, height: 12, background: '#7C3AED', borderRadius: 2 }} />
                  <span style={{ fontSize: '0.75rem', fontWeight: 850, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Basic Information</span>
@@ -143,7 +157,18 @@ export default function TransportRegistration() {
                 <Field label="Owner Name" error={errors.name} required>
                   <div className="input-group">
                     <span className="input-prefix"><User size={14} /></span>
-                    <input {...register('name', { required: 'Owner name is required' })} placeholder="Full Name" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
+                    <input 
+                      {...register('name', { 
+                        required: 'Owner name is required',
+                        pattern: { value: /^[A-Z][a-z]+(\s[A-Z][a-z]+)+$/, message: 'Please enter full name (First Last)' }
+                      })} 
+                      onInput={(e) => {
+                        e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, '').replace(/\b\w/g, c => c.toUpperCase());
+                      }}
+                      placeholder="Full Name" 
+                      className="form-input" 
+                      style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} 
+                    />
                   </div>
                 </Field>
                 
@@ -157,7 +182,18 @@ export default function TransportRegistration() {
                 <Field label="Transport Name" error={errors.businessName} required sublabel="Trade Name">
                   <div className="input-group">
                     <span className="input-prefix"><Truck size={14} /></span>
-                    <input {...register('businessName', { required: 'Business name is required' })} placeholder="e.g. Radhe Logistics" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
+                    <input 
+                      {...register('businessName', { 
+                        required: 'Business name is required',
+                        minLength: { value: 3, message: 'Minimum 3 characters required' }
+                      })} 
+                      onInput={(e) => {
+                        e.target.value = e.target.value.replace(/\b\w/g, c => c.toUpperCase());
+                      }}
+                      placeholder="e.g. Radhe Logistics" 
+                      className="form-input" 
+                      style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} 
+                    />
                   </div>
                 </Field>
               </div>
@@ -179,7 +215,7 @@ export default function TransportRegistration() {
         {step === 2 && (
           <div className="animate-fadeIn">
             {/* Step 2: KYC & Bank */}
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                  <div style={{ width: 4, height: 12, background: '#7C3AED', borderRadius: 2 }} />
                  <span style={{ fontSize: '0.75rem', fontWeight: 850, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>KYC & Bank Details</span>
@@ -232,6 +268,17 @@ export default function TransportRegistration() {
                       pattern: { value: /^[A-Z]{4}0[A-Z0-9]{6}$/i, message: 'Invalid IFSC' }
                     })} 
                     placeholder="Bank IFSC" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem', textTransform: 'uppercase' }} />
+                  </div>
+                </Field>
+
+                <Field label="Bank Name" error={errors.bankName} required>
+                  <div className="input-group">
+                    <span className="input-prefix"><Building2 size={14} /></span>
+                    <input {...register('bankName', { required: 'Bank name is required' })} 
+                    onInput={(e) => {
+                      e.target.value = e.target.value.replace(/\b\w/g, c => c.toUpperCase());
+                    }}
+                    placeholder="e.g. State Bank of India" className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.8125rem' }} />
                   </div>
                 </Field>
               </div>

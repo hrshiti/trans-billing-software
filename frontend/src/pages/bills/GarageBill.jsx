@@ -70,6 +70,13 @@ export default function GarageBill() {
       billDate: dayjs().format('YYYY-MM-DD'),
       partyId: '',
       customerName: '', customerPhone: '',
+      customerEmail: '',
+      customerAddress: '',
+      customerCity: '',
+      customerState: '',
+      customerPincode: '',
+      customerGstin: '',
+      customerPan: '',
       vehicleNo: '', vehicleModel: '', vehicleCompany: '',
       kmReading: '', nextServiceKm: '', nextServiceDate: '',
       paymentMode: 'unpaid',
@@ -95,6 +102,13 @@ export default function GarageBill() {
     if (p) {
       setValue('customerName', p.name)
       setValue('customerPhone', p.phone || '')
+      setValue('customerEmail', p.email || '')
+      setValue('customerAddress', p.address || '')
+      setValue('customerCity', p.city || '')
+      setValue('customerState', p.state || '')
+      setValue('customerPincode', p.pincode || '')
+      setValue('customerGstin', p.gstin || '')
+      setValue('customerPan', p.pan || '')
     }
   }, [partyId, parties, setValue])
 
@@ -178,6 +192,29 @@ export default function GarageBill() {
               <Field label="Phone">
                 <input {...register('customerPhone')} placeholder="Phone" className="form-input" inputMode="numeric" maxLength={10} />
               </Field>
+              <Field label="Email">
+                <input {...register('customerEmail')} placeholder="Email" className="form-input" />
+              </Field>
+              <Field label="Address">
+                <input {...register('customerAddress')} placeholder="Address" className="form-input" />
+              </Field>
+              <Field label="City">
+                <input {...register('customerCity')} placeholder="City" className="form-input" />
+              </Field>
+              <Field label="State">
+                <input {...register('customerState')} placeholder="State" className="form-input" />
+              </Field>
+              <Field label="Pincode">
+                <input {...register('customerPincode')} placeholder="Pincode" className="form-input" />
+              </Field>
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="GSTIN">
+                  <input {...register('customerGstin')} placeholder="GSTIN" className="form-input" />
+                </Field>
+                <Field label="PAN">
+                  <input {...register('customerPan')} placeholder="PAN" className="form-input" />
+                </Field>
+              </div>
             </div>
           </div>
         </SectionCard>

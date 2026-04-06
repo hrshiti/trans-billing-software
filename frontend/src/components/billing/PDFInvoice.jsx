@@ -12,15 +12,15 @@ const styles = StyleSheet.create({
   // Header
   header: { flexDirection: 'row', borderWidth: 1, borderColor: '#ccc' },
   headerGarage: { flexDirection: 'row', backgroundColor: '#FFB800', borderWidth: 0, padding: 20, borderRadius: 4, marginBottom: 15 },
-  logoBox: { width: '55%', padding: 15, flexDirection: 'row', alignItems: 'center' },
-  logo: { width: 70, height: 50, objectFit: 'contain', marginRight: 15 },
-  brandName: { fontSize: 28, fontWeight: 'bold', letterSpacing: -1 },
+  logoBox: { width: '68%', padding: '12 0 12 10', flexDirection: 'row', alignItems: 'center' },
+  logo: { width: 65, height: 45, objectFit: 'contain', marginRight: 15 },
+  brandName: { fontSize: 24, fontWeight: 'bold', letterSpacing: -0.5 },
   slogan: { fontSize: 9, color: '#444', marginTop: 5 },
   
-  metaBox: { width: '45%', borderLeftWidth: 1, borderColor: '#ccc' },
-  metaRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#ccc', height: 40, alignItems: 'center' },
-  metaLabel: { width: 80, paddingLeft: 10, fontWeight: 'bold' },
-  metaVal: { paddingLeft: 10, fontWeight: 'bold' },
+  metaBox: { width: '32%', borderLeftWidth: 1, borderColor: '#ccc' },
+  metaRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#ccc', height: 36, alignItems: 'center' },
+  metaLabel: { width: '45%', paddingLeft: 8, fontWeight: 'bold', fontSize: 9 },
+  metaVal: { width: '55%', paddingLeft: 4, fontWeight: 'bold', fontSize: 9.5 },
 
   // Addressing Info Area
   addressArea: { flexDirection: 'row', borderWidth: 1, borderTopWidth: 0, borderColor: '#ccc', marginBottom: 15 },
@@ -156,21 +156,30 @@ export const PDFInvoice = ({ bill, business }) => {
         {/* Info/Addressing */}
         <View style={isTransport ? styles.addressArea : styles.addressAreaGarage}>
           <View style={isTransport ? [styles.addrCol, { borderRightWidth: 1, borderColor: '#ccc' }] : styles.addrColGarage}>
-            <Text style={isTransport ? styles.addrLabel : styles.addrLabelGarage}>Customer Information</Text>
-            <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Name:</Text> {bill.customerName || bill.billedToName}</Text>
-            <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Address:</Text> {bill.customerAddress || bill.billedToAddress}</Text>
-            <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Phone:</Text> {bill.customerPhone || business.phone}</Text>
+            <Text style={isTransport ? styles.addrLabel : styles.addrLabelGarage}>{isTransport ? 'From (Transporter)' : 'Customer Information'}</Text>
+            <Text style={[styles.addrText, { fontWeight: 'bold', fontSize: 10 }]}>{isTransport ? business.businessName : bill.customerName}</Text>
+            <Text style={styles.addrText}>{isTransport ? business.address : `${bill.customerAddress || ''} ${bill.customerCity || ''} ${bill.customerState || ''} ${bill.customerPincode || ''}`}</Text>
+            <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Mob :</Text> {isTransport ? business.phone : (bill.customerPhone || '-')}</Text>
+            {!isTransport && bill.customerEmail && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Email :</Text> {bill.customerEmail}</Text>}
+            {!isTransport && bill.customerGstin && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>GSTIN :</Text> {bill.customerGstin}</Text>}
           </View>
           <View style={isTransport ? styles.addrCol : styles.addrColGarage}>
-            <Text style={isTransport ? styles.addrLabel : styles.addrLabelGarage}>{isTransport ? 'Billed To' : 'Vehicle Information'}</Text>
-            {!isTransport ? (
+            <Text style={isTransport ? styles.addrLabel : styles.addrLabelGarage}>{isTransport ? 'Billed To (Customer)' : 'Vehicle Information'}</Text>
+            {isTransport ? (
+              <>
+                <Text style={[styles.addrText, { fontWeight: 'bold', fontSize: 10 }]}>{bill.billedToName}</Text>
+                <Text style={styles.addrText}>{bill.billedToAddress}</Text>
+                <Text style={styles.addrText}>{bill.billedToCity && `${bill.billedToCity}, `}{bill.billedToState} {bill.billedToPincode}</Text>
+                {bill.billedToPhone && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Mob :</Text> {bill.billedToPhone}</Text>}
+                {bill.billedToEmail && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Email :</Text> {bill.billedToEmail}</Text>}
+                {bill.billedToGstin && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>GSTIN :</Text> {bill.billedToGstin}</Text>}
+              </>
+            ) : (
               <>
                 <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Make:</Text> {bill.vehicleCompany || '-'}</Text>
                 <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Model:</Text> {bill.vehicleModel || '-'}</Text>
                 <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Reg No:</Text> {bill.vehicleNo?.toUpperCase() || '-'}</Text>
               </>
-            ) : (
-              <Text style={styles.addrText}>{bill.billedToAddress}</Text>
             )}
           </View>
         </View>
@@ -232,11 +241,40 @@ export const PDFInvoice = ({ bill, business }) => {
 
         {isTransport && (
           <View style={styles.totalRowArea}>
-            <View style={styles.gratitudeBanner}><Text>Grateful for Moving What Matters to You!</Text></View>
-            <View style={styles.totalLabelBox}><Text>TOTAL :</Text></View>
-            <View style={styles.totalValBox}><Text>₹{(bill.grandTotal || 0).toLocaleString()}</Text></View>
+            <View style={[styles.gratitudeBanner, { backgroundColor: themeColor }]}><Text>{bill.notes || 'Grateful for Moving What Matters to You!'}</Text></View>
+            <View style={styles.totalLabelBox}><Text>GRAND TOTAL :</Text></View>
+            <View style={styles.totalValBox}><Text>₹{parseFloat(bill.grandTotal || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text></View>
           </View>
         )}
+
+        {/* Bank & Payment Details */}
+        <View style={styles.bankSection}>
+          <View style={[styles.bankHeader, { backgroundColor: isTransport ? '#f3f3f3' : '#fdf3f0' }]}>
+            <Text>BANK ACCOUNT DETAILS FOR PAYMENT</Text>
+          </View>
+          <View style={styles.bankContent}>
+            <View style={styles.bankGrid}>
+              <View style={styles.bankItem}>
+                <Text style={styles.bankKey}>Bank Name:</Text>
+                <Text style={styles.bankValue}>{(business.bankDetails?.bankName || 'NOT PROVIDED').toUpperCase()}</Text>
+              </View>
+              <View style={styles.bankItem}>
+                <Text style={styles.bankKey}>IFSC Code:</Text>
+                <Text style={styles.bankValue}>{(business.bankDetails?.ifsc || 'NOT PROVIDED').toUpperCase()}</Text>
+              </View>
+            </View>
+            <View style={styles.bankGrid}>
+              <View style={styles.bankItem}>
+                <Text style={styles.bankKey}>Account No.:</Text>
+                <Text style={styles.bankValue}>{business.bankDetails?.accountNumber || 'NOT PROVIDED'}</Text>
+              </View>
+              <View style={styles.bankItem}>
+                <Text style={styles.bankKey}>Account Name:</Text>
+                <Text style={styles.bankValue}>{business.bankDetails?.accountName || 'NOT PROVIDED'}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
 
         {/* Bottom Section */}
         <View style={{ marginTop: 25, flexDirection: 'row', justifyContent: 'space-between' }}>

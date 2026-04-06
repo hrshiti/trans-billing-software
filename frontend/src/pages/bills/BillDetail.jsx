@@ -17,50 +17,55 @@ function TransportInvoice({ bill, business, onPayOnline }) {
   return (
     <div className="invoice-wrap" style={{ color: '#000', fontFamily: 'Inter, sans-serif', padding: '10px', minHeight: '800px', backgroundColor: '#fff' }}>
       {/* Top Header Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 190px', border: '1px solid #ccc', borderRadius: window.innerWidth < 640 ? '8px' : '2px 2px 0 0' }}>
-        <div style={{ padding: window.innerWidth < 640 ? '10px' : '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      {/* Top Header Section */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', border: '1px solid #ccc', borderRadius: '4px 4px 0 0' }}>
+        <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
            {business?.logoUrl 
-             ? <img src={business.logoUrl} style={{ width: window.innerWidth < 640 ? 50 : 80, height: window.innerWidth < 640 ? 40 : 60, objectFit: 'contain' }} />
-             : <div style={{ minWidth: 40, height: 40, background: '#eee', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 900 }}>T</div>
+             ? <img src={business.logoUrl} style={{ width: 60, height: 45, objectFit: 'contain' }} />
+             : <div style={{ minWidth: 40, height: 40, background: '#eee', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 900 }}>{(business?.businessName || 'T')[0]}</div>
            }
-           <div style={{ flex: 1, textAlign: 'center', paddingRight: window.innerWidth < 640 ? 0 : 40 }}>
-             <h1 style={{ fontSize: window.innerWidth < 640 ? '1.3rem' : '1.8rem', fontWeight: 950, margin: 0, letterSpacing: '-0.04em', lineHeight: 0.9 }}>{business?.businessName?.toUpperCase() || 'BUSINESS'}</h1>
+           <div style={{ flex: 1, textAlign: 'center' }}>
+             <h1 style={{ fontSize: '1.4rem', fontWeight: 950, margin: 0, letterSpacing: '-0.04em', lineHeight: 0.9 }}>{business?.businessName?.toUpperCase() || 'KHAN TRANSPORT'}</h1>
              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                <div style={{ flex: 1, height: '1px', background: '#ddd' }} />
-               <p style={{ fontSize: '0.68rem', fontWeight: 400, color: '#555', textTransform: 'capitalize', margin: 0 }}>{business?.slogan || 'Move What Matters'}</p>
+               <p style={{ fontSize: '0.62rem', fontWeight: 400, color: '#555', textTransform: 'capitalize', margin: 0 }}>{business?.slogan || 'Move What Matters'}</p>
                <div style={{ flex: 1, height: '1px', background: '#ddd' }} />
              </div>
            </div>
         </div>
-        <div style={{ borderLeft: window.innerWidth < 640 ? 'none' : '1px solid #ccc', borderTop: window.innerWidth < 640 ? '1px solid #ccc' : 'none' }}>
-           <div style={{ display: 'grid', gridTemplateColumns: '85px 1fr', borderBottom: '1px solid #ccc' }}>
-             <div style={{ padding: '10px', background: '#fff', fontWeight: 600, fontSize: '0.75rem', textAlign: 'right' }}>Bill No.:</div>
-             <div style={{ padding: '10px 12px', fontWeight: 800, fontSize: '0.85rem', borderLeft: '1px solid #eee', textAlign: 'left' }}>{bill.invoiceNo}</div>
+        <div style={{ borderLeft: '1px solid #ccc' }}>
+           <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr', borderBottom: '1px solid #ccc' }}>
+             <div style={{ padding: '8px 4px', background: '#fff', fontWeight: 600, fontSize: '0.65rem', textAlign: 'right' }}>Bill No.:</div>
+             <div style={{ padding: '8px 6px', fontWeight: 800, fontSize: '0.75rem', borderLeft: '1px solid #eee', textAlign: 'left' }}>{bill.invoiceNo}</div>
            </div>
-           <div style={{ display: 'grid', gridTemplateColumns: '85px 1fr' }}>
-             <div style={{ padding: '10px', background: '#fff', fontWeight: 600, fontSize: '0.75rem', textAlign: 'right' }}>Date :</div>
-             <div style={{ padding: '10px 12px', fontWeight: 800, fontSize: '0.85rem', borderLeft: '1px solid #eee', textAlign: 'left' }}>{dayjs(bill.billDate).format('DD/MM/YYYY')}</div>
+           <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr' }}>
+             <div style={{ padding: '8px 4px', background: '#fff', fontWeight: 600, fontSize: '0.65rem', textAlign: 'right' }}>Date :</div>
+             <div style={{ padding: '8px 6px', fontWeight: 800, fontSize: '0.75rem', borderLeft: '1px solid #eee', textAlign: 'left' }}>{dayjs(bill.billDate).format('DD/MM/YYYY')}</div>
            </div>
         </div>
       </div>
 
       {/* From / To Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1fr 1fr', border: '1px solid #ccc', borderTop: 'none' }}>
-        <div style={{ padding: '10px 12px', background: '#fdf3f0', borderRight: window.innerWidth < 640 ? 'none' : '1px solid #ccc', borderBottom: window.innerWidth < 640 ? '1px solid #ccc' : 'none' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 800, marginBottom: 4 }}>From : <span style={{ fontWeight: 900 }}>{business?.businessName}</span></div>
-          <div style={{ fontSize: '0.65rem', color: '#333', lineHeight: 1.4 }}>
-            {business?.address?.substring(0, 80)}<br/>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: '1px solid #ccc', borderTop: 'none' }}>
+        <div style={{ padding: '8px 10px', background: '#fdf3f0', borderRight: '1px solid #ccc' }}>
+          <div style={{ fontSize: '0.7rem', fontWeight: 800, marginBottom: 2 }}>From : <span style={{ fontWeight: 900 }}>{business?.businessName}</span></div>
+          <div style={{ fontSize: '0.6rem', color: '#333', lineHeight: 1.3 }}>
+            {business?.address}<br/>
             Mob : {business?.phone}
           </div>
         </div>
-        <div style={{ padding: '10px 12px', background: '#fdf3f0' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 800, marginBottom: 4 }}>Billed To : <span style={{ fontWeight: 900 }}>{bill.billedToName}</span></div>
-          <div style={{ fontSize: '0.65rem', color: '#333', lineHeight: 1.4 }}>{bill.billedToAddress?.substring(0, 80)}</div>
+        <div style={{ padding: '8px 10px', background: '#fdf3f0' }}>
+          <div style={{ fontSize: '0.7rem', fontWeight: 800, marginBottom: 2 }}>Billed To : <span style={{ fontWeight: 900 }}>{bill.billedToName}</span></div>
+          <div style={{ fontSize: '0.6rem', color: '#333', lineHeight: 1.3 }}>
+            {bill.billedToAddress}<br/>
+            {bill.billedToCity && `${bill.billedToCity}, `}{bill.billedToState} {bill.billedToPincode}<br/>
+            {bill.billedToPhone && `Mob: ${bill.billedToPhone}`}
+          </div>
         </div>
       </div>
 
       {/* Billing Summary Centered Banner */}
-      <div style={{ background: accent, color: 'white', textAlign: 'center', padding: '5px', fontWeight: 900, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.15em', borderX: '1px solid #ccc', margin: '0 -1px' }}>
+      <div style={{ background: accent, color: 'white', textAlign: 'center', padding: '5px', fontWeight: 900, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.12em', borderX: '1px solid #ccc', margin: '0 -1px' }}>
         Billing Summary
       </div>
 
@@ -100,19 +105,24 @@ function TransportInvoice({ bill, business, onPayOnline }) {
         {/* Bank Details Box */}
         <div style={{ border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden' }}>
            <div style={{ background: '#fdf3f0', padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, borderBottom: '1px solid #ccc' }}>BANK DETAILS :</div>
-           <div style={{ padding: '10px 12px', backgroundColor: '#fff' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                 <div style={{ fontSize: '0.7rem' }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>A/c No:</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountNumber || ''}</span>
+           <div style={{ padding: '8px 12px', backgroundColor: '#fff' }}>
+              {/* Mapping for both bankDetails object and legacy top-level fields */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                 <div style={{ fontSize: '0.65rem' }}>
+                    <span style={{ fontWeight: 600, color: '#555' }}>A/c No:</span><br/>
+                    <span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountNumber || business?.bankAccNo || ''}</span>
                  </div>
-                 <div style={{ fontSize: '0.7rem' }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>IFSC :</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.ifsc || ''}</span>
+                 <div style={{ fontSize: '0.65rem' }}>
+                    <span style={{ fontWeight: 600, color: '#555' }}>IFSC :</span><br/>
+                    <span style={{ fontWeight: 900 }}>{business?.bankDetails?.ifsc || business?.bankIfsc || ''}</span>
                  </div>
-                 <div style={{ fontSize: '0.7rem', marginTop: 4 }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>Name :</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountName || ''}</span>
+                 <div style={{ fontSize: '0.65rem', marginTop: 3 }}>
+                    <span style={{ fontWeight: 600, color: '#555' }}>Name :</span><br/>
+                    <span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountName || business?.name || ''}</span>
                  </div>
-                 <div style={{ fontSize: '0.7rem', marginTop: 4 }}>
-                    <span style={{ fontWeight: 600, color: '#555' }}>Bank :</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.bankName || ''}</span>
+                 <div style={{ fontSize: '0.65rem', marginTop: 3 }}>
+                    <span style={{ fontWeight: 600, color: '#555' }}>Bank :</span><br/>
+                    <span style={{ fontWeight: 900 }}>{business?.bankDetails?.bankName || business?.bankName || ''}</span>
                  </div>
               </div>
            </div>
@@ -164,8 +174,11 @@ function GarageInvoice({ bill, business, onPayOnline }) {
             <div style={{ background: themeColor, padding: '4px 10px', display: 'inline-block', fontWeight: 800, fontSize: '0.7rem', marginBottom: 10, borderRadius: 2 }}>Customer Information</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '0.8125rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Name:</span> <span>{bill.customerName}</span></div>
-              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Address:</span> <span>{bill.customerAddress || '—'}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Address:</span> <span>{bill.customerAddress} {bill.customerCity} {bill.customerState} {bill.customerPincode}</span></div>
               <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Phone:</span> <span>{bill.customerPhone}</span></div>
+              {bill.customerEmail && <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>Email:</span> <span>{bill.customerEmail}</span></div>}
+              {bill.customerGstin && <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>GSTIN:</span> <span>{bill.customerGstin}</span></div>}
+              {bill.customerPan && <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr' }}><span style={{ fontWeight: 700 }}>PAN:</span> <span>{bill.customerPan}</span></div>}
             </div>
           </div>
           {/* Vehicle Info */}
@@ -231,6 +244,27 @@ function GarageInvoice({ bill, business, onPayOnline }) {
 
         {/* Another grey horizontal line */}
         <div style={{ borderTop: '1px solid #ddd', margin: '20px 0' }} />
+
+        {/* Bank Details Section */}
+        <div style={{ border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden', marginBottom: 20 }}>
+           <div style={{ background: '#fdf3f0', padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, borderBottom: '1px solid #ccc' }}>BANK DETAILS :</div>
+           <div style={{ padding: '10px 12px', backgroundColor: '#fff' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                 <div style={{ fontSize: '0.7rem' }}>
+                    <span style={{ fontWeight: 600, color: '#555' }}>A/c No:</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountNumber || ''}</span>
+                 </div>
+                 <div style={{ fontSize: '0.7rem' }}>
+                    <span style={{ fontWeight: 600, color: '#555' }}>IFSC :</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.ifsc || ''}</span>
+                 </div>
+                 <div style={{ fontSize: '0.7rem', marginTop: 4 }}>
+                    <span style={{ fontWeight: 600, color: '#555' }}>Name :</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.accountName || ''}</span>
+                 </div>
+                 <div style={{ fontSize: '0.7rem', marginTop: 4 }}>
+                    <span style={{ fontWeight: 600, color: '#555' }}>Bank :</span><br/><span style={{ fontWeight: 900 }}>{business?.bankDetails?.bankName || ''}</span>
+                 </div>
+              </div>
+           </div>
+        </div>
 
         {/* Footer info splits */}
         <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 640 ? '1fr' : '1.4fr 1fr', gap: window.innerWidth < 640 ? 20 : 40, borderTop: '1px solid #ddd', paddingTop: 20 }}>
