@@ -9,6 +9,18 @@ export default function GarageDashboard() {
   const { bills } = useBills()
   const navigate = useNavigate()
   const [showReminders, setShowReminders] = useState(false)
+  
+  const formatVehicleNo = (no) => {
+    if (!no) return '—'
+    const clean = no.toUpperCase().replace(/\s+/g, '')
+    if (clean.length === 10) {
+      return `${clean.slice(0, 2)} ${clean.slice(2, 4)} ${clean.slice(4, 6)} ${clean.slice(6)}`
+    }
+    if (clean.length === 9) {
+      return `${clean.slice(0, 2)} ${clean.slice(2, 4)} ${clean.slice(4, 5)} ${clean.slice(5)}`
+    }
+    return clean
+  }
 
   const garageBills = useMemo(() => bills.filter(b => b.type === 'garage'), [bills])
 
@@ -142,7 +154,7 @@ export default function GarageDashboard() {
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {b.customerName || 'Customer'} • {b.vehicleNo}
+                  {b.customerName || 'Customer'} • {formatVehicleNo(b.vehicleNo)}
                 </div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{dayjs(b.billDate).format('DD MMM')} • {b.vehicleModel}</div>
               </div>
@@ -157,15 +169,16 @@ export default function GarageDashboard() {
 
       {/* Reminders Detail Drawer/Modal */}
       {showReminders && (
-         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.2s ease both' }}>
+         <div onClick={() => setShowReminders(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end', animation: 'fadeIn 0.2s ease both' }}>
             <div 
+               onClick={(e) => e.stopPropagation()}
                className="animate-fadeInRight"
                style={{ width: '100%', maxWidth: 400, background: 'white', height: '100%', padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 20, boxShadow: '-10px 0 30px rgba(0,0,0,0.1)' }}
             >
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F0D2E', margin: 0 }}>Service Alerts</h2>
-                  <button onClick={() => setShowReminders(false)} style={{ border: 'none', background: '#F3F4F6', color: '#6B7280', borderRadius: 10, width: 32, height: 32, cursor: 'pointer' }}>
-                     <X size={18} />
+                  <button onClick={() => setShowReminders(false)} style={{ border: 'none', background: '#F3F4F6', color: '#6B7280', borderRadius: 10, width: 44, height: 44, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                     <X size={22} />
                   </button>
                </div>
 
@@ -177,7 +190,7 @@ export default function GarageDashboard() {
                               <Car size={18} />
                            </div>
                            <div>
-                              <div style={{ fontWeight: 800, fontSize: '0.875rem' }}>{r.vehicleNo}</div>
+                              <div style={{ fontWeight: 800, fontSize: '0.875rem' }}>{formatVehicleNo(r.vehicleNo)}</div>
                               <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>{r.customerName}</div>
                            </div>
                            <div style={{ marginLeft: 'auto', textAlign: 'right' }}>

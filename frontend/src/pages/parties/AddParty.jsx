@@ -6,6 +6,7 @@ import {
   Building2, Loader2, CheckCircle2, ArrowLeft, ChevronDown, PenLine, Truck, Wrench
 } from 'lucide-react'
 import { useParties } from '../../context/PartyContext'
+import { useAuth } from '../../context/AuthContext'
 
 const STATES = [
   'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat',
@@ -30,21 +31,25 @@ function Field({ label, error, children, required }) {
 export default function AddParty() {
   const { id } = useParams()          // if editing
   const { addParty, updateParty, getParty } = useParties()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [saved, setSaved] = useState(false)
   const [signatureUrl, setSignatureUrl] = useState('')
   const [sigPreview, setSigPreview] = useState('')
   const isEdit = Boolean(id)
 
+  // Derive partyType from the logged-in user's role — no toggle needed
+  const derivedPartyType = user?.role === 'garage' ? 'garage' : 'transport'
+
   const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
       name: '', phone: '', email: '', address: '', city: '', state: '', pincode: '',
       gstin: '', pan: '', openingBalance: '', balanceType: 'toReceive',
-      partyType: 'transport',
+      partyType: derivedPartyType,
     }
   })
 
-  // Watch current balance type and party type for toggle UI
+  // Watch current balance type
   const balanceType = watch('balanceType')
   const partyType   = watch('partyType')
 
@@ -65,7 +70,7 @@ export default function AddParty() {
           pan: p.pan || '',
           openingBalance: p.openingBalance || '0',
           balanceType: p.balanceType || 'toReceive',
-          partyType: p.partyType || 'transport',
+          partyType: p.partyType || derivedPartyType,
         })
         if (p.signatureUrl) { setSignatureUrl(p.signatureUrl); setSigPreview(p.signatureUrl) }
       }
@@ -145,45 +150,8 @@ export default function AddParty() {
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        {/* ─ Party Type card ─ */}
-        <div style={{
-          background: 'white', borderRadius: 20, padding: '20px 20px 24px',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.06)', marginBottom: 14, border: '1px solid rgba(0,0,0,0.04)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#F0FDF4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Building2 size={16} color="#16A34A" />
-            </div>
-            <h3 style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0F0D2E', margin: 0 }}>Party Type</h3>
-          </div>
-          <div style={{ display: 'flex', background: '#F4F4F8', borderRadius: 14, padding: 4, gap: 4 }}>
-            {[
-              { val: 'transport', label: 'Transport', icon: Truck, activeColor: '#2563EB', activeBg: '#DBEAFE' },
-              { val: 'garage',    label: 'Garage',    icon: Wrench, activeColor: '#D97706', activeBg: '#FEF3C7' },
-            ].map(opt => {
-              const isActive = partyType === opt.val
-              return (
-                <button
-                  key={opt.val}
-                  type="button"
-                  onClick={() => setValue('partyType', opt.val, { shouldValidate: true })}
-                  style={{
-                    flex: 1, padding: '10px 8px', borderRadius: 10, border: 'none',
-                    cursor: 'pointer', fontSize: '0.875rem', fontWeight: 700,
-                    transition: 'all 0.18s ease',
-                    background: isActive ? opt.activeBg : 'transparent',
-                    color: isActive ? opt.activeColor : '#6B7280',
-                    boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  }}
-                >
-                  <opt.icon size={15} />{opt.label}
-                </button>
-              )
-            })}
-          </div>
-          <input type="hidden" {...register('partyType')} />
-        </div>
+        {/* Hidden partyType — auto-set from user role, no toggle shown */}
+        <input type="hidden" {...register('partyType')} value={derivedPartyType} />
 
         {/* ─ Basic Info card ─ */}
         <div style={{
