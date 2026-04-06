@@ -160,6 +160,9 @@ export const PDFInvoice = ({ bill, business }) => {
             <Text style={[styles.addrText, { fontWeight: 'bold', fontSize: 10 }]}>{isTransport ? business.businessName : bill.customerName}</Text>
             <Text style={styles.addrText}>{isTransport ? business.address : `${bill.customerAddress || ''} ${bill.customerCity || ''} ${bill.customerState || ''} ${bill.customerPincode || ''}`}</Text>
             <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Mob :</Text> {isTransport ? business.phone : (bill.customerPhone || '-')}</Text>
+            {isTransport && business.email && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Email :</Text> {business.email}</Text>}
+            {isTransport && business.gstin && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>GSTIN :</Text> {business.gstin}</Text>}
+            {isTransport && business.panNo && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>PAN :</Text> {business.panNo}</Text>}
             {!isTransport && bill.customerEmail && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Email :</Text> {bill.customerEmail}</Text>}
             {!isTransport && bill.customerGstin && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>GSTIN :</Text> {bill.customerGstin}</Text>}
           </View>
@@ -173,6 +176,7 @@ export const PDFInvoice = ({ bill, business }) => {
                 {bill.billedToPhone && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Mob :</Text> {bill.billedToPhone}</Text>}
                 {bill.billedToEmail && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>Email :</Text> {bill.billedToEmail}</Text>}
                 {bill.billedToGstin && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>GSTIN :</Text> {bill.billedToGstin}</Text>}
+                {bill.billedToPan && <Text style={styles.addrText}><Text style={{ fontWeight: 'bold' }}>PAN :</Text> {bill.billedToPan}</Text>}
               </>
             ) : (
               <>
@@ -240,10 +244,41 @@ export const PDFInvoice = ({ bill, business }) => {
         </View>
 
         {isTransport && (
-          <View style={styles.totalRowArea}>
-            <View style={[styles.gratitudeBanner, { backgroundColor: themeColor }]}><Text>{bill.notes || 'Grateful for Moving What Matters to You!'}</Text></View>
-            <View style={styles.totalLabelBox}><Text>GRAND TOTAL :</Text></View>
-            <View style={styles.totalValBox}><Text>₹{parseFloat(bill.grandTotal || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text></View>
+          <View style={{ marginTop: -1 }}>
+             {parseFloat(bill.loadingCharge || 0) > 0 && (
+               <View style={styles.totalRowArea}>
+                 <View style={{ width: '67%', borderRightWidth: 1, borderColor: '#ccc' }} />
+                 <View style={[styles.totalLabelBox, { fontSize: 8, padding: 8, width: '18%' }]}><Text>Loading :</Text></View>
+                 <View style={[styles.totalValBox, { fontSize: 9, padding: 8, width: '15%' }]}><Text>₹{parseFloat(bill.loadingCharge).toLocaleString()}</Text></View>
+               </View>
+             )}
+             {parseFloat(bill.unloadingCharge || 0) > 0 && (
+               <View style={styles.totalRowArea}>
+                 <View style={{ width: '67%', borderRightWidth: 1, borderColor: '#ccc' }} />
+                 <View style={[styles.totalLabelBox, { fontSize: 8, padding: 8, width: '18%' }]}><Text>Unloading :</Text></View>
+                 <View style={[styles.totalValBox, { fontSize: 9, padding: 8, width: '15%' }]}><Text>₹{parseFloat(bill.unloadingCharge).toLocaleString()}</Text></View>
+               </View>
+             )}
+             {parseFloat(bill.detentionCharge || 0) > 0 && (
+               <View style={styles.totalRowArea}>
+                 <View style={{ width: '67%', borderRightWidth: 1, borderColor: '#ccc' }} />
+                 <View style={[styles.totalLabelBox, { fontSize: 8, padding: 8, width: '18%' }]}><Text>Detention :</Text></View>
+                 <View style={[styles.totalValBox, { fontSize: 9, padding: 8, width: '15%' }]}><Text>₹{parseFloat(bill.detentionCharge).toLocaleString()}</Text></View>
+               </View>
+             )}
+             {parseFloat(bill.otherCharge || 0) > 0 && (
+               <View style={styles.totalRowArea}>
+                 <View style={{ width: '67%', borderRightWidth: 1, borderColor: '#ccc' }} />
+                 <View style={[styles.totalLabelBox, { fontSize: 8, padding: 8, width: '18%' }]}><Text>Other :</Text></View>
+                 <View style={[styles.totalValBox, { fontSize: 9, padding: 8, width: '15%' }]}><Text>₹{parseFloat(bill.otherCharge).toLocaleString()}</Text></View>
+               </View>
+             )}
+             
+             <View style={styles.totalRowArea}>
+               <View style={[styles.gratitudeBanner, { backgroundColor: themeColor }]}><Text>{bill.notes || 'Grateful for Moving What Matters to You!'}</Text></View>
+               <View style={styles.totalLabelBox}><Text>GRAND TOTAL :</Text></View>
+               <View style={styles.totalValBox}><Text>₹{parseFloat(bill.grandTotal || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text></View>
+             </View>
           </View>
         )}
 
@@ -293,7 +328,11 @@ export const PDFInvoice = ({ bill, business }) => {
 
           <View style={styles.signBox}>
             <Text style={styles.signLabel}>{isTransport ? `For ${business.businessName},` : 'Customer Signature'}</Text>
-            <View style={styles.signLine} />
+            {isTransport && business.signatureUrl ? (
+              <Image src={business.signatureUrl} style={{ width: 100, height: 40, marginTop: 5, marginBottom: 2, alignSelf: 'center', objectFit: 'contain' }} />
+            ) : (
+              <View style={styles.signLine} />
+            )}
             <Text style={{ fontSize: 7, color: '#444' }}>{isTransport ? '(Authorized Signatory)' : 'Date'}</Text>
           </View>
         </View>

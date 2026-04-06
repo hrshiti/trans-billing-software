@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { Truck, User, MapPin, Phone, Loader2, CheckCircle2, ArrowRight, FileText, Image, Files, CreditCard, Shield, Info, Check, Building2 } from 'lucide-react'
+import { Truck, User, MapPin, Phone, Loader2, CheckCircle2, ArrowRight, FileText, Image, Files, CreditCard, Shield, Info, Check, Building2, PenTool } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import logo from '../../assets/trans-logo.png'
 
@@ -95,10 +95,23 @@ export default function TransportRegistration() {
 
   const onSubmit = async (data) => {
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1200))
+    
+    // Process signature file if exists
+    let signatureUrl = null;
+    if (data.docSignature && data.docSignature[0]) {
+      const reader = new FileReader();
+      const filePromise = new Promise((resolve) => {
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(data.docSignature[0]);
+      });
+      signatureUrl = await filePromise;
+    }
+
+    await new Promise(r => setTimeout(r, 800))
     // Nest bank details to match profile schema
     const formattedData = {
       ...data,
+      signatureUrl, // Save the DataURL
       bankDetails: {
         accountName: data.name, // default to owner name
         accountNumber: data.bankAccNo,
@@ -109,6 +122,7 @@ export default function TransportRegistration() {
     delete formattedData.bankAccNo
     delete formattedData.bankIfsc
     delete formattedData.bankName
+    delete formattedData.docSignature // remove file object
     updateProfile({ ...formattedData, setupComplete: true })
     navigate('/dashboard', { replace: true })
   }
@@ -320,6 +334,7 @@ export default function TransportRegistration() {
                 <DocUploadField label="Passport Photo" icon={Image} register={register} name="docPhoto" required />
                 <DocUploadField label="Vehicle RC" icon={Truck} register={register} name="docRc" required />
                 <DocUploadField label="Vehicle Insurance" icon={Shield} register={register} name="docInsurance" required />
+                <DocUploadField label="Authorized Signature" icon={PenTool} register={register} name="docSignature" required />
               </div>
             </div>
 

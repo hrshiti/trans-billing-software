@@ -51,7 +51,8 @@ function TransportInvoice({ bill, business, onPayOnline }) {
           <div style={{ fontSize: '0.7rem', fontWeight: 800, marginBottom: 2 }}>From : <span style={{ fontWeight: 900 }}>{business?.businessName}</span></div>
           <div style={{ fontSize: '0.6rem', color: '#333', lineHeight: 1.3 }}>
             {business?.address}<br/>
-            Mob : {business?.phone}
+            Mob : {business?.phone} {business?.email && `| Email: ${business?.email}`}<br/>
+            {business?.gstin && `GSTIN: ${business?.gstin} `} {business?.panNo && `| PAN: ${business?.panNo}`}
           </div>
         </div>
         <div style={{ padding: '8px 10px', background: '#fdf3f0' }}>
@@ -59,7 +60,8 @@ function TransportInvoice({ bill, business, onPayOnline }) {
           <div style={{ fontSize: '0.6rem', color: '#333', lineHeight: 1.3 }}>
             {bill.billedToAddress}<br/>
             {bill.billedToCity && `${bill.billedToCity}, `}{bill.billedToState} {bill.billedToPincode}<br/>
-            {bill.billedToPhone && `Mob: ${bill.billedToPhone}`}
+            {bill.billedToPhone && `Mob: ${bill.billedToPhone}`} {bill.billedToEmail && `| Email: ${bill.billedToEmail}`}<br/>
+            {bill.billedToGstin && `GSTIN: ${bill.billedToGstin} `} {bill.billedToPan && `| PAN: ${bill.billedToPan}`}
           </div>
         </div>
       </div>
@@ -89,6 +91,32 @@ function TransportInvoice({ bill, business, onPayOnline }) {
               <td style={{ padding: '10px', border: '1px solid #ccc', textAlign: 'right', fontSize: '0.85rem', fontWeight: 700 }}>{parseFloat(item.amount || 0).toLocaleString()}</td>
             </tr>
           ))}
+          {/* Extra Charges Rows */}
+          {parseFloat(bill.loadingCharge || 0) > 0 && (
+            <tr>
+              <td colSpan="4" style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 700, fontSize: '0.8rem', border: '1px solid #ccc' }}>Loading Charges :</td>
+              <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 800, fontSize: '0.85rem', border: '1px solid #ccc' }}>₹{parseFloat(bill.loadingCharge).toLocaleString()}</td>
+            </tr>
+          )}
+          {parseFloat(bill.unloadingCharge || 0) > 0 && (
+            <tr>
+              <td colSpan="4" style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 700, fontSize: '0.8rem', border: '1px solid #ccc' }}>Unloading Charges :</td>
+              <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 800, fontSize: '0.85rem', border: '1px solid #ccc' }}>₹{parseFloat(bill.unloadingCharge).toLocaleString()}</td>
+            </tr>
+          )}
+          {parseFloat(bill.detentionCharge || 0) > 0 && (
+            <tr>
+              <td colSpan="4" style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 700, fontSize: '0.8rem', border: '1px solid #ccc' }}>Detention Charges :</td>
+              <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 800, fontSize: '0.85rem', border: '1px solid #ccc' }}>₹{parseFloat(bill.detentionCharge).toLocaleString()}</td>
+            </tr>
+          )}
+          {parseFloat(bill.otherCharge || 0) > 0 && (
+            <tr>
+              <td colSpan="4" style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 700, fontSize: '0.8rem', border: '1px solid #ccc' }}>Other Charges :</td>
+              <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 800, fontSize: '0.85rem', border: '1px solid #ccc' }}>₹{parseFloat(bill.otherCharge).toLocaleString()}</td>
+            </tr>
+          )}
+
           {/* Total Row exactly like Radhe Tempo */}
           <tr>
             <td colSpan="4" style={{ background: accent, color: 'white', padding: '6px 20px', fontWeight: 800, fontSize: '0.9rem', textAlign: 'center' }}>
@@ -131,7 +159,13 @@ function TransportInvoice({ bill, business, onPayOnline }) {
         {/* Signatory Section on Right */}
         <div style={{ textAlign: 'center', paddingBottom: 6 }}>
            <div style={{ fontSize: '0.85rem', fontWeight: 900 }}>For {business?.businessName || ''},</div>
-           <div style={{ width: 170, borderBottom: '1px solid #000', margin: '35px auto 6px' }} />
+           <div style={{ height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
+              {business?.signatureUrl ? (
+                <img src={business.signatureUrl} style={{ maxHeight: '100%', maxWidth: 140, objectFit: 'contain' }} />
+              ) : (
+                <div style={{ width: 170, borderBottom: '1px solid #000', marginTop: 35 }} />
+              )}
+           </div>
            <div style={{ fontSize: '0.7rem', color: '#666' }}>(Authorized Signatory)</div>
         </div>
       </div>
