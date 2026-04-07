@@ -41,6 +41,10 @@ const TripManagement       = lazy(() => import('../pages/transport/TripManagemen
 const GarageVehicles = lazy(() => import('../pages/garage/GarageVehicles'))
 const GarageServices = lazy(() => import('../pages/garage/GarageServices'))
 
+// Insurance Module
+const InsuranceHome = lazy(() => import('../pages/insurance/InsuranceHome'))
+const InsuranceForm = lazy(() => import('../pages/insurance/InsuranceForm'))
+
 // Admin pages
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'))
 const AdminUsers     = lazy(() => import('../pages/admin/UserManagement'))
@@ -126,6 +130,10 @@ export default function AppRouter() {
               <Route path="/garage/vehicles" element={<GarageVehicles />} />
               <Route path="/garage/services" element={<GarageServices />} />
             </Route>
+
+            {/* ── Insurance Module ── */}
+            <Route path="/insurance" element={<InsuranceHome />} />
+            <Route path="/insurance/form/:type" element={<InsuranceForm />} />
 
             {/* ── Admin Module ── */}
             <Route element={<ProtectedRoute requireRole="admin" />}>

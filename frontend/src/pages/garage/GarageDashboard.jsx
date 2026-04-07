@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Wrench, Car, User, TrendingUp, Clock, AlertTriangle, ArrowRight, Plus, Bell, Calendar as CalIcon, X } from 'lucide-react'
+import { Wrench, Car, User, TrendingUp, Clock, AlertTriangle, ArrowRight, Plus, Bell, Calendar as CalIcon, X, Shield } from 'lucide-react'
 import { useBills } from '../../context/BillContext'
 import { useNavigate } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -85,6 +85,43 @@ export default function GarageDashboard() {
           <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.95)', marginTop: 4 }}>Manage job cards, spares, and customer vehicle services</p>
         </div>
         <Wrench size={64} color="rgba(255,255,255,0.1)" style={{ position: 'absolute', bottom: -12, right: 12, transform: 'rotate(-15deg)' }} />
+      </div>
+
+      {/* Insurance Service Banner - Horizontal Box */}
+      <div 
+        onClick={() => navigate('/insurance')}
+        style={{ 
+           background: 'white', 
+           borderRadius: 20, 
+           padding: '12px 18px', 
+           marginBottom: 20, 
+           display: 'flex', 
+           alignItems: 'center', 
+           gap: 14, 
+           cursor: 'pointer',
+           boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+           border: '1px solid #E5E7EB',
+           transition: 'all 0.2s'
+        }}
+        onMouseEnter={e => {
+           e.currentTarget.style.transform = 'translateY(-2px)'
+           e.currentTarget.style.borderColor = '#10B981'
+        }}
+        onMouseLeave={e => {
+           e.currentTarget.style.transform = 'translateY(0)'
+           e.currentTarget.style.borderColor = '#E5E7EB'
+        }}
+      >
+        <div style={{ width: 38, height: 38, borderRadius: 10, background: '#ECFDF5', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Shield size={18} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1F2937', display: 'flex', alignItems: 'center', gap: 6 }}>
+            Insurance Service <span style={{ fontSize: '0.55rem', background: '#3B82F6', color: 'white', padding: '2px 6px', borderRadius: 100, textTransform: 'uppercase' }}>New</span>
+          </div>
+          <div style={{ fontSize: '0.625rem', color: '#6B7280', marginTop: 1 }}>Compare rates for your customer's vehicles and earn more</div>
+        </div>
+        <ArrowRight size={16} color="#D1D5DB" />
       </div>
 
       {/* Stats Cards */}

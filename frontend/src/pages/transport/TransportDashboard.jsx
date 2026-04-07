@@ -46,6 +46,43 @@ export default function TransportDashboard() {
         <Truck size={100} color="rgba(255,255,255,0.05)" style={{ position: 'absolute', bottom: -20, right: 10, transform: 'rotate(-10deg)' }} />
       </div>
 
+      {/* Insurance Banner - Small Horizontal Box */}
+      <div 
+        onClick={() => navigate('/insurance')}
+        style={{ 
+          background: 'white', 
+          borderRadius: 20, 
+          padding: '12px 20px', 
+          marginBottom: 20, 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 16, 
+          cursor: 'pointer',
+          border: '1px solid #E5E7EB',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.02)',
+          transition: 'all 0.2s'
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.transform = 'translateY(-2px)'
+          e.currentTarget.style.borderColor = '#7C3AED'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = 'translateY(0)'
+          e.currentTarget.style.borderColor = '#E5E7EB'
+        }}
+      >
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: '#F5F3FF', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Shield size={20} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 850, color: '#1F2937', display: 'flex', alignItems: 'center', gap: 6 }}>
+            Insurance Service <span style={{ fontSize: '0.6rem', background: '#F59E0B', color: 'white', padding: '2px 8px', borderRadius: 100, textTransform: 'uppercase' }}>New</span>
+          </div>
+          <div style={{ fontSize: '0.65rem', color: '#6B7280', marginTop: 2 }}>Secure your fleet with 20+ insurers starting at ₹2094/yr</div>
+        </div>
+        <ArrowRight size={18} color="#9CA3AF" />
+      </div>
+
       {/* Stats */}
       <div className="stats-grid" style={{ marginBottom: 20 }}>
         {stats.map(s => (
