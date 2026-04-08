@@ -220,8 +220,14 @@ export const PDFInvoice = ({ bill, business }) => {
                 <>
                   <Text style={styles.colNo}>{idx + 1}</Text>
                   <Text style={styles.colDate}>{dayjs(item.date).format('DD/MM/YY')}</Text>
-                  <Text style={styles.colFrom}>{item.companyFrom || '-'}</Text>
-                  <Text style={styles.colTo}>{item.companyTo || '-'}</Text>
+                  <View style={styles.colFrom}>
+                    <Text>{item.companyFrom || '-'}</Text>
+                    {item.vehicleNo && <Text style={{ fontSize: 7, color: '#666', marginTop: 2 }}>{item.vehicleNo}</Text>}
+                  </View>
+                  <View style={styles.colTo}>
+                    <Text>{item.companyTo || '-'}</Text>
+                    {item.driverName && <Text style={{ fontSize: 7, color: '#666', marginTop: 2 }}>Dr: {item.driverName}</Text>}
+                  </View>
                   <Text style={styles.colChalan}>{item.chalanNo || '-'}</Text>
                   <Text style={styles.colAmount}>{parseFloat(item.amount || 0).toLocaleString()}</Text>
                 </>
@@ -272,6 +278,13 @@ export const PDFInvoice = ({ bill, business }) => {
                  <View style={{ width: '67%', borderRightWidth: 1, borderColor: '#ccc' }} />
                  <View style={[styles.totalLabelBox, { fontSize: 8, padding: 8, width: '18%' }]}><Text>Other :</Text></View>
                  <View style={[styles.totalValBox, { fontSize: 9, padding: 8, width: '15%' }]}><Text>₹{parseFloat(bill.otherCharge).toLocaleString()}</Text></View>
+               </View>
+             )}
+             {bill.holdCharges?.enabled && parseFloat(bill.holdCharges?.total || 0) > 0 && (
+               <View style={styles.totalRowArea}>
+                 <View style={{ width: '67%', borderRightWidth: 1, borderColor: '#ccc' }} />
+                 <View style={[styles.totalLabelBox, { fontSize: 8, padding: 8, width: '18%' }]}><Text>Hold Time :</Text></View>
+                 <View style={[styles.totalValBox, { fontSize: 9, padding: 8, width: '15%' }]}><Text>₹{parseFloat(bill.holdCharges.total).toLocaleString()}</Text></View>
                </View>
              )}
              
