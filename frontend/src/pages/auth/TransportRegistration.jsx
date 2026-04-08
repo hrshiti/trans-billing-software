@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { Truck, User, MapPin, Phone, Loader2, CheckCircle2, ArrowRight, FileText, Image, Files, CreditCard, Shield, Info, Check, Building2, PenTool } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import logo from '../../assets/trans-logo.png'
 
-function Field({ label, error, children, required, sublabel }) {
+function Field({ label, error, children, required, sublabel, style }) {
   return (
-    <div className="form-group" style={{ marginBottom: 8 }}>
+    <div className="form-group" style={{ marginBottom: 8, ...style }}>
       {label && (
         <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 650, color: '#374151', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
           {label} {required && <span style={{ color: 'var(--danger)', marginLeft: 2 }}>*</span>}
@@ -67,8 +67,10 @@ export default function TransportRegistration() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
+  const [expandedIndex, setExpandedIndex] = useState(0)
+  const totalSteps = 4
 
-  const { register, handleSubmit, formState: { errors }, trigger } = useForm({
+  const { register, handleSubmit, control, watch, formState: { errors }, trigger } = useForm({
     mode: 'onChange',
     defaultValues: {
       name: user?.name || '',
@@ -80,7 +82,13 @@ export default function TransportRegistration() {
       bankAccNo: '',
       bankIfsc: '',
       bankName: '',
+      vehicles: [{ vehicleNo: '', vehicleType: 'Truck', capacity: '', driverName: '', driverMobile: '' }]
     }
+  })
+
+  const { fields: vehicleFields, append: appendVehicle, remove: removeVehicle } = useFieldArray({
+    control,
+    name: "vehicles"
   })
 
   const handleNext = async () => {
@@ -88,8 +96,11 @@ export default function TransportRegistration() {
       const isValid = await trigger(['name', 'phone', 'address', 'businessName']);
       if (isValid) setStep(2);
     } else if (step === 2) {
-      const isValid = await trigger(['aadharNo', 'panNo', 'bankAccNo', 'bankIfsc', 'bankName']);
+      const isValid = await trigger(['vehicles']);
       if (isValid) setStep(3);
+    } else if (step === 3) {
+      const isValid = await trigger(['aadharNo', 'panNo', 'bankAccNo', 'bankIfsc', 'bankName']);
+      if (isValid) setStep(4);
     }
   }
 
@@ -161,11 +172,13 @@ export default function TransportRegistration() {
           <div style={{ height: 4, width: 28, borderRadius: 2, background: step >= 1 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
           <div style={{ height: 4, width: 28, borderRadius: 2, background: step >= 2 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
           <div style={{ height: 4, width: 28, borderRadius: 2, background: step >= 3 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
+          <div style={{ height: 4, width: 28, borderRadius: 2, background: step >= 4 ? '#7C3AED' : '#E2E8F0', transition: 'all 0.3s' }} />
         </div>
         <p style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 500, margin: 0 }}>
            {step === 1 && 'Basic business information'}
-           {step === 2 && 'KYC & Bank details'}
-           {step === 3 && 'Upload required documents'}
+           {step === 2 && 'Vehicle & Fleet details'}
+           {step === 3 && 'KYC & Bank details'}
+           {step === 4 && 'Upload required documents'}
         </p>
       </div>
 
@@ -241,7 +254,84 @@ export default function TransportRegistration() {
 
         {step === 2 && (
           <div className="animate-fadeIn">
-            {/* Step 2: KYC & Bank */}
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                 <div style={{ width: 4, height: 12, background: '#7C3AED', borderRadius: 2 }} />
+                 <span style={{ fontSize: '0.75rem', fontWeight: 850, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Vehicle Details</span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
+                {vehicleFields.map((field, index) => {
+                  const isExpanded = expandedIndex === index;
+                  const vNo = watch(`vehicles.${index}.vehicleNo`);
+                  const vType = watch(`vehicles.${index}.vehicleType`);
+                  
+                  return (
+                    <div key={field.id} style={{ background: '#F8FAFC', padding: isExpanded ? '10px 12px' : '8px 12px', borderRadius: 16, border: '1px solid #E2E8F0', position: 'relative', transition: 'all 0.3s' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isExpanded ? 6 : 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontSize: '0.62rem', fontWeight: 900, color: '#7C3AED', background: '#EDE9FE', padding: '2px 8px', borderRadius: 6 }}>VEHICLE #{index + 1}</span>
+                          {!isExpanded && (
+                            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#475569' }}>
+                              {vNo || 'New Vehicle'} {vType ? `• ${vType}` : ''}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          {!isExpanded && (
+                            <button type="button" onClick={() => setExpandedIndex(index)} style={{ border: 'none', background: 'transparent', color: '#7C3AED', fontSize: '0.65rem', fontWeight: 800, cursor: 'pointer' }}>Edit</button>
+                          )}
+                          {vehicleFields.length > 1 && (
+                            <button type="button" onClick={() => { removeVehicle(index); if (expandedIndex >= index) setExpandedIndex(Math.max(0, expandedIndex - 1)); }} style={{ border: 'none', background: 'transparent', color: '#EF4444', fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer' }}>Remove</button>
+                          )}
+                        </div>
+                      </div>
+
+                      {isExpanded && (
+                        <div className="animate-fadeIn">
+                          <div className="grid sm-grid-cols-2 gap-x-2 gap-y-1">
+                            <Field label="Vehicle No" required error={errors.vehicles?.[index]?.vehicleNo} style={{ marginBottom: 5 }}>
+                              <input {...register(`vehicles.${index}.vehicleNo`, { required: 'Vehicle No is required' })} onInput={e => e.target.value = e.target.value.toUpperCase()} placeholder="MH 12 AB 1234" className="form-input" style={{ borderRadius: 9, height: 36, fontSize: '0.75rem' }} />
+                            </Field>
+                            <Field label="Type" required style={{ marginBottom: 5 }}>
+                              <select {...register(`vehicles.${index}.vehicleType`)} className="form-input" style={{ borderRadius: 9, height: 38, fontSize: '0.75rem', padding: '0 10px' }}>
+                                <option>Truck</option>
+                                <option>Tempo</option>
+                                <option>Trailer</option>
+                              </select>
+                            </Field>
+                            <Field label="Capacity (Tons)" style={{ marginBottom: 5 }}>
+                              <input {...register(`vehicles.${index}.capacity`)} type="number" placeholder="Eg: 15" className="form-input" style={{ borderRadius: 9, height: 36, fontSize: '0.75rem' }} />
+                            </Field>
+                            <Field label="Driver Name" style={{ marginBottom: 5 }}>
+                              <input {...register(`vehicles.${index}.driverName`)} onInput={e => e.target.value = e.target.value.replace(/\b\w/g, c => c.toUpperCase())} placeholder="Driver Name" className="form-input" style={{ borderRadius: 9, height: 36, fontSize: '0.75rem' }} />
+                            </Field>
+                            <Field label="Driver Mobile" error={errors.vehicles?.[index]?.driverMobile} style={{ marginBottom: 0 }}>
+                              <input {...register(`vehicles.${index}.driverMobile`, { pattern: { value: /^[0-9]{10}$/, message: '10 digits required' } })} onInput={e => e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10)} placeholder="10-digit number" className="form-input" style={{ borderRadius: 9, height: 36, fontSize: '0.75rem' }} />
+                            </Field>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                <button type="button" onClick={() => { appendVehicle({ vehicleNo: '', vehicleType: 'Truck', capacity: '', driverName: '', driverMobile: '' }); setExpandedIndex(vehicleFields.length); }} className="btn btn-ghost" style={{ width: '100%', borderRadius: 12, border: '1.5px dashed #CBD5E1', fontSize: '0.75rem', fontWeight: 700, color: '#7C3AED', height: 36, background: '#F8FAFC', marginTop: 4 }}>
+                  + Add Vehicle
+                </button>
+              </div>
+            </div>
+
+            <div className="btn-group btn-group-mobile-row" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <button type="button" onClick={() => setStep(1)} className="btn" style={{ flex: 1, height: 48, borderRadius: 16, fontSize: '0.875rem', fontWeight: 600, background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#64748B' }}>Back</button>
+              <button type="button" onClick={handleNext} className="btn btn-primary" style={{ flex: 2, height: 48, borderRadius: 16, fontSize: '0.875rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>Next Step <ArrowRight size={18} /></button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="animate-fadeIn">
+            {/* Step 3: KYC & Bank */}
             <div style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                  <div style={{ width: 4, height: 12, background: '#7C3AED', borderRadius: 2 }} />
@@ -315,7 +405,7 @@ export default function TransportRegistration() {
             <div className="btn-group btn-group-mobile-row" style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
               <button 
                 type="button" 
-                onClick={() => setStep(1)} 
+                onClick={() => setStep(2)} 
                 className="btn" 
                 style={{ flex: 1, height: 48, borderRadius: 16, fontSize: '0.875rem', fontWeight: 600, background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#64748B' }}
               >
@@ -333,9 +423,9 @@ export default function TransportRegistration() {
           </div>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
           <div className="animate-fadeIn">
-            {/* Step 3: Document Proofs */}
+            {/* Step 4: Document Proofs */}
             <div style={{ marginBottom: 12, padding: '12px 14px', background: '#F1F5F9', borderRadius: 18 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                  <Files size={14} color="#7C3AED" />
@@ -356,7 +446,7 @@ export default function TransportRegistration() {
             <div className="btn-group btn-group-mobile-row" style={{ marginTop: 10, display: 'flex', gap: 10, alignItems: 'center' }}>
               <button 
                 type="button" 
-                onClick={() => setStep(2)} 
+                onClick={() => setStep(3)} 
                 className="btn" 
                 style={{ flex: 1, height: 48, borderRadius: 16, fontSize: '0.875rem', fontWeight: 600, background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#64748B' }}
               >

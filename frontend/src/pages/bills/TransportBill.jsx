@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm, useFieldArray } from 'react-hook-form'
 import {
   Truck, MapPin, User, Package, Plus, Trash2,
-  CheckCircle2, Loader2, ArrowLeft, ChevronDown, FileText, Calendar
+  CheckCircle2, Loader2, ArrowLeft, ChevronDown, FileText, Calendar, Clock, Shield, AlertCircle
 } from 'lucide-react'
 import { useBills } from '../../context/BillContext'
 import { useParties } from '../../context/PartyContext'
 import { useVehicles } from '../../context/VehicleContext'
+import { useAuth } from '../../context/AuthContext'
 import dayjs from 'dayjs'
 
 function Field({ label, error, children, required, style }) {
@@ -50,7 +51,8 @@ const PAYMENT_MODES = [
 export default function TransportBill() {
   const { addBill } = useBills()
   const { parties } = useParties()
-  const { vehicles } = useVehicles()
+  const fleet = useVehicles() // Use the whole context object
+  const { user } = useAuth() // Need user for registered vehicles
   const navigate = useNavigate()
   const [saving, setSaving] = useState(false)
   const [savedBill, setSavedBill] = useState(null)
@@ -81,6 +83,14 @@ export default function TransportBill() {
       gstPercent: '0', gstType: 'CGST+SGST',
       paymentMode: 'topay',
       notes: 'Grateful for Moving What Matters to You!',
+      holdCharges: {
+        enabled: false,
+        arrivalTime: '',
+        departureTime: '',
+        freeTime: '2',
+        ratePerHour: '200',
+        total: 0
+      }
     }
   })
 
@@ -96,6 +106,7 @@ export default function TransportBill() {
   const detentionCharge = watch('detentionCharge')
   const otherCharge     = watch('otherCharge')
   const gstPercent      = watch('gstPercent')
+  const holdCharges     = watch('holdCharges')
 
   // Auto-fill party details
   const partyId = watch('partyId')
@@ -115,9 +126,57 @@ export default function TransportBill() {
     }
   }, [partyId, parties, setValue])
 
+  // Feature 2: Vehicle Suggestion Logic
+  const vehicles = useMemo(() => {
+    const fleetVehicles = fleet.vehicles || []
+    const userFleet = (user?.vehicles || []).map((v, i) => ({
+      ...v,
+      id: v.id || `reg_${i}_${v.vehicleNo || 'v'}`
+    }))
+    return [...fleetVehicles, ...userFleet]
+  }, [fleet.vehicles, user?.vehicles])
+
+  const handleVehicleSelect = (idx, vehicleId) => {
+    if (!vehicleId) return
+    const v = vehicles.find(x => x.id === vehicleId)
+    if (v) {
+      setValue(`items.${idx}.vehicleNo`, v.vehicleNo || v.number || '')
+      setValue(`items.${idx}.vehicleType`, v.vehicleType || v.type || '')
+      setValue(`items.${idx}.driverName`, v.driverName || '')
+      setValue(`items.${idx}.driverMobile`, v.driverMobile || '')
+    }
+  }
+
+  // Feature 3: Hold Time Calculation
+  const calculatedHoldCharge = useMemo(() => {
+    if (!holdCharges.enabled || !holdCharges.arrivalTime || !holdCharges.departureTime) return 0
+    
+    const arrival = dayjs(`2000-01-01 ${holdCharges.arrivalTime}`)
+    let departure = dayjs(`2000-01-01 ${holdCharges.departureTime}`)
+    
+    // Handle overnight departure
+    if (departure.isBefore(arrival)) {
+      departure = departure.add(1, 'day')
+    }
+    
+    const totalMinutes = departure.diff(arrival, 'minute')
+    const freeMinutes = (parseFloat(holdCharges.freeTime) || 0) * 60
+    const extraMinutes = Math.max(0, totalMinutes - freeMinutes)
+    const extraHours = extraMinutes / 60
+    
+    const charge = extraHours * (parseFloat(holdCharges.ratePerHour) || 0)
+    return Math.round(charge)
+  }, [holdCharges.enabled, holdCharges.arrivalTime, holdCharges.departureTime, holdCharges.freeTime, holdCharges.ratePerHour])
+
+  // Update hold charge total in form
+  useEffect(() => {
+    setValue('holdCharges.total', calculatedHoldCharge)
+  }, [calculatedHoldCharge, setValue])
+
+
   // Totals calculation
   const itemsTotal = (watchedItems || []).reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0)
-  const otherChargesTotal = [loadingCharge, unloadingCharge, detentionCharge, otherCharge]
+  const otherChargesTotal = [loadingCharge, unloadingCharge, detentionCharge, otherCharge, calculatedHoldCharge]
     .reduce((s, v) => s + (parseFloat(v) || 0), 0)
   
   const subtotal = itemsTotal + otherChargesTotal
@@ -395,6 +454,47 @@ export default function TransportBill() {
                       <input type="number" {...register(`items.${index}.amount`)} placeholder="0.00" className="form-input" style={{ fontSize: '0.875rem', height: 42 }} />
                     </div>
                   </Field>
+
+                  {/* Feature 2: Vehicle Suggestion */}
+                  <div style={{ gridColumn: 'span 2', padding: '12px', background: 'white', borderRadius: 14, border: '1px solid #E2E8F0', marginTop: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                      <Truck size={14} color="#7C3AED" />
+                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#4B5563' }}>Vehicle Information</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 gap-3">
+                      <Field label="Select From Fleet (Auto-fill)">
+                        <div style={{ position: 'relative' }}>
+                          <select 
+                            onChange={(e) => handleVehicleSelect(index, e.target.value)}
+                            className="form-input" 
+                            style={{ height: 38, fontSize: '0.8rem', appearance: 'none', paddingRight: 32 }}
+                          >
+                            <option value="">— Select vehicle —</option>
+                            {vehicles.map(v => (
+                              <option key={v.id} value={v.id}>{v.vehicleNo || v.number} ({v.vehicleType || v.type})</option>
+                            ))}
+                          </select>
+                          <ChevronDown size={14} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
+                        </div>
+                      </Field>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <Field label="Vehicle No">
+                          <input {...register(`items.${index}.vehicleNo`)} placeholder="Vehicle No" className="form-input" style={{ height: 36, fontSize: '0.75rem' }} />
+                        </Field>
+                        <Field label="Type">
+                          <input {...register(`items.${index}.vehicleType`)} placeholder="Truck / Tempo" className="form-input" style={{ height: 36, fontSize: '0.75rem' }} />
+                        </Field>
+                        <Field label="Driver Name">
+                          <input {...register(`items.${index}.driverName`)} placeholder="Driver" className="form-input" style={{ height: 36, fontSize: '0.75rem' }} />
+                        </Field>
+                        <Field label="Driver Mobile">
+                          <input {...register(`items.${index}.driverMobile`)} placeholder="Mobile" className="form-input" style={{ height: 36, fontSize: '0.75rem' }} />
+                        </Field>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -412,7 +512,7 @@ export default function TransportBill() {
         {/* ── Other Charges & GST ── */}
         <div className="grid md-grid-cols-2 gap-4">
           <SectionCard icon={FileText} iconBg="#FEE2E2" iconColor="#DC2626" title="Extra Charges">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 mb-4">
               {[
                 { name: 'loadingCharge',   label: 'Loading' },
                 { name: 'unloadingCharge', label: 'Unloading' },
@@ -426,6 +526,57 @@ export default function TransportBill() {
                   </div>
                 </Field>
               ))}
+            </div>
+
+            {/* Feature 3: Tempo Hold Time Charges */}
+            <div style={{ borderTop: '1px dashed #E2E8F0', paddingTop: 14, marginTop: 4 }}>
+              <div 
+                onClick={() => setValue('holdCharges.enabled', !holdCharges.enabled)}
+                style={{ 
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                  cursor: 'pointer', padding: '10px 12px', borderRadius: 12,
+                  background: holdCharges.enabled ? '#F5F3FF' : '#F9FAFB',
+                  border: holdCharges.enabled ? '1.5px solid #DDD6FE' : '1.5px solid #F1F5F9',
+                  transition: '0.2s'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: holdCharges.enabled ? '#7C3AED' : '#E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                    <Clock size={16} />
+                  </div>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 800, color: holdCharges.enabled ? '#5B21B6' : '#6B7280' }}>Add Tempo Hold Time Charges</span>
+                </div>
+                <ChevronDown size={18} style={{ transform: holdCharges.enabled ? 'rotate(180deg)' : 'none', transition: '0.3s', color: '#9CA3AF' }} />
+              </div>
+
+              {holdCharges.enabled && (
+                <div className="animate-fadeIn" style={{ marginTop: 12, padding: 12, background: '#F8FAFC', borderRadius: 16, border: '1px solid #E2E8F0' }}>
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    <Field label="Arrival Time">
+                      <input type="time" {...register('holdCharges.arrivalTime')} className="form-input" style={{ height: 36, fontSize: '0.75rem' }} />
+                    </Field>
+                    <Field label="Departure Time">
+                      <input type="time" {...register('holdCharges.departureTime')} className="form-input" style={{ height: 36, fontSize: '0.75rem' }} />
+                    </Field>
+                    <Field label="Free Time (Hrs)">
+                      <input type="number" {...register('holdCharges.freeTime')} className="form-input" style={{ height: 36, fontSize: '0.75rem' }} />
+                    </Field>
+                    <Field label="Rate / Hr (₹)">
+                      <input type="number" {...register('holdCharges.ratePerHour')} className="form-input" style={{ height: 36, fontSize: '0.75rem' }} />
+                    </Field>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px', background: 'white', borderRadius: 10, border: '1px solid #E2E8F0' }}>
+                    <div>
+                      <div style={{ fontSize: '0.65rem', color: '#6B7280', fontWeight: 600 }}>Calculated Hold Charge</div>
+                      <div style={{ fontSize: '1rem', fontWeight: 900, color: '#111827' }}>₹{calculatedHoldCharge || 0}</div>
+                    </div>
+                    {calculatedHoldCharge > 0 && (
+                      <div style={{ fontSize: '0.6rem', background: '#DCFCE7', color: '#16A34A', padding: '3px 8px', borderRadius: 100, fontWeight: 700 }}>APPLIED</div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </SectionCard>
 
@@ -448,6 +599,12 @@ export default function TransportBill() {
                 <span>Subtotal</span>
                 <span>₹{subtotal.toFixed(2)}</span>
               </div>
+              {calculatedHoldCharge > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: '0.875rem', color: '#facc15' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Clock size={12} /> Hold Time Charges</span>
+                  <span>₹{calculatedHoldCharge.toFixed(2)}</span>
+                </div>
+              )}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)' }}>
                 <span>GST Amount</span>
                 <span>₹{gstAmount.toFixed(2)}</span>
